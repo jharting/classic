@@ -1,0 +1,135 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>seam-classic-parent</artifactId>
+        <groupId>org.jboss.seam.classic</groupId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>seam-classic-impl</artifactId>
+    <groupId>org.jboss.seam.classic</groupId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Seam Classic Implementation</name>
+    <url>http://seamframework.org/</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss.seam.classic</groupId>
+            <artifactId>seam-classic-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.seam.solder</groupId>
+            <artifactId>seam-solder</artifactId>
+            <version>3.0.1-SNAPSHOT</version> <!-- TODO -->
+        </dependency>
+        
+        <!-- JEE API -->
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.jboss.arquillian</groupId>
+            <artifactId>arquillian-junit</artifactId>
+            <version>1.0.0.Alpha5</version><!-- TODO -->
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>r09</version> <!-- TODO -->
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.arquillian.container</groupId>
+                    <artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
+                    <scope>test</scope>
+                    <version>1.0.0.Alpha5</version><!-- TODO -->
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.weld</groupId>
+                    <artifactId>weld-core</artifactId>
+                    <scope>test</scope>
+                    <version>1.1.0.Final</version><!-- TODO -->
+                </dependency>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                    <scope>test</scope>
+                    <version>1.5.10</version><!-- TODO -->
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.spec.javax.ejb</groupId>
+                    <artifactId>jboss-ejb-api_3.1_spec</artifactId>
+                    <scope>test</scope>
+                    <version>1.0.0.Final</version><!-- TODO -->
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.spec.javax.transaction</groupId>
+                    <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+                    <scope>test</scope>
+                    <version>1.0.0.Final</version><!-- TODO -->
+                </dependency>
+                <dependency>
+                    <groupId>org.hibernate.javax.persistence</groupId>
+                    <artifactId>hibernate-jpa-2.0-api</artifactId>
+                    <scope>test</scope>
+                    <version>1.0.0.Final</version><!-- TODO -->
+                </dependency>
+                <dependency>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <scope>test</scope>
+                    <version>1.0.0.GA</version><!-- TODO -->
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.spec.javax.el</groupId>
+                    <artifactId>jboss-el-api_2.2_spec</artifactId>
+                    <scope>test</scope>
+                    <version>1.0.0.Final</version><!-- TODO -->
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jbossas-remote-6</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.jbossas</groupId>
+                    <artifactId>jboss-as-profileservice-client</artifactId>
+                    <version>6.0.0.Final</version><!-- TODO -->
+                    <type>pom</type>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.arquillian.container</groupId>
+                    <artifactId>arquillian-jbossas-remote-6</artifactId>
+                    <version>1.0.0.Alpha5</version><!-- TODO -->
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+</project>
