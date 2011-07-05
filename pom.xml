@@ -21,10 +21,10 @@
         <seam.version>3.0.0.Final</seam.version>
     </properties>
 
-<!--    <modules>
+    <modules>
         <module>api</module>
         <module>impl</module>
-    </modules>-->
+    </modules>
 
     <dependencyManagement>
         <dependencies>

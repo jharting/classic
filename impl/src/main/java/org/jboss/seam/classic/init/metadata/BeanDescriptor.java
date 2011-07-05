@@ -10,6 +10,7 @@ import org.jboss.seam.annotations.AutoCreate;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.Role;
 import org.jboss.seam.annotations.Roles;
 import org.jboss.seam.annotations.Scope;
@@ -59,7 +60,21 @@ public class BeanDescriptor {
         for (Method method : javaClass.getDeclaredMethods()) {
             if (method.isAnnotationPresent(Factory.class)) {
                 Factory factory = method.getAnnotation(Factory.class);
-                factories.add(new FactoryDescriptor(factory.value(), factory.scope(), factory.autoCreate(), this, method));
+                if (method.getReturnType().equals(void.class)) // void @Factory
+                {
+                    Field field = findFieldAssociatedWithFactoryMethod(javaClass, factory.value());
+                    if (field == null)
+                    {
+                        throw new RuntimeException(); // TODO replace with something meaningful 
+                    }
+                    Out out = field.getAnnotation(Out.class);
+                    factories.add(new FactoryDescriptor(factory.value(), out.scope(), factory.autoCreate(), this, method, field));
+                }
+                else // regular @Factory
+                {
+                    factories.add(new FactoryDescriptor(factory.value(), factory.scope(), factory.autoCreate(), this, method));
+                }
+                
             }
         }
 
@@ -74,6 +89,27 @@ public class BeanDescriptor {
                 injectionPoints.add(new InjectionPointDescriptor(this, name, in.create(), in.required(), in.scope(), field));
             }
         }
+    }
+    
+    private Field findFieldAssociatedWithFactoryMethod(Class<?> javaClass, String name)
+    {
+        for (Field field : javaClass.getDeclaredFields())
+        {
+            if (field.isAnnotationPresent(Out.class))
+            {
+                Out out = field.getAnnotation(Out.class);
+                if (out.value().equals(name))
+                {
+                    return field;
+                }
+                if (out.value().equals("") && field.getName().equals(name))
+                {
+                    return field;
+                }
+                
+            }
+        }
+        return null;
     }
 
     public Class<?> getJavaClass() {

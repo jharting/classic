@@ -4,26 +4,19 @@ import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.ejb.Stateful;
-import javax.ejb.Stateless;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.ObserverMethod;
-import javax.persistence.Entity;
 
-import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Destroy;
 import org.jboss.seam.classic.init.metadata.BeanDescriptor;
+import org.jboss.seam.classic.init.metadata.FactoryDescriptor;
 import org.jboss.seam.classic.init.metadata.RoleDescriptor;
 import org.jboss.seam.classic.init.redefiners.CreateAnnotationRedefiner;
 import org.jboss.seam.classic.init.redefiners.DestroyAnnotationRedefiner;
-import org.jboss.seam.solder.literal.ApplicationScopedLiteral;
-import org.jboss.seam.solder.literal.ConversationScopedLiteral;
-import org.jboss.seam.solder.literal.DependentLiteral;
 import org.jboss.seam.solder.literal.NamedLiteral;
-import org.jboss.seam.solder.literal.RequestScopedLiteral;
-import org.jboss.seam.solder.literal.SessionScopedLiteral;
 import org.jboss.seam.solder.reflection.annotated.AnnotatedTypeBuilder;
 
 public class ClassicBeanTransformer {
@@ -31,8 +24,8 @@ public class ClassicBeanTransformer {
     private Set<AnnotatedType<?>> annotatedTypesToRegister = new HashSet<AnnotatedType<?>>();
     private Set<Bean<?>> producerMethodsToRegister = new HashSet<Bean<?>>();
     private Set<ObserverMethod<?>> observerMethodsToRegister = new HashSet<ObserverMethod<?>>();
-    
-    public void processLegacyBeans(Set<BeanDescriptor> beans) {
+
+    public void processLegacyBeans(Set<BeanDescriptor> beans, BeanManager manager) {
         // TODO process @Install
 
         for (BeanDescriptor bean : beans) {
@@ -41,54 +34,34 @@ public class ClassicBeanTransformer {
                 // Set name
                 builder.addToClass(new NamedLiteral(role.getName()));
                 // Set scope
-                Annotation scope = transformScope(role.getScope(), bean.getJavaClass());
+                Annotation scope = ScopeUtils.transformBeanScope(role.getScope(), bean.getJavaClass());
                 builder.addToClass(scope);
                 // Process annotation redefiners
                 builder.redefine(Create.class, new CreateAnnotationRedefiner());
                 builder.redefine(Destroy.class, new DestroyAnnotationRedefiner());
 
-                // TODO producer methods
+                for (FactoryDescriptor factory : bean.getFactories()) {
+                    Class<? extends Annotation> factoryScope = ScopeUtils.transformFactoryScope(factory.getScope(),
+                            role.getScope(), bean.getJavaClass()).annotationType();
+                    producerMethodsToRegister.add(createClassicFactory(factory, factory.getProductType(), factoryScope,
+                            role.getName(), manager));
+                }
+
                 // TODO observer methods
                 // TODO interceptors
-                
+
                 annotatedTypesToRegister.add(builder.create());
             }
         }
     }
 
-    private <T> AnnotatedTypeBuilder<T> createAnnotatedTypeBuilder(Class<T> javaClass) {
-        return new AnnotatedTypeBuilder<T>().readFromType(javaClass);
+    private <T> ClassicFactory<T> createClassicFactory(FactoryDescriptor descriptor, Class<T> beanClass,
+            Class<? extends Annotation> scope, String hostName, BeanManager manager) {
+        return new ClassicFactory<T>(descriptor, beanClass, scope, hostName, manager);
     }
 
-    private Annotation transformScope(ScopeType scope, Class<?> javaClass) {
-        switch (scope) {
-            case STATELESS:
-                return new DependentLiteral();
-            case METHOD:
-                throw new UnsupportedOperationException("Scope not supported"); // TODO
-            case EVENT:
-                return new RequestScopedLiteral();
-            case PAGE:
-                throw new UnsupportedOperationException("Scope not supported"); // TODO
-            case CONVERSATION:
-                return new ConversationScopedLiteral();
-            case SESSION:
-                return new SessionScopedLiteral();
-            case APPLICATION:
-                return new ApplicationScopedLiteral();
-            case BUSINESS_PROCESS:
-                throw new UnsupportedOperationException("Scope not supported"); // TODO
-            case UNSPECIFIED:
-                if (javaClass.isAnnotationPresent(Stateful.class) || javaClass.isAnnotationPresent(Entity.class)) {
-                    return new ConversationScopedLiteral();
-                } else if (javaClass.isAnnotationPresent(Stateless.class)) {
-                    return new DependentLiteral();
-                } else {
-                    return new RequestScopedLiteral();
-                }
-            default:
-                throw new IllegalStateException();
-        }
+    private <T> AnnotatedTypeBuilder<T> createAnnotatedTypeBuilder(Class<T> javaClass) {
+        return new AnnotatedTypeBuilder<T>().readFromType(javaClass);
     }
 
     public Set<AnnotatedType<?>> getAnnotatedTypesToRegister() {

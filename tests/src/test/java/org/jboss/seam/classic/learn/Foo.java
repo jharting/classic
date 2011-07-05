@@ -8,12 +8,19 @@ import org.jboss.seam.annotations.Scope;
 
 @Name("foo")
 @Scope(ScopeType.EVENT)
-@Role(name = "foo2", scope = ScopeType.APPLICATION)
+//@Role(name = "foo2", scope = ScopeType.APPLICATION)
 public class Foo {
 
     @Factory("bar")
     public String bar()
     {
-        return "bar";
+        return null;
+//        return "bar";
+    }
+    
+    @Factory("baz")
+    public void baz()
+    {
+        
     }
 }

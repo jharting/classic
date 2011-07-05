@@ -17,6 +17,11 @@
     <name>Seam Classic Implementation</name>
     <url>http://seamframework.org/</url>
 
+    <properties>
+        <shrinkwrap.version>1.0.0-alpha-12</shrinkwrap.version>
+        <scannotation.version>1.1-SNAPSHOT</scannotation.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.jboss.seam.classic</groupId>
@@ -28,7 +33,7 @@
             <artifactId>seam-solder</artifactId>
             <version>3.0.1-SNAPSHOT</version> <!-- TODO -->
         </dependency>
-        
+
         <!-- JEE API -->
         <dependency>
             <groupId>javax.enterprise</groupId>
@@ -36,11 +41,39 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.spec.javax.ejb</groupId>
+            <artifactId>jboss-ejb-api_3.1_spec</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.scannotation</groupId>
+            <artifactId>scannotation</artifactId>
+            <version>${scannotation.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scannotation</groupId>
+            <artifactId>scannotation-vfs</artifactId>
+            <version>${scannotation.version}</version>
+        </dependency>
+
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.jboss.arquillian</groupId>
             <artifactId>arquillian-junit</artifactId>
             <version>1.0.0.Alpha5</version><!-- TODO -->
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.resolver</groupId>
+            <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+            <version>${shrinkwrap.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -82,20 +115,8 @@
                     <version>1.5.10</version><!-- TODO -->
                 </dependency>
                 <dependency>
-                    <groupId>org.jboss.spec.javax.ejb</groupId>
-                    <artifactId>jboss-ejb-api_3.1_spec</artifactId>
-                    <scope>test</scope>
-                    <version>1.0.0.Final</version><!-- TODO -->
-                </dependency>
-                <dependency>
                     <groupId>org.jboss.spec.javax.transaction</groupId>
                     <artifactId>jboss-transaction-api_1.1_spec</artifactId>
-                    <scope>test</scope>
-                    <version>1.0.0.Final</version><!-- TODO -->
-                </dependency>
-                <dependency>
-                    <groupId>org.hibernate.javax.persistence</groupId>
-                    <artifactId>hibernate-jpa-2.0-api</artifactId>
                     <scope>test</scope>
                     <version>1.0.0.Final</version><!-- TODO -->
                 </dependency>
