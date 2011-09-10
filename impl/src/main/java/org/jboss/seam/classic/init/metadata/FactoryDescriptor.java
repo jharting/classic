@@ -71,4 +71,12 @@ public class FactoryDescriptor {
     {
         return field != null;
     }
+
+    @Override
+    public String toString() {
+        return "FactoryDescriptor [name=" + name + ", scope=" + scope + ", autoCreate=" + autoCreate + ", bean=" + bean
+                + ", method=" + method + ", field=" + field + ", productType=" + productType + "]";
+    }
+    
+    
 }

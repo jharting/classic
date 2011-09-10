@@ -13,7 +13,8 @@ public class InjectionPointDescriptor {
     private ScopeType scope;
     private Field field;
 
-    public InjectionPointDescriptor(BeanDescriptor bean, String name, boolean create, boolean required, ScopeType scope, Field field) {
+    public InjectionPointDescriptor(BeanDescriptor bean, String name, boolean create, boolean required, ScopeType scope,
+            Field field) {
         this.bean = bean;
         this.name = name;
         this.create = create;
@@ -45,4 +46,11 @@ public class InjectionPointDescriptor {
     public Field getField() {
         return field;
     }
+
+    @Override
+    public String toString() {
+        return "InjectionPointDescriptor [bean=" + bean + ", name=" + name + ", create=" + create + ", required=" + required
+                + ", scope=" + scope + ", field=" + field + "]";
+    }
+
 }

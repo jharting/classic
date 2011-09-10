@@ -19,4 +19,9 @@ public class RoleDescriptor {
     public ScopeType getScope() {
         return scope;
     }
+
+    @Override
+    public String toString() {
+        return "RoleDescriptor [name=" + name + ", scope=" + scope + "]";
+    }
 }

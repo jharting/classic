@@ -151,4 +151,10 @@ public class BeanDescriptor {
     public void setJavaClass(Class<?> javaClass) {
         this.javaClass = javaClass;
     }
+
+    @Override
+    public String toString() {
+        return "BeanDescriptor [javaClass=" + javaClass + ", autoCreate=" + autoCreate + ", roles=" + roles + ", factories="
+                + factories + ", injectionPoints=" + injectionPoints + "]";
+    }
 }
