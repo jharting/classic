@@ -18,8 +18,13 @@
     <url>http://seamframework.org/</url>
 
     <properties>
-        <shrinkwrap.version>1.0.0-alpha-12</shrinkwrap.version>
+        <arquillian.version>1.0.0.CR3</arquillian.version>
+        <arquillian.jbossas6.version>1.0.0.CR1</arquillian.jbossas6.version>
+        <shrinkwrap.resolver.version>1.0.0-beta-5</shrinkwrap.resolver.version>
         <scannotation.version>1.1-SNAPSHOT</scannotation.version>
+        <jbossas6.version>6.1.0.Final</jbossas6.version>
+        <jbossas7.version>7.0.1.Final</jbossas7.version>
+        <seam.solder.version>3.1.0-SNAPSHOT</seam.solder.version>
     </properties>
 
     <dependencies>
@@ -31,7 +36,12 @@
         <dependency>
             <groupId>org.jboss.seam.solder</groupId>
             <artifactId>seam-solder</artifactId>
-            <version>3.0.1-SNAPSHOT</version> <!-- TODO -->
+            <version>${seam.solder.version}</version> 
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.seam.solder</groupId>
+            <artifactId>seam-solder-api</artifactId>
+            <version>${seam.solder.version}</version> 
         </dependency>
 
         <!-- JEE API -->
@@ -65,15 +75,15 @@
 
         <!-- Test dependencies -->
         <dependency>
-            <groupId>org.jboss.arquillian</groupId>
-            <artifactId>arquillian-junit</artifactId>
-            <version>1.0.0.Alpha5</version><!-- TODO -->
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-container</artifactId>
             <scope>test</scope>
+            <version>${arquillian.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jboss.shrinkwrap.resolver</groupId>
             <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-            <version>${shrinkwrap.version}</version>
+            <version>${shrinkwrap.resolver.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -90,65 +100,66 @@
     </dependencies>
 
     <profiles>
+        <!-- <profile> -->
+        <!-- <id>default</id> -->
+        <!-- <activation> -->
+        <!-- <activeByDefault>true</activeByDefault> -->
+        <!-- </activation> -->
+        <!-- <dependencies> -->
+        <!-- <dependency> -->
+        <!-- <groupId>org.jboss.arquillian.container</groupId> -->
+        <!-- <artifactId>arquillian-weld-ee-embedded-1.1</artifactId> -->
+        <!-- <scope>test</scope> -->
+        <!-- <version>${arquillian.version}</version> -->
+        <!-- </dependency> -->
+        <!-- <dependency> -->
+        <!-- <groupId>org.jboss.weld</groupId> -->
+        <!-- <artifactId>weld-core</artifactId> -->
+        <!-- <scope>test</scope> -->
+        <!-- <version>1.1.0.Final</version>TODO -->
+        <!-- </dependency> -->
+        <!-- <dependency> -->
+        <!-- <groupId>org.slf4j</groupId> -->
+        <!-- <artifactId>slf4j-simple</artifactId> -->
+        <!-- <scope>test</scope> -->
+        <!-- <version>1.5.10</version>TODO -->
+        <!-- </dependency> -->
+        <!-- <dependency> -->
+        <!-- <groupId>org.jboss.spec</groupId> -->
+        <!-- <artifactId>jboss-javaee-6.0</artifactId> -->
+        <!-- <scope>test</scope> -->
+        <!-- <type>pom</type> -->
+        <!-- </dependency> -->
+        <!-- </dependencies> -->
+        <!-- </profile> -->
         <profile>
-            <id>default</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.jboss.arquillian.container</groupId>
-                    <artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
-                    <scope>test</scope>
-                    <version>1.0.0.Alpha5</version><!-- TODO -->
-                </dependency>
-                <dependency>
-                    <groupId>org.jboss.weld</groupId>
-                    <artifactId>weld-core</artifactId>
-                    <scope>test</scope>
-                    <version>1.1.0.Final</version><!-- TODO -->
-                </dependency>
-                <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-simple</artifactId>
-                    <scope>test</scope>
-                    <version>1.5.10</version><!-- TODO -->
-                </dependency>
-                <dependency>
-                    <groupId>org.jboss.spec.javax.transaction</groupId>
-                    <artifactId>jboss-transaction-api_1.1_spec</artifactId>
-                    <scope>test</scope>
-                    <version>1.0.0.Final</version><!-- TODO -->
-                </dependency>
-                <dependency>
-                    <groupId>javax.validation</groupId>
-                    <artifactId>validation-api</artifactId>
-                    <scope>test</scope>
-                    <version>1.0.0.GA</version><!-- TODO -->
-                </dependency>
-                <dependency>
-                    <groupId>org.jboss.spec.javax.el</groupId>
-                    <artifactId>jboss-el-api_2.2_spec</artifactId>
-                    <scope>test</scope>
-                    <version>1.0.0.Final</version><!-- TODO -->
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>jbossas-remote-6</id>
             <dependencies>
                 <dependency>
                     <groupId>org.jboss.jbossas</groupId>
                     <artifactId>jboss-as-profileservice-client</artifactId>
-                    <version>6.0.0.Final</version><!-- TODO -->
+                    <version>${jbossas6.version}</version>
                     <type>pom</type>
                     <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.jboss.arquillian.container</groupId>
                     <artifactId>arquillian-jbossas-remote-6</artifactId>
-                    <version>1.0.0.Alpha5</version><!-- TODO -->
+                    <version>${arquillian.jbossas6.version}</version>
                     <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jbossas-remote-7</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.as</groupId>
+                    <artifactId>jboss-as-arquillian-container-remote</artifactId>
+                    <version>${jbossas7.version}</version>
                 </dependency>
             </dependencies>
         </profile>

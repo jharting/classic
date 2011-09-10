@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.jboss.seam.solder.logging.Logger;
+import org.jboss.seam.logging.Logger;
 import org.scannotation.AnnotationDB;
 
 public class ScannotationScanner {

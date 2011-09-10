@@ -5,6 +5,7 @@ import javax.enterprise.inject.spi.Extension;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.classic.init.SeamClassicExtension;
+import org.jboss.seam.classic.runtime.BijectionInterceptor;
 import org.jboss.seam.classic.util.literals.PreDestroyLiteral;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -15,11 +16,16 @@ public class Archives {
 
     public static JavaArchive createSeamClassic() {
         return ShrinkWrap.create(JavaArchive.class, "seam-classic.jar")
-                .addPackages(true, SeamClassicExtension.class.getPackage()) // org.jboss.seam.classic.init
-                .addPackages(true, PreDestroyLiteral.class.getPackage()) // org.jboss.seam.classic.util.literal
-                .addPackages(false, ScopeType.class.getPackage()).addPackages(true, Name.class.getPackage())
+                .addPackages(true, SeamClassicExtension.class.getPackage())
+                // org.jboss.seam.classic.init
+                .addPackage(BijectionInterceptor.class.getPackage())
+                // org.jboss.seam.classic.runtime
+                .addPackages(true, PreDestroyLiteral.class.getPackage())
+                // org.jboss.seam.classic.util.literal
+                .addPackage(ScopeType.class.getPackage()).addPackages(true, Name.class.getPackage())
+                // api
                 .addAsServiceProvider(Extension.class, SeamClassicExtension.class)
-                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+                .addAsManifestResource("META-INF/beans.xml", "beans.xml");
     }
 
     public static JavaArchive createSeamJar(String name, Class<?>... classes) {
@@ -36,10 +42,11 @@ public class Archives {
                 .addClasses(classes);
         // beans.xml should not be required, but we bundle it since we want CDI to be enabled for tests
         war.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
-        
+
         if (bundleSeamClassic) {
             war.addAsLibrary(createSeamClassic()).addAsLibraries(Dependencies.SEAM_SOLDER)
-                    .addAsLibraries(Dependencies.SCANNOTATION).addAsLibraries(Dependencies.SCANNOTATION_VFS);
+                    .addAsLibraries(Dependencies.SCANNOTATION).addAsLibraries(Dependencies.SCANNOTATION_VFS)
+                    .addAsLibraries(Dependencies.GUAVA);
         }
         return war;
     }

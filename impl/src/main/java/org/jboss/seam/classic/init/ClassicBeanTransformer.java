@@ -16,9 +16,16 @@ import org.jboss.seam.classic.init.metadata.FactoryDescriptor;
 import org.jboss.seam.classic.init.metadata.RoleDescriptor;
 import org.jboss.seam.classic.init.redefiners.CreateAnnotationRedefiner;
 import org.jboss.seam.classic.init.redefiners.DestroyAnnotationRedefiner;
+import org.jboss.seam.classic.runtime.BijectionInterceptor;
 import org.jboss.seam.solder.literal.NamedLiteral;
 import org.jboss.seam.solder.reflection.annotated.AnnotatedTypeBuilder;
 
+/**
+ * This class is responsible for transforming metadata gathered during the scanning phase to CDI SPI objects.
+ * 
+ * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * 
+ */
 public class ClassicBeanTransformer {
 
     private Set<AnnotatedType<?>> annotatedTypesToRegister = new HashSet<AnnotatedType<?>>();
@@ -49,6 +56,11 @@ public class ClassicBeanTransformer {
 
                 // TODO observer methods
                 // TODO interceptors
+                // TODO producer fields
+
+                // Register interceptors
+                // TODO: take @BypassInterceptors into account
+                registerInterceptors(builder);
 
                 annotatedTypesToRegister.add(builder.create());
             }
@@ -62,6 +74,10 @@ public class ClassicBeanTransformer {
 
     private <T> AnnotatedTypeBuilder<T> createAnnotatedTypeBuilder(Class<T> javaClass) {
         return new AnnotatedTypeBuilder<T>().readFromType(javaClass);
+    }
+
+    private <T> void registerInterceptors(AnnotatedTypeBuilder<T> builder) {
+        builder.addToClass(BijectionInterceptor.Bijected.BijectedLiteral.INSTANCE);
     }
 
     public Set<AnnotatedType<?>> getAnnotatedTypesToRegister() {
