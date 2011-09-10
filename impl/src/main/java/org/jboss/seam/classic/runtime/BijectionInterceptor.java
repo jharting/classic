@@ -22,7 +22,7 @@ import javax.interceptor.Interceptor;
 import javax.interceptor.InterceptorBinding;
 import javax.interceptor.InvocationContext;
 
-import org.jboss.seam.classic.init.SeamClassicExtension;
+import org.jboss.seam.RequiredException;
 import org.jboss.seam.classic.init.metadata.BeanDescriptor;
 import org.jboss.seam.classic.init.metadata.InjectionPointDescriptor;
 import org.jboss.seam.solder.reflection.Reflections;
@@ -34,14 +34,19 @@ public class BijectionInterceptor implements Serializable {
     private static final long serialVersionUID = -2311065357544463370L;
 
     @Inject
-    private SeamClassicExtension extension;
+    private MetadataRegistry registry;
     @Inject
     private BeanManager manager;
-    private Set<InjectionPointDescriptor> injectionPoints;
+
+    private BeanDescriptor descriptor;
+
+    public BijectionInterceptor() {
+
+    }
 
     @PostConstruct
     public void postConstruct(InvocationContext ctx) {
-        initInjectionPointDescriptors(ctx);
+        init(ctx);
 
         inject(ctx.getTarget());
 
@@ -58,8 +63,8 @@ public class BijectionInterceptor implements Serializable {
 
     @AroundInvoke
     public Object aroundInvoke(InvocationContext ctx) throws Exception {
-        if (injectionPoints == null) {
-            initInjectionPointDescriptors(ctx);
+        if (descriptor == null) {
+            init(ctx);
         }
 
         inject(ctx.getTarget());
@@ -67,27 +72,17 @@ public class BijectionInterceptor implements Serializable {
         return ctx.proceed();
     }
 
-    protected void initInjectionPointDescriptors(InvocationContext ctx) {
+    protected void init(InvocationContext ctx) {
 
         Class<?> targetClass = ctx.getTarget().getClass();
-        Collection<BeanDescriptor> descriptors = extension.getDescriptorsByClass(targetClass);
-        if (descriptors.isEmpty()) {
-            // let's try again with superclass since the original class might have been a subclass which CDI implementation
-            // uses to implement interceptors and decorators
-            descriptors = extension.getDescriptorsByClass(targetClass.getSuperclass());
-            if (descriptors.isEmpty()) {
-                throw new IllegalStateException(targetClass + " is not a Seam bean.");
-            }
-        }
-
+        Collection<BeanDescriptor> descriptors = registry.getBeanDescriptorsByClass(targetClass, true);
         // since all the bean descriptors share the same class, any is OK for us
-        BeanDescriptor descriptor = descriptors.iterator().next();
-        injectionPoints = descriptor.getInjectionPoints();
+        descriptor = descriptors.iterator().next();
     }
 
     protected void inject(Object target) {
-        for (InjectionPointDescriptor injectionPoint : injectionPoints) {
-            BeanDescriptor candidate = extension.getDescriptor(injectionPoint.getName());
+        for (InjectionPointDescriptor injectionPoint : descriptor.getInjectionPoints()) {
+            BeanDescriptor candidate = registry.getBeanDescriptorByName(injectionPoint.getName());
 
             Set<Bean<?>> beans = manager.getBeans(injectionPoint.getName());
             Bean<?> bean = manager.resolve(beans);
@@ -97,10 +92,7 @@ public class BijectionInterceptor implements Serializable {
             // TODO: check OutjectedValueHolder
 
             if (injectionPoint.isCreate() || (candidate != null && candidate.isAutoCreate())) {
-                if (bean == null) {
-                    // TODO: ?
-                    // throw exception
-                } else {
+                if (bean != null) {
                     CreationalContext<?> ctx = manager.createCreationalContext(bean);
                     object = manager.getReference(bean, injectionPoint.getField().getType(), ctx);
                 }
@@ -114,7 +106,8 @@ public class BijectionInterceptor implements Serializable {
             if (object != null) {
                 Reflections.setFieldValue(true, injectionPoint.getField(), target, object);
             } else if (injectionPoint.isRequired()) {
-                // TODO: throw exception
+                throw new RequiredException("@In attribute requires non-null value: " + descriptor.getJavaClass() + "."
+                        + injectionPoint.getField().getName());
             }
         }
     }

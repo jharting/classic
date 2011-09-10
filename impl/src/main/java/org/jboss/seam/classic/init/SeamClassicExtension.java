@@ -1,9 +1,6 @@
 package org.jboss.seam.classic.init;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.event.Observes;
@@ -17,21 +14,14 @@ import javax.enterprise.inject.spi.ProcessAnnotatedType;
 
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.classic.init.metadata.BeanDescriptor;
-import org.jboss.seam.classic.init.metadata.RoleDescriptor;
 import org.jboss.seam.classic.init.scan.ScannotationScanner;
 import org.jboss.seam.logging.Logger;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 
 public class SeamClassicExtension implements Extension {
 
     private static final Logger log = Logger.getLogger(SeamClassicExtension.class);
 
-    // TODO move into MetadataRegistry
     private Set<BeanDescriptor> descriptors = new HashSet<BeanDescriptor>();
-    private Multimap<Class<?>, BeanDescriptor> descriptorsByClass = HashMultimap.create();
-    private Map<String, BeanDescriptor> descriptorsByName = new HashMap<String, BeanDescriptor>();
 
     private ClassicBeanTransformer beanTransformer = new ClassicBeanTransformer();
 
@@ -48,17 +38,10 @@ public class SeamClassicExtension implements Extension {
         }
 
         // TODO: reduce allDescriptors by processing @Install
+        
+        descriptors = enabledDescriptors;
 
         // TODO: process XML configuration
-
-        // prepare metadata registry for easy lookup at runtime
-        this.descriptors = enabledDescriptors;
-        for (BeanDescriptor descriptor : enabledDescriptors) {
-            descriptorsByClass.put(descriptor.getJavaClass(), descriptor);
-            for (RoleDescriptor role : descriptor.getRoles()) {
-                descriptorsByName.put(role.getName(), descriptor);
-            }
-        }
 
         beanTransformer.processLegacyBeans(descriptors, manager);
         Set<AnnotatedType<?>> annotatedTypes = beanTransformer.getAnnotatedTypesToRegister();
@@ -88,13 +71,5 @@ public class SeamClassicExtension implements Extension {
 
     public Set<BeanDescriptor> getDescriptors() {
         return descriptors;
-    }
-
-    public Collection<BeanDescriptor> getDescriptorsByClass(Class<?> javaClass) {
-        return descriptorsByClass.get(javaClass);
-    }
-
-    public BeanDescriptor getDescriptor(String name) {
-        return descriptorsByName.get(name);
     }
 }

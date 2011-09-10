@@ -10,11 +10,11 @@ public class Alpha {
     private Bravo bravo;
     @In(value = "charlie", create = true)
     private Charlie ch;
-    @In
+    @In(required = false)
     private Delta delta; // should be null as create is false by default
     @In
     private Echo echo; // Echo has @AutoCreate
-    @In
+    @In(required = false)
     private Foxtrot foxtrot;
     @In
     private CyclicBean1 cyclicBean1;
