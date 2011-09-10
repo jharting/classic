@@ -22,6 +22,7 @@ import javax.interceptor.Interceptor;
 import javax.interceptor.InterceptorBinding;
 import javax.interceptor.InvocationContext;
 
+import org.jboss.seam.InstantiationException;
 import org.jboss.seam.RequiredException;
 import org.jboss.seam.classic.init.metadata.BeanDescriptor;
 import org.jboss.seam.classic.init.metadata.InjectionPointDescriptor;
@@ -44,6 +45,13 @@ public class BijectionInterceptor implements Serializable {
 
     }
 
+    protected void init(InvocationContext ctx) {
+        Class<?> targetClass = ctx.getTarget().getClass();
+        Collection<BeanDescriptor> descriptors = registry.getBeanDescriptorsByClass(targetClass, true);
+        // since all the bean descriptors share the same class, any is OK for us
+        descriptor = descriptors.iterator().next();
+    }
+    
     @PostConstruct
     public void postConstruct(InvocationContext ctx) {
         init(ctx);
@@ -54,7 +62,7 @@ public class BijectionInterceptor implements Serializable {
         try {
             ctx.proceed();
         } catch (Exception e) {
-            // TODO: throw something
+            throw new InstantiationException("Could not instantiate Seam component: " + descriptor.getJavaClass(), e);
         }
 
         // TODO: outject
@@ -72,13 +80,6 @@ public class BijectionInterceptor implements Serializable {
         return ctx.proceed();
     }
 
-    protected void init(InvocationContext ctx) {
-
-        Class<?> targetClass = ctx.getTarget().getClass();
-        Collection<BeanDescriptor> descriptors = registry.getBeanDescriptorsByClass(targetClass, true);
-        // since all the bean descriptors share the same class, any is OK for us
-        descriptor = descriptors.iterator().next();
-    }
 
     protected void inject(Object target) {
         for (InjectionPointDescriptor injectionPoint : descriptor.getInjectionPoints()) {
