@@ -15,13 +15,14 @@ import org.jboss.seam.annotations.Role;
 import org.jboss.seam.annotations.Roles;
 import org.jboss.seam.annotations.Scope;
 
-public class BeanDescriptor {
+public class BeanDescriptor implements ManagedInstanceDescriptor{
 
     private Class<?> javaClass;
     private boolean autoCreate;
     private Set<RoleDescriptor> roles = new HashSet<RoleDescriptor>();
     private Set<FactoryDescriptor> factories = new HashSet<FactoryDescriptor>();
     private Set<InjectionPointDescriptor> injectionPoints = new HashSet<InjectionPointDescriptor>();
+    private Set<OutjectionPointDescriptor> outjectionPoints = new HashSet<OutjectionPointDescriptor>();
 
     public BeanDescriptor(Class<?> javaClass) {
         if (!javaClass.isAnnotationPresent(Name.class)) {
@@ -63,18 +64,17 @@ public class BeanDescriptor {
                 if (method.getReturnType().equals(void.class)) // void @Factory
                 {
                     Field field = findFieldAssociatedWithFactoryMethod(javaClass, factory.value());
-                    if (field == null)
-                    {
-                        throw new RuntimeException(); // TODO replace with something meaningful 
+                    if (field == null) {
+                        throw new RuntimeException(); // TODO replace with something meaningful
                     }
                     Out out = field.getAnnotation(Out.class);
-                    factories.add(new FactoryDescriptor(factory.value(), out.scope(), factory.autoCreate(), this, method, field));
-                }
-                else // regular @Factory
+                    factories
+                            .add(new FactoryDescriptor(factory.value(), out.scope(), factory.autoCreate(), this, method, field));
+                } else // regular @Factory
                 {
                     factories.add(new FactoryDescriptor(factory.value(), factory.scope(), factory.autoCreate(), this, method));
                 }
-                
+
             }
         }
 
@@ -89,24 +89,31 @@ public class BeanDescriptor {
                 injectionPoints.add(new InjectionPointDescriptor(this, name, in.create(), in.required(), in.scope(), field));
             }
         }
-    }
-    
-    private Field findFieldAssociatedWithFactoryMethod(Class<?> javaClass, String name)
-    {
-        for (Field field : javaClass.getDeclaredFields())
-        {
-            if (field.isAnnotationPresent(Out.class))
-            {
+
+        // Register @Out
+        for (Field field : javaClass.getDeclaredFields()) {
+            if (field.isAnnotationPresent(Out.class)) {
                 Out out = field.getAnnotation(Out.class);
-                if (out.value().equals(name))
-                {
+                String name = out.value();
+                if ("".equals(name)) {
+                    name = field.getName();
+                }
+                outjectionPoints.add(new OutjectionPointDescriptor(this, name, out.required(), out.scope(), field));
+            }
+        }
+    }
+
+    private Field findFieldAssociatedWithFactoryMethod(Class<?> javaClass, String name) {
+        for (Field field : javaClass.getDeclaredFields()) {
+            if (field.isAnnotationPresent(Out.class)) {
+                Out out = field.getAnnotation(Out.class);
+                if (out.value().equals(name)) {
                     return field;
                 }
-                if (out.value().equals("") && field.getName().equals(name))
-                {
+                if (out.value().equals("") && field.getName().equals(name)) {
                     return field;
                 }
-                
+
             }
         }
         return null;
@@ -146,6 +153,14 @@ public class BeanDescriptor {
 
     public void setInjectionPoints(Set<InjectionPointDescriptor> injectionPoints) {
         this.injectionPoints = injectionPoints;
+    }
+
+    public Set<OutjectionPointDescriptor> getOutjectionPoints() {
+        return outjectionPoints;
+    }
+
+    public void setOutjectionPoints(Set<OutjectionPointDescriptor> outjectionPoints) {
+        this.outjectionPoints = outjectionPoints;
     }
 
     public void setJavaClass(Class<?> javaClass) {

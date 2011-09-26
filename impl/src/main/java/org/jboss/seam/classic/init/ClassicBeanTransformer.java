@@ -17,6 +17,8 @@ import org.jboss.seam.classic.init.metadata.RoleDescriptor;
 import org.jboss.seam.classic.init.redefiners.CreateAnnotationRedefiner;
 import org.jboss.seam.classic.init.redefiners.DestroyAnnotationRedefiner;
 import org.jboss.seam.classic.runtime.BijectionInterceptor;
+import org.jboss.seam.classic.util.CdiScopeUtils;
+import org.jboss.seam.classic.util.ClassicScopeUtils;
 import org.jboss.seam.solder.literal.NamedLiteral;
 import org.jboss.seam.solder.reflection.annotated.AnnotatedTypeBuilder;
 
@@ -41,15 +43,15 @@ public class ClassicBeanTransformer {
                 // Set name
                 builder.addToClass(new NamedLiteral(role.getName()));
                 // Set scope
-                Annotation scope = ScopeUtils.transformBeanScope(role.getScope(), bean.getJavaClass());
-                builder.addToClass(scope);
+                Class<? extends Annotation> scope = ClassicScopeUtils.transformLegacyBeanScopeToCdiScope(role.getScope(), bean.getJavaClass());
+                builder.addToClass(CdiScopeUtils.getScopeLiteral(scope));
                 // Process annotation redefiners
                 builder.redefine(Create.class, new CreateAnnotationRedefiner());
                 builder.redefine(Destroy.class, new DestroyAnnotationRedefiner());
 
                 for (FactoryDescriptor factory : bean.getFactories()) {
-                    Class<? extends Annotation> factoryScope = ScopeUtils.transformFactoryScope(factory.getScope(),
-                            role.getScope(), bean.getJavaClass()).annotationType();
+                    Class<? extends Annotation> factoryScope = ClassicScopeUtils.transformLegacyFactoryScopeToCdiScope(factory.getScope(),
+                            role.getScope(), bean.getJavaClass());
                     producerMethodsToRegister.add(createClassicFactory(factory, factory.getProductType(), factoryScope,
                             role.getName(), manager));
                 }

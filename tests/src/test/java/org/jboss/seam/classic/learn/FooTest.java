@@ -12,7 +12,8 @@ public class FooTest extends SeamTest {
 
             @Override
             protected void testComponents() throws Exception {
-                String bar = (String) getInstance("baz");
+                Foo foo = (Foo) getInstance("foo");
+                foo.ping();
 //                assertNull(bar);
 //                assertNotNull(bar);
 //                assertEquals(bar, "bar");

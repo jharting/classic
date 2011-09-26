@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 
 import org.jboss.seam.ScopeType;
 
-public class FactoryDescriptor {
+public class FactoryDescriptor implements ManagedInstanceDescriptor {
 
     private String name;
     private ScopeType scope;

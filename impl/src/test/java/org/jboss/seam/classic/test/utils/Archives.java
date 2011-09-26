@@ -6,6 +6,8 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.classic.init.SeamClassicExtension;
 import org.jboss.seam.classic.runtime.BijectionInterceptor;
+import org.jboss.seam.classic.runtime.outjection.RewritableContextManager;
+import org.jboss.seam.classic.util.CdiScopeUtils;
 import org.jboss.seam.classic.util.literals.PreDestroyLiteral;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -21,6 +23,10 @@ public class Archives {
                 .addPackage(BijectionInterceptor.class.getPackage())
                 // org.jboss.seam.classic.runtime
                 .addPackages(true, PreDestroyLiteral.class.getPackage())
+                // org.jboss.seam.classic.runtime.outjection
+                .addPackages(true, RewritableContextManager.class.getPackage())
+                // org.jboss.seam.classic.util
+                .addPackage(CdiScopeUtils.class.getPackage())
                 // org.jboss.seam.classic.util.literal
                 .addPackage(ScopeType.class.getPackage()).addPackages(true, Name.class.getPackage())
                 // api

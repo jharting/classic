@@ -4,13 +4,20 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.ContextNotActiveException;
+import javax.enterprise.context.ConversationScoped;
+import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.SessionScoped;
 import javax.enterprise.context.spi.Context;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
@@ -24,8 +31,14 @@ import javax.interceptor.InvocationContext;
 
 import org.jboss.seam.InstantiationException;
 import org.jboss.seam.RequiredException;
+import org.jboss.seam.ScopeType;
 import org.jboss.seam.classic.init.metadata.BeanDescriptor;
 import org.jboss.seam.classic.init.metadata.InjectionPointDescriptor;
+import org.jboss.seam.classic.init.metadata.ManagedInstanceDescriptor;
+import org.jboss.seam.classic.init.metadata.MetadataRegistry;
+import org.jboss.seam.classic.init.metadata.OutjectionPointDescriptor;
+import org.jboss.seam.classic.runtime.outjection.RewritableContextManager;
+import org.jboss.seam.classic.util.ClassicScopeUtils;
 import org.jboss.seam.solder.reflection.Reflections;
 
 @Interceptor
@@ -38,6 +51,8 @@ public class BijectionInterceptor implements Serializable {
     private MetadataRegistry registry;
     @Inject
     private BeanManager manager;
+    @Inject
+    private RewritableContextManager rewritableContextManager;
 
     private BeanDescriptor descriptor;
 
@@ -47,16 +62,17 @@ public class BijectionInterceptor implements Serializable {
 
     protected void init(InvocationContext ctx) {
         Class<?> targetClass = ctx.getTarget().getClass();
-        Collection<BeanDescriptor> descriptors = registry.getBeanDescriptorsByClass(targetClass, true);
+        Collection<BeanDescriptor> descriptors = registry.getDescriptorsByClass(targetClass, true);
         // since all the bean descriptors share the same class, any is OK for us
         descriptor = descriptors.iterator().next();
     }
-    
+
     @PostConstruct
     public void postConstruct(InvocationContext ctx) {
         init(ctx);
 
-        inject(ctx.getTarget());
+        Object target = ctx.getTarget();
+        inject(target);
 
         // proceed initializer chain
         try {
@@ -65,8 +81,8 @@ public class BijectionInterceptor implements Serializable {
             throw new InstantiationException("Could not instantiate Seam component: " + descriptor.getJavaClass(), e);
         }
 
-        // TODO: outject
-        // TODO: disinject
+        outject(target);
+        disinject(target);
     }
 
     @AroundInvoke
@@ -75,41 +91,110 @@ public class BijectionInterceptor implements Serializable {
             init(ctx);
         }
 
-        inject(ctx.getTarget());
+        Object target = ctx.getTarget();
 
-        return ctx.proceed();
+        inject(target);
+
+        Object result = ctx.proceed();
+
+        outject(target);
+        disinject(target);
+
+        return result;
     }
-
 
     protected void inject(Object target) {
         for (InjectionPointDescriptor injectionPoint : descriptor.getInjectionPoints()) {
-            BeanDescriptor candidate = registry.getBeanDescriptorByName(injectionPoint.getName());
+            Object injectableReference = getInjectableReference(injectionPoint);
 
-            Set<Bean<?>> beans = manager.getBeans(injectionPoint.getName());
-            Bean<?> bean = manager.resolve(beans);
-
-            Object object = null;
-
-            // TODO: check OutjectedValueHolder
-
-            if (injectionPoint.isCreate() || (candidate != null && candidate.isAutoCreate())) {
-                if (bean != null) {
-                    CreationalContext<?> ctx = manager.createCreationalContext(bean);
-                    object = manager.getReference(bean, injectionPoint.getField().getType(), ctx);
-                }
-            } else {
-                if (bean != null) {
-                    Context context = manager.getContext(bean.getScope());
-                    object = context.get(bean);
-                }
-            }
-
-            if (object != null) {
-                Reflections.setFieldValue(true, injectionPoint.getField(), target, object);
+            if (injectableReference != null) {
+                Reflections.setFieldValue(true, injectionPoint.getField(), target, injectableReference);
             } else if (injectionPoint.isRequired()) {
-                throw new RequiredException("@In attribute requires non-null value: " + descriptor.getJavaClass() + "."
-                        + injectionPoint.getField().getName());
+                throw new RequiredException("@In attribute requires non-null value: " + getInAttributeMessage(injectionPoint));
             }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Object getInjectableReference(InjectionPointDescriptor injectionPoint) {
+        return getInjectableReference(injectionPoint, RequestScoped.class, ConversationScoped.class, SessionScoped.class,
+                ApplicationScoped.class);
+    }
+
+    protected Object getInjectableReference(InjectionPointDescriptor injectionPoint, Class<? extends Annotation>... scopes) {
+        String injectionPointName = injectionPoint.getName();
+        ManagedInstanceDescriptor candidate = registry.getDescriptorByName(injectionPointName);
+
+        Set<Bean<?>> beans = manager.getBeans(injectionPointName);
+        Bean<?> bean = manager.resolve(beans);
+
+        boolean create = injectionPoint.isCreate() || (candidate != null && candidate.isAutoCreate());
+
+        for (Class<? extends Annotation> scope : scopes) {
+            if (!isContextActive(scope)) {
+                continue;
+            }
+
+            Object reference = rewritableContextManager.get(injectionPointName, scope);
+            if (reference != null) {
+                return reference;
+            }
+
+            if (bean != null && scope.equals(bean.getScope())) {
+                if (create) {
+                    CreationalContext<?> ctx = manager.createCreationalContext(bean);
+                    return manager.getReference(bean, injectionPoint.getField().getType(), ctx);
+                } else {
+                    Context context = manager.getContext(bean.getScope());
+                    Object value = context.get(bean);
+                    if (value != null) {
+                        return value;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    // TODO is there a better way to find out?
+    protected boolean isContextActive(Class<? extends Annotation> scope) {
+        try {
+            manager.getContext(scope);
+            return true;
+        } catch (ContextNotActiveException e) {
+            return false;
+        }
+    }
+
+    protected void outject(Object target) {
+        for (OutjectionPointDescriptor outjectionPoint : descriptor.getOutjectionPoints()) {
+            outjectField(outjectionPoint, target);
+        }
+    }
+
+    protected void outjectField(OutjectionPointDescriptor outjectionPoint, Object target) {
+        if (outjectionPoint.getScope() == ScopeType.STATELESS) {
+            throw new IllegalArgumentException("cannot specify explicit scope=STATELESS on @Out: " + getOutAttributeMessage(outjectionPoint));
+        }
+
+        Class<? extends Annotation> scope = ClassicScopeUtils.transformLegacyOutScopeToCdiScope(outjectionPoint.getScope(),
+                descriptor);
+        Field field = outjectionPoint.getField();
+        if (!field.isAccessible()) {
+            Reflections.setAccessible(field);
+        }
+        Object value = Reflections.getFieldValue(outjectionPoint.getField(), target);
+
+        if (value == null && outjectionPoint.isRequired()) {
+            throw new RequiredException("@Out attribute requires non-null value: " + getOutAttributeMessage(outjectionPoint));
+        }
+
+        rewritableContextManager.set(outjectionPoint.getName(), value, scope);
+    }
+
+    protected void disinject(Object target) {
+        for (InjectionPointDescriptor injectionPoint : descriptor.getInjectionPoints()) {
+            Reflections.setFieldValue(true, injectionPoint.getField(), target, null);
         }
     }
 
@@ -124,5 +209,14 @@ public class BijectionInterceptor implements Serializable {
             private static final long serialVersionUID = -5531820054700986956L;
             public static final BijectedLiteral INSTANCE = new BijectedLiteral();
         }
+    }
+
+    // TODO
+    public String getOutAttributeMessage(OutjectionPointDescriptor op) {
+        return op.getDescriptor().getJavaClass().getName() + "." + op.getField().getName();
+    }
+    // TODO
+    public String getInAttributeMessage(InjectionPointDescriptor ip) {
+        return ip.getBean().getJavaClass().getName() + "." + ip.getField().getName();
     }
 }

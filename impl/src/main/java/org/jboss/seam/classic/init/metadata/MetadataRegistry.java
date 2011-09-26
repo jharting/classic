@@ -1,4 +1,4 @@
-package org.jboss.seam.classic.runtime;
+package org.jboss.seam.classic.init.metadata;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -8,8 +8,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.jboss.seam.classic.init.SeamClassicExtension;
-import org.jboss.seam.classic.init.metadata.BeanDescriptor;
-import org.jboss.seam.classic.init.metadata.RoleDescriptor;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -18,7 +16,7 @@ import com.google.common.collect.Multimap;
 public class MetadataRegistry {
 
     private Multimap<Class<?>, BeanDescriptor> descriptorsByClass = HashMultimap.create();
-    private Map<String, BeanDescriptor> descriptorsByName = new HashMap<String, BeanDescriptor>();
+    private Map<String, ManagedInstanceDescriptor> descriptorsByName = new HashMap<String, ManagedInstanceDescriptor>();
     
     public MetadataRegistry() {
     }
@@ -32,15 +30,20 @@ public class MetadataRegistry {
             for (RoleDescriptor role : descriptor.getRoles()) {
                 descriptorsByName.put(role.getName(), descriptor);
             }
+            for (FactoryDescriptor factory : descriptor.getFactories())
+            {
+                descriptorsByName.put(factory.getName(), factory);
+            }
+            
         }
     }
     
-    public BeanDescriptor getBeanDescriptorByName(String name)
+    public ManagedInstanceDescriptor getDescriptorByName(String name)
     {
         return descriptorsByName.get(name);
     }
     
-    public Collection<BeanDescriptor> getBeanDescriptorsByClass(Class<?> clazz, boolean superClassFallback)
+    public Collection<BeanDescriptor> getDescriptorsByClass(Class<?> clazz, boolean superClassFallback)
     {
         Collection<BeanDescriptor> descriptors = descriptorsByClass.get(clazz);
         if (descriptors.isEmpty() && superClassFallback) {
