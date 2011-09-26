@@ -25,17 +25,15 @@ public class ClassicFactory<T> implements Bean<T> {
     private String hostName;
     private Bean<?> hostBean;
     private Method method;
-    private boolean isVoid;
     private BeanManager manager;
 
-    public ClassicFactory(FactoryDescriptor descriptor, Class<T> beanClass, Class<? extends Annotation> scope, String hostName,
+    public ClassicFactory(FactoryDescriptor descriptor, Class<T> beanClass, String hostName,
             BeanManager manager) {
         this.name = descriptor.getName();
-        this.scope = scope;
+        this.scope = descriptor.getCdiScope();
         this.beanClass = beanClass;
         this.hostName = hostName;
         this.method = descriptor.getMethod();
-        this.isVoid = descriptor.isVoid();
         this.manager = manager;
         this.types.add(beanClass);
         this.types.add(Object.class);
@@ -56,13 +54,7 @@ public class ClassicFactory<T> implements Bean<T> {
 
         T product;
 
-        if (isVoid) {
-            // Reflections.invokeMethod(true, method, void.class, host);
-            // product = null;
-            throw new UnsupportedOperationException();
-        } else {
-            product = Reflections.invokeMethod(true, method, beanClass, host);
-        }
+        product = Reflections.invokeMethod(true, method, beanClass, host);
 
         ctx.release(); // we do not need the host anymore
 

@@ -31,14 +31,12 @@ import javax.interceptor.InvocationContext;
 
 import org.jboss.seam.InstantiationException;
 import org.jboss.seam.RequiredException;
-import org.jboss.seam.ScopeType;
-import org.jboss.seam.classic.init.metadata.BeanDescriptor;
+import org.jboss.seam.classic.init.metadata.AbstractManagedInstanceDescriptor;
 import org.jboss.seam.classic.init.metadata.InjectionPointDescriptor;
-import org.jboss.seam.classic.init.metadata.ManagedInstanceDescriptor;
+import org.jboss.seam.classic.init.metadata.ManagedBeanDescriptor;
 import org.jboss.seam.classic.init.metadata.MetadataRegistry;
 import org.jboss.seam.classic.init.metadata.OutjectionPointDescriptor;
 import org.jboss.seam.classic.runtime.outjection.RewritableContextManager;
-import org.jboss.seam.classic.util.ClassicScopeUtils;
 import org.jboss.seam.solder.reflection.Reflections;
 
 @Interceptor
@@ -54,7 +52,7 @@ public class BijectionInterceptor implements Serializable {
     @Inject
     private RewritableContextManager rewritableContextManager;
 
-    private BeanDescriptor descriptor;
+    private ManagedBeanDescriptor descriptor;
 
     public BijectionInterceptor() {
 
@@ -62,7 +60,7 @@ public class BijectionInterceptor implements Serializable {
 
     protected void init(InvocationContext ctx) {
         Class<?> targetClass = ctx.getTarget().getClass();
-        Collection<BeanDescriptor> descriptors = registry.getDescriptorsByClass(targetClass, true);
+        Collection<ManagedBeanDescriptor> descriptors = registry.getManagedInstanceDescriptorByClass(targetClass, true);
         // since all the bean descriptors share the same class, any is OK for us
         descriptor = descriptors.iterator().next();
     }
@@ -110,7 +108,7 @@ public class BijectionInterceptor implements Serializable {
             if (injectableReference != null) {
                 Reflections.setFieldValue(true, injectionPoint.getField(), target, injectableReference);
             } else if (injectionPoint.isRequired()) {
-                throw new RequiredException("@In attribute requires non-null value: " + getInAttributeMessage(injectionPoint));
+                throw new RequiredException("@In attribute requires non-null value: " + injectionPoint.getPath());
             }
         }
     }
@@ -123,7 +121,7 @@ public class BijectionInterceptor implements Serializable {
 
     protected Object getInjectableReference(InjectionPointDescriptor injectionPoint, Class<? extends Annotation>... scopes) {
         String injectionPointName = injectionPoint.getName();
-        ManagedInstanceDescriptor candidate = registry.getDescriptorByName(injectionPointName);
+        AbstractManagedInstanceDescriptor candidate = registry.getManagedInstanceDescriptorByName(injectionPointName);
 
         Set<Bean<?>> beans = manager.getBeans(injectionPointName);
         Bean<?> bean = manager.resolve(beans);
@@ -173,12 +171,6 @@ public class BijectionInterceptor implements Serializable {
     }
 
     protected void outjectField(OutjectionPointDescriptor outjectionPoint, Object target) {
-        if (outjectionPoint.getScope() == ScopeType.STATELESS) {
-            throw new IllegalArgumentException("cannot specify explicit scope=STATELESS on @Out: " + getOutAttributeMessage(outjectionPoint));
-        }
-
-        Class<? extends Annotation> scope = ClassicScopeUtils.transformLegacyOutScopeToCdiScope(outjectionPoint.getScope(),
-                descriptor);
         Field field = outjectionPoint.getField();
         if (!field.isAccessible()) {
             Reflections.setAccessible(field);
@@ -186,10 +178,10 @@ public class BijectionInterceptor implements Serializable {
         Object value = Reflections.getFieldValue(outjectionPoint.getField(), target);
 
         if (value == null && outjectionPoint.isRequired()) {
-            throw new RequiredException("@Out attribute requires non-null value: " + getOutAttributeMessage(outjectionPoint));
+            throw new RequiredException("@Out attribute requires non-null value: " + outjectionPoint.getPath());
         }
 
-        rewritableContextManager.set(outjectionPoint.getName(), value, scope);
+        rewritableContextManager.set(outjectionPoint.getName(), value, outjectionPoint.getCdiScope());
     }
 
     protected void disinject(Object target) {
@@ -209,14 +201,5 @@ public class BijectionInterceptor implements Serializable {
             private static final long serialVersionUID = -5531820054700986956L;
             public static final BijectedLiteral INSTANCE = new BijectedLiteral();
         }
-    }
-
-    // TODO
-    public String getOutAttributeMessage(OutjectionPointDescriptor op) {
-        return op.getDescriptor().getJavaClass().getName() + "." + op.getField().getName();
-    }
-    // TODO
-    public String getInAttributeMessage(InjectionPointDescriptor ip) {
-        return ip.getBean().getJavaClass().getName() + "." + ip.getField().getName();
     }
 }

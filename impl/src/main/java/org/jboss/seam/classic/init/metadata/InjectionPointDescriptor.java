@@ -3,54 +3,26 @@ package org.jboss.seam.classic.init.metadata;
 import java.lang.reflect.Field;
 
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.In;
 
-public class InjectionPointDescriptor {
+public class InjectionPointDescriptor extends AbstractManagedFieldDescriptor {
 
-    private BeanDescriptor bean;
-    private String name;
-    private boolean create;
-    private boolean required;
-    private ScopeType scope;
-    private Field field;
+    private final boolean create;
 
-    public InjectionPointDescriptor(BeanDescriptor bean, String name, boolean create, boolean required, ScopeType scope,
-            Field field) {
-        this.bean = bean;
-        this.name = name;
+    public InjectionPointDescriptor(In in, Field field, ManagedBeanDescriptor bean)
+    {
+        super(in.value(), in.required(), in.scope(), field, bean);
+        this.create = in.create();
+    }
+    
+    public InjectionPointDescriptor(String name, boolean required, ScopeType specifiedScope, Field field,
+            ManagedBeanDescriptor bean, boolean create) {
+        super(name, required, specifiedScope, field, bean);
         this.create = create;
-        this.required = required;
-        this.scope = scope;
-        this.field = field;
-    }
-
-    public BeanDescriptor getBean() {
-        return bean;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public boolean isCreate() {
         return create;
     }
-
-    public boolean isRequired() {
-        return required;
-    }
-
-    public ScopeType getScope() {
-        return scope;
-    }
-
-    public Field getField() {
-        return field;
-    }
-
-    @Override
-    public String toString() {
-        return "InjectionPointDescriptor [bean=" + bean + ", name=" + name + ", create=" + create + ", required=" + required
-                + ", scope=" + scope + ", field=" + field + "]";
-    }
-
+    
 }

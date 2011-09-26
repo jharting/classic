@@ -18,7 +18,7 @@ import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 
 import org.jboss.seam.annotations.Name;
-import org.jboss.seam.classic.init.metadata.BeanDescriptor;
+import org.jboss.seam.classic.init.metadata.ManagedBeanDescriptor;
 import org.jboss.seam.classic.init.scan.ScannotationScanner;
 import org.jboss.seam.classic.runtime.outjection.OutjectedReferenceHolder;
 import org.jboss.seam.classic.util.CdiScopeUtils;
@@ -30,7 +30,7 @@ public class SeamClassicExtension implements Extension {
 
     private static final Logger log = Logger.getLogger(SeamClassicExtension.class);
 
-    private Set<BeanDescriptor> descriptors = new HashSet<BeanDescriptor>();
+    private Set<ManagedBeanDescriptor> descriptors = new HashSet<ManagedBeanDescriptor>();
 
     private ClassicBeanTransformer beanTransformer = new ClassicBeanTransformer();
 
@@ -41,9 +41,9 @@ public class SeamClassicExtension implements Extension {
         Set<Class<?>> classes = scanner.getClasses(Name.class.getName());
         log.debugv("Scan finished. {0} classes were loaded.", classes.size());
 
-        Set<BeanDescriptor> enabledDescriptors = new HashSet<BeanDescriptor>();
+        Set<ManagedBeanDescriptor> enabledDescriptors = new HashSet<ManagedBeanDescriptor>();
         for (Class<?> clazz : classes) {
-            enabledDescriptors.add(new BeanDescriptor(clazz));
+            enabledDescriptors.add(new ManagedBeanDescriptor(clazz));
         }
 
         // TODO: reduce allDescriptors by processing @Install
@@ -70,7 +70,7 @@ public class SeamClassicExtension implements Extension {
     }
 
     public void registerBeans(@Observes AfterBeanDiscovery event) {
-        Set<Bean<?>> factories = beanTransformer.getProducerMethodsToRegister();
+        Set<Bean<?>> factories = beanTransformer.getFactoriesToRegister();
         log.debugv("Registering {0} factories.", factories.size());
         for (Bean<?> factory : factories) {
             log.debugv("Registering {0}", factory);
@@ -78,7 +78,7 @@ public class SeamClassicExtension implements Extension {
         }
     }
 
-    public Set<BeanDescriptor> getDescriptors() {
+    public Set<ManagedBeanDescriptor> getDescriptors() {
         return descriptors;
     }
 

@@ -1,49 +1,41 @@
 package org.jboss.seam.classic.init.metadata;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
+import javax.enterprise.context.Dependent;
+import javax.enterprise.context.RequestScoped;
+
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.annotations.Out;
+import org.jboss.seam.classic.util.ClassicScopeUtils;
 
-public class OutjectionPointDescriptor {
+public class OutjectionPointDescriptor extends AbstractManagedFieldDescriptor {
 
-    private BeanDescriptor descriptor;
-    private String name;
-    private boolean required;
-    private ScopeType scope;
-    private Field field;
-
-    public OutjectionPointDescriptor(BeanDescriptor descriptor, String name, boolean required, ScopeType scope, Field field) {
-        this.descriptor = descriptor;
-        this.name = name;
-        this.required = required;
-        this.scope = scope;
-        this.field = field;
+    public OutjectionPointDescriptor(String specifiedName, boolean required, ScopeType specifiedScope, Field field,
+            ManagedBeanDescriptor bean) {
+        super(specifiedName, required, specifiedScope, field, bean);
+        if (specifiedScope == ScopeType.STATELESS) {
+            throw new IllegalArgumentException("cannot specify explicit scope=STATELESS on @Out: " + getPath());
+        }
     }
 
-    public BeanDescriptor getDescriptor() {
-        return descriptor;
+    public OutjectionPointDescriptor(Out out, Field field, ManagedBeanDescriptor bean) {
+        super(out.value(), out.required(), out.scope(), field, bean);
     }
 
-    public String getName() {
-        return name;
-    }
+    /**
+     * Translates Seam 2 ScopeType to matching CDI scope. Default scope rules for Seam 2 outjected fields are considered.
+     */
+    public Class<? extends Annotation> getCdiScope() {
+        if (getSpecifiedScope() == ScopeType.UNSPECIFIED) {
+            Class<? extends Annotation> hostScope = getBean().getImplicitRole().getCdiScope();
 
-    public boolean isRequired() {
-        return required;
+            if (Dependent.class.equals(hostScope)) {
+                return RequestScoped.class;
+            }
+            return hostScope;
+        }
+        return ClassicScopeUtils.transformExplicitLegacyScopeToCdiScope(getSpecifiedScope());
     }
-
-    public ScopeType getScope() {
-        return scope;
-    }
-
-    public Field getField() {
-        return field;
-    }
-
-    @Override
-    public String toString() {
-        return "OutjectionPointDescriptor [descriptor=" + descriptor + ", name=" + name + ", required=" + required + ", scope="
-                + scope + ", field=" + field + "]";
-    }
-
 }
