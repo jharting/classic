@@ -9,6 +9,7 @@ import javax.enterprise.context.RequestScoped;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Out;
 import org.jboss.seam.classic.util.ClassicScopeUtils;
+import org.jboss.seam.solder.reflection.Reflections;
 
 public class OutjectionPointDescriptor extends AbstractManagedFieldDescriptor {
 
@@ -24,6 +25,14 @@ public class OutjectionPointDescriptor extends AbstractManagedFieldDescriptor {
         super(out.value(), out.required(), out.scope(), field, bean);
     }
 
+    public Object get(Object target)
+    {
+        if (!getField().isAccessible()) {
+            Reflections.setAccessible(getField());
+        }
+        return Reflections.getFieldValue(getField(), target);
+    }
+    
     /**
      * Translates Seam 2 ScopeType to matching CDI scope. Default scope rules for Seam 2 outjected fields are considered.
      */

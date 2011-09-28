@@ -8,7 +8,6 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Set;
 
@@ -37,7 +36,6 @@ import org.jboss.seam.classic.init.metadata.ManagedBeanDescriptor;
 import org.jboss.seam.classic.init.metadata.MetadataRegistry;
 import org.jboss.seam.classic.init.metadata.OutjectionPointDescriptor;
 import org.jboss.seam.classic.runtime.outjection.RewritableContextManager;
-import org.jboss.seam.solder.reflection.Reflections;
 
 @Interceptor
 @BijectionInterceptor.Bijected
@@ -106,7 +104,7 @@ public class BijectionInterceptor implements Serializable {
             Object injectableReference = getInjectableReference(injectionPoint);
 
             if (injectableReference != null) {
-                Reflections.setFieldValue(true, injectionPoint.getField(), target, injectableReference);
+                injectionPoint.set(target, injectableReference);
             } else if (injectionPoint.isRequired()) {
                 throw new RequiredException("@In attribute requires non-null value: " + injectionPoint.getPath());
             }
@@ -133,24 +131,31 @@ public class BijectionInterceptor implements Serializable {
                 continue;
             }
 
+            // check rewritable context
             Object reference = rewritableContextManager.get(injectionPointName, scope);
             if (reference != null) {
                 return reference;
             }
 
+            // check CDI read-only context
             if (bean != null && scope.equals(bean.getScope())) {
-                if (create) {
-                    CreationalContext<?> ctx = manager.createCreationalContext(bean);
-                    return manager.getReference(bean, injectionPoint.getField().getType(), ctx);
-                } else {
-                    Context context = manager.getContext(bean.getScope());
-                    Object value = context.get(bean);
-                    if (value != null) {
-                        return value;
-                    }
+                Context context = manager.getContext(bean.getScope());
+                Object value = context.get(bean);
+                if (value != null) {
+                    return value;
                 }
             }
         }
+
+        // create using CDI
+        if (bean != null && create) {
+            CreationalContext<?> ctx = manager.createCreationalContext(bean);
+            return manager.getReference(bean, injectionPoint.getField().getType(), ctx);
+        }
+        
+        // TODO void factories
+        // TODO unwrap
+
         return null;
     }
 
@@ -171,12 +176,7 @@ public class BijectionInterceptor implements Serializable {
     }
 
     protected void outjectField(OutjectionPointDescriptor outjectionPoint, Object target) {
-        Field field = outjectionPoint.getField();
-        if (!field.isAccessible()) {
-            Reflections.setAccessible(field);
-        }
-        Object value = Reflections.getFieldValue(outjectionPoint.getField(), target);
-
+        Object value = outjectionPoint.get(target);
         if (value == null && outjectionPoint.isRequired()) {
             throw new RequiredException("@Out attribute requires non-null value: " + outjectionPoint.getPath());
         }
@@ -186,7 +186,7 @@ public class BijectionInterceptor implements Serializable {
 
     protected void disinject(Object target) {
         for (InjectionPointDescriptor injectionPoint : descriptor.getInjectionPoints()) {
-            Reflections.setFieldValue(true, injectionPoint.getField(), target, null);
+            injectionPoint.set(target, null);
         }
     }
 
