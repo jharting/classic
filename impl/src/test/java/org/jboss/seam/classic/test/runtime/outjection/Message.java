@@ -3,14 +3,14 @@ package org.jboss.seam.classic.test.runtime.outjection;
 import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class StringWrapper implements Serializable {
+public class Message implements Serializable {
 
     private String value;
 
-    public StringWrapper() {
+    public Message() {
     }
 
-    public StringWrapper(String value) {
+    public Message(String value) {
         this.value = value;
     }
 

@@ -10,23 +10,23 @@ import org.jboss.seam.annotations.Scope;
 public class FactoryBean {
 
     @Factory(scope = ScopeType.EVENT, value = "delta")
-    public CharSequence getDelta() {
-        return "factoryDelta";
+    public Message getDelta() {
+        return new Message("factoryDelta");
     }
 
     @Factory(autoCreate = true, scope = ScopeType.SESSION, value = "echo")
-    public CharSequence getEcho() {
-        return "factoryEcho";
+    public Message getEcho() {
+        return new Message("factoryEcho");
     }
 
     @Factory(autoCreate = true, scope = ScopeType.SESSION, value = "foxtrot")
-    public StringWrapper getFoxtrot() {
-        return new StringWrapper("factoryFoxtrot");
+    public Message getFoxtrot() {
+        return new Message("factoryFoxtrot");
     }
 
     @Factory(autoCreate = true, scope = ScopeType.SESSION, value = "golf")
-    public StringWrapper getGolf() {
-        return new StringWrapper("factoryGolf");
+    public Message getGolf() {
+        return new Message("factoryGolf");
     }
 
 }

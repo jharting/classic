@@ -32,40 +32,40 @@ public class OutjectionTest {
     @Test
     public void testExplicitScopeOutjection() {
         outjectingBean.ping();
-        assertEquals("alpha", injectingBean.getAlpha());
+        assertEquals("alpha", injectingBean.getAlpha().getValue());
     }
 
     @Test
     public void testImplicitScopeOutjection() {
         outjectingBean.ping();
-        assertEquals("bravo", injectingBean.getBravo());
+        assertEquals("bravo", injectingBean.getBravo().getValue());
     }
     
     @Test
     public void testExplicitNameOutjection() {
         outjectingBean.ping();
-        assertEquals("charlie", injectingBean.getCharlie());
+        assertEquals("charlie", injectingBean.getCharlie().getValue());
     }
     
     @Test
     public void testOutjectedValueSelectedOverNonAutoCreateFactory()
     {
         outjectingBean.ping();
-        assertEquals("delta", injectingBean.getDelta());
+        assertEquals("delta", injectingBean.getDelta().getValue());
     }
     
     @Test
     public void testOutjectedValueSelectedOverAutoCreateFactory()
     {
         outjectingBean.ping();
-        assertEquals("echo", injectingBean.getEcho());
+        assertEquals("echo", injectingBean.getEcho().getValue());
     }
     
     @Test
     public void testAutoCreateFactorySelectedOverOutjectedValue()
     {
         outjectingBean.ping();
-        assertEquals("factoryFoxtrot", injectingBean.getFoxtrot().getValue());
+        assertEquals("foxtrot", injectingBean.getFoxtrot().getValue());
     }
     
     @Test
@@ -75,7 +75,7 @@ public class OutjectionTest {
         assertEquals("golf", injectingBean.getGolf().getValue());
         outjectingBean.setGolf(null);
         assertEquals("factoryGolf", injectingBean.getGolf().getValue());
-        outjectingBean.setGolf(new StringWrapper("foobar"));
+        outjectingBean.setGolf(new Message("foobar"));
         assertEquals("foobar", injectingBean.getGolf().getValue());
     }
     

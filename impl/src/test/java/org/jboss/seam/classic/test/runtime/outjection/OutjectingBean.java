@@ -11,24 +11,24 @@ import org.jboss.seam.annotations.Scope;
 public class OutjectingBean {
 
     @Out(scope = ScopeType.APPLICATION)
-    private CharSequence alpha = "alpha";
+    private Message alpha = new Message("alpha");
     @Out
-    private CharSequence bravo = "bravo";
+    private Message bravo = new Message("bravo");
     @Out("charlie")
-    private CharSequence foo = "charlie";
+    private Message foo = new Message("charlie");
     @Out(scope = ScopeType.SESSION)
-    private CharSequence delta = "delta";
+    private Message delta = new Message("delta");
     @Out(scope = ScopeType.SESSION)
-    private CharSequence echo = "echo";
+    private Message echo = new Message("echo");
     @Out(scope = ScopeType.APPLICATION)
-    private CharSequence foxtrot = "foxtrot";
+    private Message foxtrot = new Message("foxtrot");
     @Out(scope = ScopeType.EVENT, required = false)
-    private StringWrapper golf = new StringWrapper("golf");
+    private Message golf = new Message("golf");
 
     public void ping() {
     }
 
-    public void setGolf(StringWrapper golf) {
+    public void setGolf(Message golf) {
         this.golf = golf;
     }
 }

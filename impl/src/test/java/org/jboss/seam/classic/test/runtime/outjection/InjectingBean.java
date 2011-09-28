@@ -10,45 +10,45 @@ import org.jboss.seam.annotations.Scope;
 public class InjectingBean {
 
     @In(required = false)
-    private CharSequence alpha;
+    private Message alpha;
     @In(required = false)
-    private CharSequence bravo;
+    private Message bravo;
     @In(required = false)
-    private CharSequence charlie;
+    private Message charlie;
     @In(required = false)
-    private CharSequence delta;
+    private Message delta;
     @In(required = false)
-    private CharSequence echo;
+    private Message echo;
     @In(required = false)
-    private StringWrapper foxtrot;
+    private Message foxtrot;
     @In(required = false)
-    private StringWrapper golf;
+    private Message golf;
 
-    public CharSequence getAlpha() {
+    public Message getAlpha() {
         return alpha;
     }
 
-    public CharSequence getBravo() {
+    public Message getBravo() {
         return bravo;
     }
 
-    public CharSequence getCharlie() {
+    public Message getCharlie() {
         return charlie;
     }
 
-    public CharSequence getDelta() {
+    public Message getDelta() {
         return delta;
     }
 
-    public CharSequence getEcho() {
+    public Message getEcho() {
         return echo;
     }
 
-    public StringWrapper getFoxtrot() {
+    public Message getFoxtrot() {
         return foxtrot;
     }
 
-    public StringWrapper getGolf() {
+    public Message getGolf() {
         return golf;
     }
 }
