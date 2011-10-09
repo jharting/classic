@@ -33,9 +33,4 @@ public class LegacyElFactory extends AbstractLegacyFactory<Object> {
             return expressions.evaluateMethodExpression(expression);
         }
     }
-
-    @Override
-    public void destroy(Object instance, CreationalContext<Object> creationalContext) {
-        creationalContext.release();
-    }
 }

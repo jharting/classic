@@ -29,7 +29,7 @@ public class LegacyObserverMethod extends AbstractLegacyObserverMethod {
     }
 
     public void notify(EventPayload event) {
-        CdiUtils.ManagedBeanInstance<?> hostInstance =  CdiUtils.lookupBean(hostName, hostType, getManager());
+        CdiUtils.ManagedBeanInstance<?> hostInstance =  CdiUtils.lookupBeanByName(hostName, hostType, getManager());
         try {
             Reflections.invokeMethod(true, method, Object.class, hostInstance.getInstance(), event.getParameters());
         } finally {

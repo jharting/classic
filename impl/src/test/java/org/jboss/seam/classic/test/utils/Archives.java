@@ -5,6 +5,7 @@ import javax.enterprise.inject.spi.Extension;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.async.Schedule;
+import org.jboss.seam.classic.Seam2ManagedBean;
 import org.jboss.seam.classic.config.ComponentsDotXml;
 import org.jboss.seam.classic.init.SeamClassicExtension;
 import org.jboss.seam.classic.init.event.EventsImpl;
@@ -26,6 +27,8 @@ public class Archives {
         return ShrinkWrap
                 .create(JavaArchive.class, "seam-classic.jar")
                 .addPackages(true, SeamClassicExtension.class.getPackage())
+                // org.jboss.seam.classic
+                .addPackage(Seam2ManagedBean.class.getPackage())
                 // org.jboss.seam.classic.async
                 .addPackage(Schedule.class.getPackage())
                 // org.jboss.seam.classic.config

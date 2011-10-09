@@ -24,6 +24,7 @@ import javax.enterprise.inject.spi.ProcessAnnotatedType;
 
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.classic.config.ComponentsDotXml;
+import org.jboss.seam.classic.init.factory.UnwrappedBean;
 import org.jboss.seam.classic.init.metadata.AbstractFactoryDescriptor;
 import org.jboss.seam.classic.init.metadata.AbstractObserverMethodDescriptor;
 import org.jboss.seam.classic.init.metadata.ManagedBeanDescriptor;
@@ -122,6 +123,13 @@ public class SeamClassicExtension implements Extension {
             log.debugv("Registering {0}", factory);
             event.addBean(factory);
         }
+        Set<UnwrappedBean> unwrappedBeans = beanTransformer.getUnwrappedBeansToRegister();
+        log.debugv("Registering {0} unwrapping methods.", unwrappedBeans.size());
+        for (UnwrappedBean unwrappedBean : unwrappedBeans) {
+            log.debugv("Registering {0}", unwrappedBean);
+            event.addBean(unwrappedBean);
+        }
+        
     }
 
     void registerObserverMethods(@Observes AfterBeanDiscovery event, BeanManager manager) {

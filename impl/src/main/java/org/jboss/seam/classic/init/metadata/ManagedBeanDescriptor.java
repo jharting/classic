@@ -15,6 +15,7 @@ import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.Role;
 import org.jboss.seam.annotations.Roles;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.annotations.Unwrap;
 
 public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
 
@@ -28,6 +29,7 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
     private final Set<InjectionPointDescriptor> injectionPoints = new HashSet<InjectionPointDescriptor>();
     private final Set<OutjectionPointDescriptor> outjectionPoints = new HashSet<OutjectionPointDescriptor>();
     private final Set<ObserverMethodDescriptor> observerMethods = new HashSet<ObserverMethodDescriptor>();
+    private final Method unwrappingMethod;
 
     public ManagedBeanDescriptor(Class<?> javaClass) {
         super(javaClass);
@@ -67,6 +69,8 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
             }
         }
 
+        Method unwrappingMethod = null; // bypassing the final field check
+        
         // Iterate over methods
         for (Method method : javaClass.getDeclaredMethods()) {
             // Register @Factory
@@ -80,7 +84,16 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
                     observerMethods.add(new ObserverMethodDescriptor(type, this, method, observer.create()));
                 }
             }
+            if (method.isAnnotationPresent(Unwrap.class))
+            {
+                if (unwrappingMethod != null)
+                {
+                    throw new IllegalStateException("component has multiple @Unwrap methods: " + javaClass.getName());
+                }
+                unwrappingMethod = method;
+            }
         }
+        this.unwrappingMethod = unwrappingMethod;
 
         // @Register @In
         for (Field field : javaClass.getDeclaredFields()) {
@@ -129,6 +142,15 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
 
     public Set<ObserverMethodDescriptor> getObserverMethods() {
         return observerMethods;
+    }
+    
+    public Method getUnwrappingMethod() {
+        return unwrappingMethod;
+    }
+    
+    public boolean hasUnwrappingMethod()
+    {
+        return unwrappingMethod != null;
     }
 
     @Override

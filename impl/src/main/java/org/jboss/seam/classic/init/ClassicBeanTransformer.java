@@ -1,6 +1,8 @@
 package org.jboss.seam.classic.init;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,6 +18,7 @@ import org.jboss.seam.classic.init.event.LegacyElObserverMethod;
 import org.jboss.seam.classic.init.event.LegacyObserverMethod;
 import org.jboss.seam.classic.init.factory.LegacyFactory;
 import org.jboss.seam.classic.init.factory.LegacyElFactory;
+import org.jboss.seam.classic.init.factory.UnwrappedBean;
 import org.jboss.seam.classic.init.metadata.AbstractFactoryDescriptor;
 import org.jboss.seam.classic.init.metadata.AbstractObserverMethodDescriptor;
 import org.jboss.seam.classic.init.metadata.FactoryDescriptor;
@@ -28,8 +31,10 @@ import org.jboss.seam.classic.init.redefiners.CreateAnnotationRedefiner;
 import org.jboss.seam.classic.init.redefiners.DestroyAnnotationRedefiner;
 import org.jboss.seam.classic.runtime.BijectionInterceptor;
 import org.jboss.seam.classic.util.CdiScopeUtils;
+import org.jboss.seam.solder.literal.DefaultLiteral;
 import org.jboss.seam.solder.literal.NamedLiteral;
 import org.jboss.seam.solder.reflection.annotated.AnnotatedTypeBuilder;
+import org.jboss.seam.classic.Seam2ManagedBean;
 
 /**
  * This class is responsible for transforming metadata gathered during the scanning phase to CDI SPI objects.
@@ -41,13 +46,23 @@ public class ClassicBeanTransformer {
 
     private Set<AnnotatedType<?>> annotatedTypesToRegister = new HashSet<AnnotatedType<?>>();
     private Set<ObserverMethod<?>> observerMethodsToRegister = new HashSet<ObserverMethod<?>>();
+    private Set<Bean<?>> factoryMethodsToRegister = new HashSet<Bean<?>>();
+    private Set<UnwrappedBean> unwrappedBeansToRegister = new HashSet<UnwrappedBean>();
 
     public void processLegacyBeans(Set<ManagedBeanDescriptor> beans, BeanManager manager) {
         for (ManagedBeanDescriptor bean : beans) {
             for (RoleDescriptor role : bean.getRoles()) {
                 AnnotatedTypeBuilder<?> builder = createAnnotatedTypeBuilder(bean.getJavaClass());
                 // Set name
-                builder.addToClass(new NamedLiteral(role.getName()));
+                builder.addToClass(new Seam2ManagedBean.Seam2ManagedBeanLiteral(role.getName()));
+                builder.addToClass(DefaultLiteral.INSTANCE);
+                if (bean.hasUnwrappingMethod()) // if it has one, the name is reserved for the unwrapping method
+                {
+                    registerUnwrappedBean(role.getName(), bean.getJavaClass(), bean.getUnwrappingMethod()
+                            .getGenericReturnType(), bean.getUnwrappingMethod(), manager);
+                } else {
+                    builder.addToClass(new NamedLiteral(role.getName()));
+                }
                 // Set scope
                 Class<? extends Annotation> scope = role.getCdiScope();
                 builder.addToClass(CdiScopeUtils.getScopeLiteral(scope));
@@ -55,9 +70,7 @@ public class ClassicBeanTransformer {
                 builder.redefine(Create.class, new CreateAnnotationRedefiner());
                 builder.redefine(Destroy.class, new DestroyAnnotationRedefiner());
 
-                // TODO observer methods
                 // TODO interceptors
-                // TODO producer fields
 
                 // Register interceptors
                 // TODO: take @BypassInterceptors into account
@@ -69,17 +82,17 @@ public class ClassicBeanTransformer {
     }
 
     public Set<Bean<?>> processLegacyFactories(Set<AbstractFactoryDescriptor> factoryDescriptors, BeanManager manager) {
-        Set<Bean<?>> factories = new HashSet<Bean<?>>();
         for (AbstractFactoryDescriptor descriptor : factoryDescriptors) {
             if (descriptor instanceof FactoryDescriptor) {
                 FactoryDescriptor beanFactoryDescriptor = (FactoryDescriptor) descriptor;
-                factories.add(createClassicFactory(beanFactoryDescriptor, beanFactoryDescriptor.getProductType(), manager));
+                factoryMethodsToRegister.add(createClassicFactory(beanFactoryDescriptor,
+                        beanFactoryDescriptor.getProductType(), beanFactoryDescriptor.getBean().getJavaClass(), manager));
             } else if (descriptor instanceof ElFactoryDescriptor) {
                 ElFactoryDescriptor factoryDescriptor = (ElFactoryDescriptor) descriptor;
-                factories.add(new LegacyElFactory(factoryDescriptor, manager));
+                factoryMethodsToRegister.add(new LegacyElFactory(factoryDescriptor, manager));
             }
         }
-        return factories;
+        return factoryMethodsToRegister;
     }
 
     public Set<ObserverMethod<?>> processLegacyObserverMethods(Set<AbstractObserverMethodDescriptor> observerMethods,
@@ -91,7 +104,7 @@ public class ClassicBeanTransformer {
 
                 if (om instanceof ElObserverMethodDescriptor) {
                     ElObserverMethodDescriptor observerMethod = (ElObserverMethodDescriptor) om;
-                    observerMethodsToRegister.add(new LegacyElObserverMethod(observerMethod, phase,  manager));
+                    observerMethodsToRegister.add(new LegacyElObserverMethod(observerMethod, phase, manager));
                 }
                 if (om instanceof ObserverMethodDescriptor) {
                     ObserverMethodDescriptor observerMethod = (ObserverMethodDescriptor) om;
@@ -104,9 +117,12 @@ public class ClassicBeanTransformer {
         return observerMethodsToRegister;
     }
 
-    private <T> LegacyFactory<T> createClassicFactory(FactoryDescriptor descriptor, Class<T> beanClass,
-            BeanManager manager) {
-        return new LegacyFactory<T>(descriptor, beanClass, manager);
+    public Set<UnwrappedBean> getUnwrappedBeansToRegister() {
+        return unwrappedBeansToRegister;
+    }
+
+    private <PRODUCT_TYPE, HOST_TYPE> LegacyFactory<PRODUCT_TYPE, HOST_TYPE> createClassicFactory(FactoryDescriptor descriptor, Class<PRODUCT_TYPE> beanClass, Class<HOST_TYPE> hostType, BeanManager manager) {
+        return new LegacyFactory<PRODUCT_TYPE, HOST_TYPE>(descriptor, beanClass, hostType, manager);
     }
 
     private <T> AnnotatedTypeBuilder<T> createAnnotatedTypeBuilder(Class<T> javaClass) {
@@ -115,6 +131,10 @@ public class ClassicBeanTransformer {
 
     private <T> void registerInterceptors(AnnotatedTypeBuilder<T> builder) {
         builder.addToClass(BijectionInterceptor.Bijected.BijectedLiteral.INSTANCE);
+    }
+
+    private <T> void registerUnwrappedBean(String name, Class<?> hostType, Type type, Method method, BeanManager manager) {
+        unwrappedBeansToRegister.add(new UnwrappedBean(name, hostType, type, method, manager));
     }
 
     public Set<AnnotatedType<?>> getAnnotatedTypesToRegister() {

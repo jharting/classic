@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
@@ -74,6 +75,11 @@ public abstract class AbstractLegacyFactory<T> implements Bean<T> {
     @Override
     public Set<InjectionPoint> getInjectionPoints() {
         return Collections.emptySet();
+    }
+    
+    @Override
+    public void destroy(T instance, CreationalContext<T> creationalContext) {
+        creationalContext.release();
     }
 
     protected BeanManager getManager() {

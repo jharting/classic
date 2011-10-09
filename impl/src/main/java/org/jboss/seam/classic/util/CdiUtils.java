@@ -8,6 +8,8 @@ import javax.enterprise.inject.UnsatisfiedResolutionException;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 
+import org.jboss.seam.classic.Seam2ManagedBean;
+
 public class CdiUtils {
 
     private CdiUtils() {
@@ -18,8 +20,13 @@ public class CdiUtils {
         return lookupBean(beans, clazz, manager);
     }
 
-    public static <T> ManagedBeanInstance<T> lookupBean(String beanName, Class<T> clazz, BeanManager manager) {
+    public static <T> ManagedBeanInstance<T> lookupBeanByName(String beanName, Class<T> clazz, BeanManager manager) {
         Set<Bean<?>> beans = manager.getBeans(beanName);
+        return lookupBean(beans, clazz, manager);
+    }
+
+    public static <T> ManagedBeanInstance<T> lookupBeanByInternalName(String beanName, Class<T> clazz, BeanManager manager) {
+        Set<Bean<?>> beans = manager.getBeans(clazz, new Seam2ManagedBean.Seam2ManagedBeanLiteral(beanName));
         return lookupBean(beans, clazz, manager);
     }
 

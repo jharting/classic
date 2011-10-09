@@ -1,6 +1,5 @@
 package org.jboss.seam.classic.test.event;
 
-import static org.jboss.seam.classic.test.utils.Archives.createSeamClassic;
 import static org.jboss.seam.classic.test.utils.Archives.createSeamWebApp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -31,7 +30,7 @@ public class EventTest {
 
     @Deployment
     public static WebArchive getDeployment() {
-        return createSeamWebApp("test.war").addPackage(EventTest.class.getPackage()).addAsLibrary(createSeamClassic());
+        return createSeamWebApp("test.war").addPackage(EventTest.class.getPackage());
     }
 
     @Test
