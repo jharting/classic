@@ -85,8 +85,7 @@ public class ClassicBeanTransformer {
         for (AbstractFactoryDescriptor descriptor : factoryDescriptors) {
             if (descriptor instanceof FactoryDescriptor) {
                 FactoryDescriptor beanFactoryDescriptor = (FactoryDescriptor) descriptor;
-                factoryMethodsToRegister.add(createClassicFactory(beanFactoryDescriptor,
-                        beanFactoryDescriptor.getProductType(), beanFactoryDescriptor.getBean().getJavaClass(), manager));
+                factoryMethodsToRegister.add(new LegacyFactory(beanFactoryDescriptor, manager));
             } else if (descriptor instanceof ElFactoryDescriptor) {
                 ElFactoryDescriptor factoryDescriptor = (ElFactoryDescriptor) descriptor;
                 factoryMethodsToRegister.add(new LegacyElFactory(factoryDescriptor, manager));
@@ -119,10 +118,6 @@ public class ClassicBeanTransformer {
 
     public Set<UnwrappedBean> getUnwrappedBeansToRegister() {
         return unwrappedBeansToRegister;
-    }
-
-    private <PRODUCT_TYPE, HOST_TYPE> LegacyFactory<PRODUCT_TYPE, HOST_TYPE> createClassicFactory(FactoryDescriptor descriptor, Class<PRODUCT_TYPE> beanClass, Class<HOST_TYPE> hostType, BeanManager manager) {
-        return new LegacyFactory<PRODUCT_TYPE, HOST_TYPE>(descriptor, beanClass, hostType, manager);
     }
 
     private <T> AnnotatedTypeBuilder<T> createAnnotatedTypeBuilder(Class<T> javaClass) {

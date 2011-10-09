@@ -8,7 +8,7 @@ import org.jboss.seam.annotations.Scope;
 @Name("factory")
 @Scope(ScopeType.APPLICATION)
 public class FactoryBean {
-
+    
     @Factory(scope = ScopeType.EVENT, value = "delta")
     public Message getDelta() {
         return new Message("factoryDelta");
@@ -28,5 +28,4 @@ public class FactoryBean {
     public Message getGolf() {
         return new Message("factoryGolf");
     }
-
 }

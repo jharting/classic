@@ -7,6 +7,7 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.context.RequestScoped;
 
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.classic.scope.StatelessScoped;
 import org.jboss.seam.classic.util.ClassicScopeUtils;
 
 public class FactoryDescriptor extends AbstractFactoryDescriptor {
@@ -35,6 +36,10 @@ public class FactoryDescriptor extends AbstractFactoryDescriptor {
      * Translates Seam 2 ScopeType to matching CDI scope. Default scope rules for Seam 2 factories are considered.
      */
     public Class<? extends Annotation> getCdiScope() {
+        if (isVoid())
+        {
+            return StatelessScoped.class;
+        }
         if (getScope().equals(ScopeType.UNSPECIFIED)) {
             Class<? extends Annotation> hostScope = bean.getImplicitRole().getCdiScope();
             if (hostScope.equals(Dependent.class)) {

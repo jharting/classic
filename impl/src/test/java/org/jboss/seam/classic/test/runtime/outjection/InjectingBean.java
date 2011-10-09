@@ -23,6 +23,8 @@ public class InjectingBean {
     private Message foxtrot;
     @In(required = false)
     private Message golf;
+    @In(required = false)
+    private String hotel;
 
     public Message getAlpha() {
         return alpha;
@@ -50,5 +52,9 @@ public class InjectingBean {
 
     public Message getGolf() {
         return golf;
+    }
+
+    public String getHotel() {
+        return hotel;
     }
 }

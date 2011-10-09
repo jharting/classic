@@ -9,34 +9,48 @@ import org.jboss.seam.classic.init.metadata.FactoryDescriptor;
 import org.jboss.seam.classic.util.CdiUtils;
 import org.jboss.seam.solder.reflection.Reflections;
 
-public class LegacyFactory<PRODUCT_TYPE, HOST_TYPE> extends AbstractLegacyFactory<PRODUCT_TYPE> {
+public class LegacyFactory extends AbstractLegacyFactory<Object> {
 
-    private Class<PRODUCT_TYPE> beanClass;
+    private Class<?> beanClass;
     private String hostName;
-    private Class<HOST_TYPE> hostType;
+    private Class<?> hostType;
     private Method method;
+    private boolean isVoid;
 
-    public LegacyFactory(FactoryDescriptor descriptor, Class<PRODUCT_TYPE> beanClass, Class<HOST_TYPE> hostType, BeanManager manager) {
+    public LegacyFactory(FactoryDescriptor descriptor, BeanManager manager) {
         super(descriptor.getName(), descriptor.getCdiScope(), manager);
-        this.beanClass = beanClass;
-        
+        this.beanClass = descriptor.getMethod().getReturnType();
         this.hostName = descriptor.getBean().getImplicitRole().getName();
-        this.hostType = hostType;
+        this.hostType = descriptor.getBean().getJavaClass();
         this.method = descriptor.getMethod();
-        addTypes(Object.class, beanClass);
+        this.isVoid = void.class.equals(this.beanClass);
+        if (isVoid) {
+            addTypes(Object.class, Void.class);
+        } else {
+            addTypes(Object.class, this.beanClass);
+        }
     }
 
     @Override
-    public PRODUCT_TYPE create(CreationalContext<PRODUCT_TYPE> creationalContext) {
-        
-        CdiUtils.ManagedBeanInstance<HOST_TYPE> host = CdiUtils.lookupBeanByName(hostName, hostType, getManager());
+    public Object create(CreationalContext<Object> creationalContext) {
 
-        try
-        {
-            return Reflections.invokeMethod(true, method, beanClass, host.getInstance());
-        }
-        finally
-        {
+        CdiUtils.ManagedBeanInstance<?> host = CdiUtils.lookupBeanByName(hostName, hostType, getManager());
+
+        try {
+            if (isVoid)
+            {
+                Reflections.invokeMethod(true, method, beanClass, host.getInstance());
+                /*
+                 * this value must be overriden by an outjected value
+                 * otherwise, an attempt to inject it results in an exception
+                 */
+                return Void.INSTANCE;
+            }
+            else
+            {
+                return Reflections.invokeMethod(true, method, beanClass, host.getInstance());
+            }
+        } finally {
             host.getCreationalContext().release();
         }
     }

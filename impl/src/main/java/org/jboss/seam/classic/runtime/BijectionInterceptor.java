@@ -68,7 +68,7 @@ public class BijectionInterceptor implements Serializable {
         init(ctx);
 
         Object target = ctx.getTarget();
-        inject(target);
+        inject(target, false);
 
         // proceed initializer chain
         try {
@@ -77,7 +77,7 @@ public class BijectionInterceptor implements Serializable {
             throw new InstantiationException("Could not instantiate Seam component: " + descriptor.getJavaClass(), e);
         }
 
-        outject(target);
+        outject(target, false);
         disinject(target);
     }
 
@@ -89,23 +89,27 @@ public class BijectionInterceptor implements Serializable {
 
         Object target = ctx.getTarget();
 
-        inject(target);
+        inject(target, true);
 
         Object result = ctx.proceed();
 
-        outject(target);
+        outject(target, true);
         disinject(target);
 
         return result;
     }
 
-    protected void inject(Object target) {
+    protected void inject(Object target, boolean enforce) {
         for (InjectionPointDescriptor injectionPoint : descriptor.getInjectionPoints()) {
             Object injectableReference = getInjectableReference(injectionPoint);
 
             if (injectableReference != null) {
+                if (injectableReference instanceof Void) {
+                    throw new IllegalStateException("Factory method did not outject a value. Unable to injected reference: "
+                            + injectionPoint.getName());
+                }
                 injectionPoint.set(target, injectableReference);
-            } else if (injectionPoint.isRequired()) {
+            } else if (enforce && injectionPoint.isRequired()) {
                 throw new RequiredException("@In attribute requires non-null value: " + injectionPoint.getPath());
             }
         }
@@ -113,11 +117,12 @@ public class BijectionInterceptor implements Serializable {
 
     @SuppressWarnings("unchecked")
     protected Object getInjectableReference(InjectionPointDescriptor injectionPoint) {
-        return getInjectableReference(injectionPoint, RequestScoped.class, ConversationScoped.class, SessionScoped.class,
+        return getInjectableReference(injectionPoint, false, RequestScoped.class, ConversationScoped.class, SessionScoped.class,
                 ApplicationScoped.class);
     }
 
-    protected Object getInjectableReference(InjectionPointDescriptor injectionPoint, Class<? extends Annotation>... scopes) {
+    protected Object getInjectableReference(InjectionPointDescriptor injectionPoint, boolean readOnly,
+            Class<? extends Annotation>... scopes) {
         String injectionPointName = injectionPoint.getName();
         AbstractManagedInstanceDescriptor candidate = registry.getManagedInstanceDescriptorByName(injectionPointName);
 
@@ -148,14 +153,19 @@ public class BijectionInterceptor implements Serializable {
         }
 
         // create using CDI
-        if (bean != null && create) {
+        if (bean != null && create && !readOnly) {
             CreationalContext<?> ctx = manager.createCreationalContext(bean);
-            return manager.getReference(bean, Object.class, ctx);
-        }
-        
-        // TODO void factories
-        // TODO unwrap
+            Object product = manager.getReference(bean, Object.class, ctx);
 
+            // void factory was invoked, let's find the outjected value
+            if (product instanceof org.jboss.seam.classic.init.factory.Void) {
+                // invoke void factory method
+                ((org.jboss.seam.classic.init.factory.Void) product).forceBeanCreation();
+                return getInjectableReference(injectionPoint, true, scopes);
+            } else {
+                return product;
+            }
+        }
         return null;
     }
 
@@ -169,15 +179,15 @@ public class BijectionInterceptor implements Serializable {
         }
     }
 
-    protected void outject(Object target) {
+    protected void outject(Object target, boolean enforce) {
         for (OutjectionPointDescriptor outjectionPoint : descriptor.getOutjectionPoints()) {
-            outjectField(outjectionPoint, target);
+            outjectField(outjectionPoint, target, enforce);
         }
     }
 
-    protected void outjectField(OutjectionPointDescriptor outjectionPoint, Object target) {
+    protected void outjectField(OutjectionPointDescriptor outjectionPoint, Object target, boolean enforce) {
         Object value = outjectionPoint.get(target);
-        if (value == null && outjectionPoint.isRequired()) {
+        if (enforce && value == null && outjectionPoint.isRequired()) {
             throw new RequiredException("@Out attribute requires non-null value: " + outjectionPoint.getPath());
         }
 

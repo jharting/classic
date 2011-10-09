@@ -92,5 +92,11 @@ public class OutjectionTest {
             // expected
         }
     }
+    
+    @Test
+    public void testVoidFactory()
+    {
+        assertEquals("hotel", injectingBean.getHotel());
+    }
 
 }
