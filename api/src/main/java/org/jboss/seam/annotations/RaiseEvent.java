@@ -14,6 +14,9 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import javax.enterprise.util.Nonbinding;
+import javax.interceptor.InterceptorBinding;
+
 /**
  * Causes an event to be raised after the method returns a non-null result without exception.
  * 
@@ -22,6 +25,7 @@ import java.lang.annotation.Target;
 @Target({ METHOD, TYPE })
 @Retention(RUNTIME)
 @Documented
+@InterceptorBinding
 public @interface RaiseEvent {
 
     /**
@@ -29,5 +33,5 @@ public @interface RaiseEvent {
      * 
      * @return the event name
      */
-    String[] value() default {};
+    @Nonbinding String[] value() default {};
 }

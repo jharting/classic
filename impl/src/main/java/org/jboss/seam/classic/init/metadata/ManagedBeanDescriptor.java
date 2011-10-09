@@ -8,7 +8,9 @@ import java.util.Set;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
+import org.jboss.seam.annotations.Install;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.Observer;
 import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.Role;
 import org.jboss.seam.annotations.Roles;
@@ -17,6 +19,7 @@ import org.jboss.seam.annotations.Scope;
 public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
 
     private final Class<?> javaClass;
+    private final InstallDescriptor install;
     // roles
     private final Set<RoleDescriptor> roles = new HashSet<RoleDescriptor>();
     private final RoleDescriptor implicitRole;
@@ -24,12 +27,19 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
     private final Set<FactoryDescriptor> factories = new HashSet<FactoryDescriptor>();
     private final Set<InjectionPointDescriptor> injectionPoints = new HashSet<InjectionPointDescriptor>();
     private final Set<OutjectionPointDescriptor> outjectionPoints = new HashSet<OutjectionPointDescriptor>();
+    private final Set<ObserverMethodDescriptor> observerMethods = new HashSet<ObserverMethodDescriptor>();
 
     public ManagedBeanDescriptor(Class<?> javaClass) {
         super(javaClass);
 
         if (!javaClass.isAnnotationPresent(Name.class)) {
             throw new IllegalArgumentException(javaClass.getName() + " is not a legacy bean.");
+        }
+
+        if (javaClass.isAnnotationPresent(Install.class)) {
+            install = new InstallDescriptor(javaClass.getAnnotation(Install.class));
+        } else {
+            install = new InstallDescriptor();
         }
 
         this.javaClass = javaClass;
@@ -57,11 +67,18 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
             }
         }
 
-        // Register @Factory
+        // Iterate over methods
         for (Method method : javaClass.getDeclaredMethods()) {
+            // Register @Factory
             if (method.isAnnotationPresent(Factory.class)) {
                 Factory factory = method.getAnnotation(Factory.class);
                 factories.add(new FactoryDescriptor(factory.value(), factory.scope(), factory.autoCreate(), this, method));
+            }
+            if (method.isAnnotationPresent(Observer.class)) {
+                Observer observer = method.getAnnotation(Observer.class);
+                for (String type : observer.value()) {
+                    observerMethods.add(new ObserverMethodDescriptor(type, this, method, observer.create()));
+                }
             }
         }
 
@@ -104,6 +121,14 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
 
     public Set<OutjectionPointDescriptor> getOutjectionPoints() {
         return outjectionPoints;
+    }
+
+    public InstallDescriptor getInstallDescriptor() {
+        return install;
+    }
+
+    public Set<ObserverMethodDescriptor> getObserverMethods() {
+        return observerMethods;
     }
 
     @Override

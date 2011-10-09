@@ -13,7 +13,9 @@ import java.util.Set;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.classic.init.event.RaiseEventInterceptor;
 import org.jboss.seam.classic.init.scan.ScannotationScanner;
+import org.jboss.seam.classic.runtime.BijectionInterceptor;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -26,7 +28,7 @@ public class WarTest {
 
     public static JavaArchive createSeamClassic() {
         return ShrinkWrap.create(JavaArchive.class, "seam-classic.jar").addClasses(ScannotationScanner.class)
-                .addClass(Name.class);
+                .addClasses(Name.class, BijectionInterceptor.class, RaiseEventInterceptor.class);
     }
     
     @Deployment
@@ -37,6 +39,7 @@ public class WarTest {
         war.addAsLibrary(createSeamClassic());
         war.addAsLibrary(createSeamJar("bravo.jar", Bravo.class));
         war.addAsLibrary(createSeamJar("charlie.jar", Charlie.class));
+        war.addAsWebInfResource("META-INF/beans.xml", "beans.xml");
         return war;
     }
 

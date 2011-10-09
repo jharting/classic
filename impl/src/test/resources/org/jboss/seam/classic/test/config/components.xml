@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://jboss.com/products/seam/components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd">
+
+    <factory name="alpha" value="alpha" auto-create="true" />
+    <factory name="bravo" value="#{foo.foo}" auto-create="true" />
+    <factory name="charlie" value="#{foo.bool ? 'true' : 'false'}" auto-create="true" />
+    <factory name="delta" method="#{foo.delta}" auto-create="true" />
+
+    <event type="event">
+        <action execute="#{observingBean.alpha}" />
+        <action execute="#{observingBean.bravo}" />
+    </event>
+
+</components>

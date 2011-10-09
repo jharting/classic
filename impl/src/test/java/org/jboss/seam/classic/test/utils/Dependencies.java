@@ -20,4 +20,7 @@ public interface Dependencies {
 
     public static final Archive<?>[] GUAVA = DependencyResolvers.use(MavenDependencyResolver.class).loadMetadataFromPom("pom.xml")
             .artifact("com.google.guava:guava").exclusion("*").resolveAs(GenericArchive.class).toArray(new Archive<?>[0]);
+
+    public static final Archive<?>[] DOM4J = DependencyResolvers.use(MavenDependencyResolver.class).loadMetadataFromPom("pom.xml")
+            .artifact("dom4j:dom4j").exclusion("*").resolveAs(GenericArchive.class).toArray(new Archive<?>[0]);
 }

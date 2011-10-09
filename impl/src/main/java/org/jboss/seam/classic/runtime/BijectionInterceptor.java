@@ -150,7 +150,7 @@ public class BijectionInterceptor implements Serializable {
         // create using CDI
         if (bean != null && create) {
             CreationalContext<?> ctx = manager.createCreationalContext(bean);
-            return manager.getReference(bean, injectionPoint.getField().getType(), ctx);
+            return manager.getReference(bean, Object.class, ctx);
         }
         
         // TODO void factories

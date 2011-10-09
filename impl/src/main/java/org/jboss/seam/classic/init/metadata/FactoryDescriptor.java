@@ -9,19 +9,15 @@ import javax.enterprise.context.RequestScoped;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.classic.util.ClassicScopeUtils;
 
-public class FactoryDescriptor extends AbstractManagedInstanceDescriptor {
+public class FactoryDescriptor extends AbstractFactoryDescriptor {
 
-    private final String name;
-    private final ScopeType specifiedScope;
     private ManagedBeanDescriptor bean;
     private Method method;
     private Class<?> productType;
 
     public FactoryDescriptor(String name, ScopeType specifiedScope, boolean autoCreate, ManagedBeanDescriptor bean,
             Method method) {
-        super(autoCreate);
-        this.name = name;
-        this.specifiedScope = specifiedScope;
+        super(name, specifiedScope, autoCreate);
         this.bean = bean;
         this.method = method;
         this.productType = method.getReturnType();
@@ -35,26 +31,18 @@ public class FactoryDescriptor extends AbstractManagedInstanceDescriptor {
         return method;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public ScopeType getSpecifiedScope() {
-        return specifiedScope;
-    }
-
     /**
      * Translates Seam 2 ScopeType to matching CDI scope. Default scope rules for Seam 2 factories are considered.
      */
     public Class<? extends Annotation> getCdiScope() {
-        if (specifiedScope.equals(ScopeType.UNSPECIFIED)) {
+        if (getScope().equals(ScopeType.UNSPECIFIED)) {
             Class<? extends Annotation> hostScope = bean.getImplicitRole().getCdiScope();
             if (hostScope.equals(Dependent.class)) {
                 return RequestScoped.class;
             }
             return hostScope;
         } else {
-            return ClassicScopeUtils.transformExplicitLegacyScopeToCdiScope(specifiedScope);
+            return ClassicScopeUtils.transformExplicitLegacyScopeToCdiScope(getScope());
         }
     }
 
@@ -64,11 +52,5 @@ public class FactoryDescriptor extends AbstractManagedInstanceDescriptor {
 
     public boolean isVoid() {
         return void.class.equals(productType);
-    }
-
-    @Override
-    public String toString() {
-        return "FactoryDescriptor [name=" + name + ", specifiedScope=" + specifiedScope + ", bean=" + bean + ", method="
-                + method + "]";
     }
 }

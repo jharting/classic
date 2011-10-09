@@ -25,18 +25,15 @@ public class MetadataRegistry {
     public MetadataRegistry(SeamClassicExtension extension)
     {
         // prepare metadata registry for easy lookup at runtime
-        for (ManagedBeanDescriptor descriptor : extension.getDescriptors()) {
+        for (ManagedBeanDescriptor descriptor : extension.getBeanDescriptors()) {
             managedInstancesByClass.put(descriptor.getJavaClass(), descriptor);
             for (RoleDescriptor role : descriptor.getRoles()) {
                 managedInstancesByName.put(role.getName(), descriptor);
             }
-            for (FactoryDescriptor factory : descriptor.getFactories())
-            {
-                if (!factory.isVoid())
-                {
-                    managedInstancesByName.put(factory.getName(), factory);
-                }
-            }
+        }
+        for (AbstractFactoryDescriptor descriptor : extension.getFactoryDescriptors())
+        {
+            managedInstancesByName.put(descriptor.getName(), descriptor);
         }
     }
     

@@ -4,11 +4,17 @@ import javax.enterprise.inject.spi.Extension;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.async.Schedule;
+import org.jboss.seam.classic.config.ComponentsDotXml;
 import org.jboss.seam.classic.init.SeamClassicExtension;
+import org.jboss.seam.classic.init.event.EventsImpl;
 import org.jboss.seam.classic.runtime.BijectionInterceptor;
 import org.jboss.seam.classic.runtime.outjection.RewritableContextManager;
+import org.jboss.seam.classic.scope.StatelessScoped;
 import org.jboss.seam.classic.util.CdiScopeUtils;
 import org.jboss.seam.classic.util.literals.PreDestroyLiteral;
+import org.jboss.seam.core.Events;
+import org.jboss.seam.util.StaticLookup;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -17,19 +23,29 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 public class Archives {
 
     public static JavaArchive createSeamClassic() {
-        return ShrinkWrap.create(JavaArchive.class, "seam-classic.jar")
+        return ShrinkWrap
+                .create(JavaArchive.class, "seam-classic.jar")
                 .addPackages(true, SeamClassicExtension.class.getPackage())
+                // org.jboss.seam.classic.async
+                .addPackage(Schedule.class.getPackage())
+                // org.jboss.seam.classic.config
+                .addPackage(ComponentsDotXml.class.getPackage())
                 // org.jboss.seam.classic.init
                 .addPackage(BijectionInterceptor.class.getPackage())
                 // org.jboss.seam.classic.runtime
                 .addPackages(true, PreDestroyLiteral.class.getPackage())
+                // org.jboss.seam.classic.event
+                .addPackages(true, EventsImpl.class.getPackage())
                 // org.jboss.seam.classic.runtime.outjection
                 .addPackages(true, RewritableContextManager.class.getPackage())
+                // org.jboss.seam.classic.scope
+                .addPackages(true, StatelessScoped.class.getPackage())
                 // org.jboss.seam.classic.util
                 .addPackage(CdiScopeUtils.class.getPackage())
-                // org.jboss.seam.classic.util.literal
-                .addPackage(ScopeType.class.getPackage()).addPackages(true, Name.class.getPackage())
                 // api
+                .addPackage(ScopeType.class.getPackage())
+                .addPackages(true, Name.class.getPackage(), Events.class.getPackage(), StaticLookup.class.getPackage())
+
                 .addAsServiceProvider(Extension.class, SeamClassicExtension.class)
                 .addAsManifestResource("META-INF/beans.xml", "beans.xml");
     }
@@ -47,12 +63,11 @@ public class Archives {
         WebArchive war = ShrinkWrap.create(WebArchive.class, name).addAsResource(EmptyAsset.INSTANCE, "seam.properties")
                 .addClasses(classes);
         // beans.xml should not be required, but we bundle it since we want CDI to be enabled for tests
-        war.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
+        war.addAsWebInfResource("META-INF/beans.xml", "beans.xml");
 
         if (bundleSeamClassic) {
-            war.addAsLibrary(createSeamClassic()).addAsLibraries(Dependencies.SEAM_SOLDER)
-                    .addAsLibraries(Dependencies.SCANNOTATION).addAsLibraries(Dependencies.SCANNOTATION_VFS)
-                    .addAsLibraries(Dependencies.GUAVA);
+            war.addAsLibrary(createSeamClassic()).addAsLibraries(Dependencies.SEAM_SOLDER, Dependencies.SCANNOTATION,
+                    Dependencies.SCANNOTATION_VFS, Dependencies.DOM4J, Dependencies.GUAVA);
         }
         return war;
     }
