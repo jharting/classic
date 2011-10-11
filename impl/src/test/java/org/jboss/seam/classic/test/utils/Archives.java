@@ -12,6 +12,7 @@ import org.jboss.seam.classic.init.event.EventsImpl;
 import org.jboss.seam.classic.runtime.BijectionInterceptor;
 import org.jboss.seam.classic.runtime.outjection.RewritableContextManager;
 import org.jboss.seam.classic.scope.StatelessScoped;
+import org.jboss.seam.classic.startup.StartupListener;
 import org.jboss.seam.classic.util.CdiScopeUtils;
 import org.jboss.seam.classic.util.literals.PreDestroyLiteral;
 import org.jboss.seam.core.Events;
@@ -43,6 +44,8 @@ public class Archives {
                 .addPackages(true, RewritableContextManager.class.getPackage())
                 // org.jboss.seam.classic.scope
                 .addPackages(true, StatelessScoped.class.getPackage())
+                // org.jboss.seam.classic.startup
+                .addPackages(true, StartupListener.class.getPackage())
                 // org.jboss.seam.classic.util
                 .addPackage(CdiScopeUtils.class.getPackage())
                 // api

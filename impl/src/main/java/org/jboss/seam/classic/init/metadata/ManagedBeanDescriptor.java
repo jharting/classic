@@ -14,6 +14,7 @@ import org.jboss.seam.annotations.Out;
 import org.jboss.seam.annotations.Role;
 import org.jboss.seam.annotations.Roles;
 import org.jboss.seam.annotations.Scope;
+import org.jboss.seam.annotations.Startup;
 import org.jboss.seam.annotations.Unwrap;
 import org.jboss.seam.classic.config.ConfiguredManagedBean;
 
@@ -21,6 +22,10 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
 
     private final Class<?> javaClass;
     private final InstallDescriptor install;
+
+    private final boolean startup;
+    private final String[] startupDependencies;
+
     // roles
     private final Set<RoleDescriptor> roles = new HashSet<RoleDescriptor>();
     private final RoleDescriptor implicitRole;
@@ -39,6 +44,8 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
         }
 
         install = new InstallDescriptor(javaClass);
+        startup = javaClass.isAnnotationPresent(Startup.class);
+        startupDependencies = processStartupDependencies(javaClass);
 
         this.javaClass = javaClass;
 
@@ -66,6 +73,10 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
         this.javaClass = javaClass;
 
         install = new InstallDescriptor(javaClass, configuredManagedBean.getInstalled(), configuredManagedBean.getPrecedence());
+        startup = (configuredManagedBean.getStartup() != null) ? configuredManagedBean.getStartup() : javaClass
+                .isAnnotationPresent(Startup.class);
+        startupDependencies = (configuredManagedBean.getStartupDependends() != null) ? configuredManagedBean
+                .getStartupDependends() : processStartupDependencies(javaClass);
 
         String implicitRoleName = configuredManagedBean.getName();
         ScopeType implicitRoleScope = ScopeType.UNSPECIFIED;
@@ -89,8 +100,12 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
             throw new IllegalStateException("Cannot redefine metadata for a different class");
         }
         this.javaClass = managedBeanDescriptor.getJavaClass();
-        this.install = new InstallDescriptor(managedBeanDescriptor.getInstallDescriptor(), configuredManagedBean.getInstalled(),
-                configuredManagedBean.getPrecedence());
+        this.install = new InstallDescriptor(managedBeanDescriptor.getInstallDescriptor(),
+                configuredManagedBean.getInstalled(), configuredManagedBean.getPrecedence());
+        startup = (configuredManagedBean.getStartup() != null) ? configuredManagedBean.getStartup() : managedBeanDescriptor
+                .isStartup();
+        startupDependencies = (configuredManagedBean.getStartupDependends() != null) ? configuredManagedBean
+                .getStartupDependends() : managedBeanDescriptor.getStartupDependencies();
 
         // copy roles
         String implicitRoleName = configuredManagedBean.getName();
@@ -186,6 +201,14 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
         }
     }
 
+    private String[] processStartupDependencies(Class<?> javaClass) {
+        if (javaClass.isAnnotationPresent(Startup.class)) {
+            return javaClass.getAnnotation(Startup.class).depends();
+        } else {
+            return new String[0];
+        }
+    }
+
     public Class<?> getJavaClass() {
         return javaClass;
     }
@@ -224,6 +247,14 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
 
     public boolean hasUnwrappingMethod() {
         return unwrappingMethod != null;
+    }
+
+    public boolean isStartup() {
+        return startup;
+    }
+
+    public String[] getStartupDependencies() {
+        return startupDependencies;
     }
 
     @Override
