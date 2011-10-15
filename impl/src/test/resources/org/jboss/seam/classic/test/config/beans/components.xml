@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://jboss.com/products/seam/components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:subpackage="http://example.com/sparrow"
+    xsi:schemaLocation="http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.2.xsd">
+
+    <component name="eagle" auto-create="true" scope="session" class="org.jboss.seam.classic.test.config.beans.Eagle" />
+
+    <component name="falcon" auto-create="false" scope="application" installed="true" />
+
+    <component name="pigeon" precedence="30" scope="event" class="org.jboss.seam.classic.test.config.beans.UltimatePigeon" />
+    
+    <subpackage:sparrow scope="application" age="13" auto-create="true">
+        <name>Ricki</name>
+    </subpackage:sparrow>
+</components>

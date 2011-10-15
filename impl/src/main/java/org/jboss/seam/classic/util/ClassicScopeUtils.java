@@ -4,11 +4,11 @@ import java.lang.annotation.Annotation;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.ConversationScoped;
-import javax.enterprise.context.Dependent;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
 
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.classic.scope.StatelessScoped;
 
 public class ClassicScopeUtils {
 
@@ -18,7 +18,7 @@ public class ClassicScopeUtils {
     public static Class<? extends Annotation> transformExplicitLegacyScopeToCdiScope(ScopeType scope) {
         switch (scope) {
             case STATELESS:
-                return Dependent.class;
+                return StatelessScoped.class;
             case METHOD:
                 throw new UnsupportedOperationException("Scope not supported"); // TODO
             case EVENT:

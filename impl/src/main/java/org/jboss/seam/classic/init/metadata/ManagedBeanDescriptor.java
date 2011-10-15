@@ -8,7 +8,6 @@ import java.util.Set;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
-import org.jboss.seam.annotations.Install;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Observer;
 import org.jboss.seam.annotations.Out;
@@ -16,6 +15,7 @@ import org.jboss.seam.annotations.Role;
 import org.jboss.seam.annotations.Roles;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Unwrap;
+import org.jboss.seam.classic.config.ConfiguredManagedBean;
 
 public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
 
@@ -38,11 +38,7 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
             throw new IllegalArgumentException(javaClass.getName() + " is not a legacy bean.");
         }
 
-        if (javaClass.isAnnotationPresent(Install.class)) {
-            install = new InstallDescriptor(javaClass.getAnnotation(Install.class));
-        } else {
-            install = new InstallDescriptor();
-        }
+        install = new InstallDescriptor(javaClass);
 
         this.javaClass = javaClass;
 
@@ -52,7 +48,84 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
         if (javaClass.isAnnotationPresent(Scope.class)) {
             implicitRoleScope = javaClass.getAnnotation(Scope.class).value();
         }
-        implicitRole = new RoleDescriptor(implicitRoleName, implicitRoleScope, this);
+
+        this.implicitRole = processRoles(implicitRoleName, implicitRoleScope, javaClass);
+        // process methods (@Factory, @Observer, @Unwrap)
+        this.unwrappingMethod = processMethods(javaClass);
+        processInjectionPoints(javaClass);
+        processOutjectionPoints(javaClass);
+
+    }
+
+    public ManagedBeanDescriptor(ConfiguredManagedBean configuredManagedBean) {
+        this(configuredManagedBean, configuredManagedBean.getClazz());
+    }
+
+    public ManagedBeanDescriptor(ConfiguredManagedBean configuredManagedBean, Class<?> javaClass) {
+        super(configuredManagedBean.getAutoCreate(), javaClass);
+        this.javaClass = javaClass;
+
+        install = new InstallDescriptor(javaClass, configuredManagedBean.getInstalled(), configuredManagedBean.getPrecedence());
+
+        String implicitRoleName = configuredManagedBean.getName();
+        ScopeType implicitRoleScope = ScopeType.UNSPECIFIED;
+        if (configuredManagedBean.getScope() != null) {
+            implicitRoleScope = configuredManagedBean.getScope();
+        } else if (javaClass.isAnnotationPresent(Scope.class)) {
+            implicitRoleScope = javaClass.getAnnotation(Scope.class).value();
+        }
+
+        this.implicitRole = processRoles(implicitRoleName, implicitRoleScope, javaClass);
+        // process methods (@Factory, @Observer, @Unwrap)
+        this.unwrappingMethod = processMethods(javaClass);
+        processInjectionPoints(javaClass);
+        processOutjectionPoints(javaClass);
+    }
+
+    public ManagedBeanDescriptor(ConfiguredManagedBean configuredManagedBean, ManagedBeanDescriptor managedBeanDescriptor) {
+        super(configuredManagedBean.getAutoCreate(), managedBeanDescriptor.getJavaClass());
+        if (configuredManagedBean.getClazz() != null
+                && !configuredManagedBean.getClazz().equals(managedBeanDescriptor.getJavaClass())) {
+            throw new IllegalStateException("Cannot redefine metadata for a different class");
+        }
+        this.javaClass = managedBeanDescriptor.getJavaClass();
+        this.install = new InstallDescriptor(managedBeanDescriptor.getInstallDescriptor(), configuredManagedBean.getInstalled(),
+                configuredManagedBean.getPrecedence());
+
+        // copy roles
+        String implicitRoleName = configuredManagedBean.getName();
+        ScopeType implicitRoleScope = managedBeanDescriptor.getImplicitRole().getSpecifiedScope();
+        if (configuredManagedBean.getScope() != null) {
+            implicitRoleScope = configuredManagedBean.getScope();
+        }
+        this.implicitRole = new RoleDescriptor(implicitRoleName, implicitRoleScope, this);
+        roles.add(implicitRole);
+
+        for (RoleDescriptor role : managedBeanDescriptor.getRoles()) {
+            // we already added the implicit scope
+            if (!role.equals(managedBeanDescriptor.getImplicitRole())) {
+                roles.add(new RoleDescriptor(role, this));
+            }
+        }
+
+        // copy the rest
+        this.unwrappingMethod = managedBeanDescriptor.getUnwrappingMethod();
+        for (FactoryDescriptor descriptor : managedBeanDescriptor.getFactories()) {
+            factories.add(new FactoryDescriptor(descriptor, this));
+        }
+        for (ObserverMethodDescriptor observer : managedBeanDescriptor.getObserverMethods()) {
+            observerMethods.add(new ObserverMethodDescriptor(observer, this));
+        }
+        for (InjectionPointDescriptor descriptor : managedBeanDescriptor.getInjectionPoints()) {
+            injectionPoints.add(new InjectionPointDescriptor(descriptor, this));
+        }
+        for (OutjectionPointDescriptor descriptor : managedBeanDescriptor.getOutjectionPoints()) {
+            outjectionPoints.add(new OutjectionPointDescriptor(descriptor, this));
+        }
+    }
+
+    private RoleDescriptor processRoles(String implicitRoleName, ScopeType implicitRoleScope, Class<?> javaClass) {
+        RoleDescriptor implicitRole = new RoleDescriptor(implicitRoleName, implicitRoleScope, this);
         roles.add(implicitRole);
 
         // Register @Role if present
@@ -68,10 +141,11 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
                 this.roles.add(new RoleDescriptor(role.name(), role.scope(), this));
             }
         }
+        return implicitRole;
+    }
 
+    private Method processMethods(Class<?> javaClass) {
         Method unwrappingMethod = null; // bypassing the final field check
-        
-        // Iterate over methods
         for (Method method : javaClass.getDeclaredMethods()) {
             // Register @Factory
             if (method.isAnnotationPresent(Factory.class)) {
@@ -84,26 +158,26 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
                     observerMethods.add(new ObserverMethodDescriptor(type, this, method, observer.create()));
                 }
             }
-            if (method.isAnnotationPresent(Unwrap.class))
-            {
-                if (unwrappingMethod != null)
-                {
+            if (method.isAnnotationPresent(Unwrap.class)) {
+                if (unwrappingMethod != null) {
                     throw new IllegalStateException("component has multiple @Unwrap methods: " + javaClass.getName());
                 }
                 unwrappingMethod = method;
             }
         }
-        this.unwrappingMethod = unwrappingMethod;
+        return unwrappingMethod;
+    }
 
-        // @Register @In
+    private void processInjectionPoints(Class<?> javaClass) {
         for (Field field : javaClass.getDeclaredFields()) {
             if (field.isAnnotationPresent(In.class)) {
                 In in = field.getAnnotation(In.class);
                 injectionPoints.add(new InjectionPointDescriptor(in, field, this));
             }
         }
+    }
 
-        // Register @Out
+    private void processOutjectionPoints(Class<?> javaClass) {
         for (Field field : javaClass.getDeclaredFields()) {
             if (field.isAnnotationPresent(Out.class)) {
                 Out out = field.getAnnotation(Out.class);
@@ -143,13 +217,12 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
     public Set<ObserverMethodDescriptor> getObserverMethods() {
         return observerMethods;
     }
-    
+
     public Method getUnwrappingMethod() {
         return unwrappingMethod;
     }
-    
-    public boolean hasUnwrappingMethod()
-    {
+
+    public boolean hasUnwrappingMethod() {
         return unwrappingMethod != null;
     }
 

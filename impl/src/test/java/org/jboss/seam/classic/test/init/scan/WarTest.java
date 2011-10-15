@@ -2,9 +2,6 @@ package org.jboss.seam.classic.test.init.scan;
 
 import static org.jboss.seam.classic.test.utils.Archives.createSeamJar;
 import static org.jboss.seam.classic.test.utils.Archives.createSeamWebApp;
-import static org.jboss.seam.classic.test.utils.Dependencies.SCANNOTATION;
-import static org.jboss.seam.classic.test.utils.Dependencies.SCANNOTATION_VFS;
-import static org.jboss.seam.classic.test.utils.Dependencies.SEAM_SOLDER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -13,11 +10,14 @@ import java.util.Set;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.Namespace;
 import org.jboss.seam.classic.init.event.RaiseEventInterceptor;
 import org.jboss.seam.classic.init.scan.ScannotationScanner;
 import org.jboss.seam.classic.runtime.BijectionInterceptor;
+import org.jboss.seam.classic.test.init.scan.subpackage.AlphaJet;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
@@ -34,12 +34,10 @@ public class WarTest {
     @Deployment
     public static Archive<?> getDeployment() {
 
-        WebArchive war = createSeamWebApp("test.war", false, Alpha.class).addAsLibraries(SEAM_SOLDER).addAsLibraries(SCANNOTATION)
-                .addAsLibraries(SCANNOTATION_VFS);
-        war.addAsLibrary(createSeamClassic());
+        WebArchive war = createSeamWebApp("test.war", true, Alpha.class).addPackage(AlphaJet.class.getPackage());
         war.addAsLibrary(createSeamJar("bravo.jar", Bravo.class));
         war.addAsLibrary(createSeamJar("charlie.jar", Charlie.class));
-        war.addAsWebInfResource("META-INF/beans.xml", "beans.xml");
+        war.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
         return war;
     }
 
@@ -52,6 +50,12 @@ public class WarTest {
         assertTrue(classes.contains(Alpha.class));
         assertTrue(classes.contains(Bravo.class));
         assertTrue(classes.contains(Charlie.class));
+        
+        Set<Class<?>> namespaces = scanner.getClasses(Namespace.class.getName());
+        assertEquals(1, namespaces.size());
+        Class<?> namespace = namespaces.iterator().next();
+        assertTrue(namespace.isAnnotationPresent(Namespace.class));
+        assertEquals("http://example.com/test", namespace.getAnnotation(Namespace.class).value());
     }
 
 }

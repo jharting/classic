@@ -1,7 +1,6 @@
 package org.jboss.seam.classic.scope;
 
 import java.lang.annotation.Annotation;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 

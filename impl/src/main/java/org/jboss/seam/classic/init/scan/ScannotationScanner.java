@@ -89,6 +89,11 @@ public class ScannotationScanner {
         annotationIndex = db.getAnnotationIndex();
     }
 
+    /**
+     * 
+     * @param name FQN of an annotation
+     * @return classes annotated with the annotation
+     */
     public Set<String> getClassNames(String name) {
         Set<String> namedClasses = annotationIndex.get(name);
         if (namedClasses == null) {

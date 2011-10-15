@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.jboss.seam.classic.init.ConditionalInstallationService;
-import org.jboss.seam.classic.init.metadata.FactoryDescriptor;
+import org.jboss.seam.classic.init.metadata.AbstractFactoryDescriptor;
 import org.jboss.seam.classic.init.metadata.ManagedBeanDescriptor;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -61,7 +61,7 @@ public class ConditionalInstallationTest {
     public void testExplicitVeto()
     {
         assertFalse(installationService.getInstallableManagedBeanDescriptorMap().containsKey("bean8"));
-        for (FactoryDescriptor factory : installationService.getInstallableFactoryDescriptors())
+        for (AbstractFactoryDescriptor factory : installationService.getInstallableFactoryDescriptors())
         {
             if (factory.getName().equals("factory8"))
             {
@@ -74,7 +74,7 @@ public class ConditionalInstallationTest {
     public void testExplicitInstallation()
     {
         assertTrue(installationService.getInstallableManagedBeanDescriptorMap().containsKey("bean9"));
-        for (FactoryDescriptor factory : installationService.getInstallableFactoryDescriptors())
+        for (AbstractFactoryDescriptor factory : installationService.getInstallableFactoryDescriptors())
         {
             if (factory.getName().equals("factory9"))
             {

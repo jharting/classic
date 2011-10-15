@@ -24,6 +24,10 @@ public class RoleDescriptor {
         this.bean = bean;
     }
 
+    public RoleDescriptor(RoleDescriptor role, ManagedBeanDescriptor managedBeanDescriptor) {
+        this(role.getName(), role.getSpecifiedScope(), managedBeanDescriptor);
+    }
+
     public ManagedBeanDescriptor getBean() {
         return bean;
     }

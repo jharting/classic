@@ -49,7 +49,20 @@ public class ClassicBeanTransformer {
     private Set<Bean<?>> factoryMethodsToRegister = new HashSet<Bean<?>>();
     private Set<UnwrappedBean> unwrappedBeansToRegister = new HashSet<UnwrappedBean>();
 
-    public void processLegacyBeans(Set<ManagedBeanDescriptor> beans, BeanManager manager) {
+    public ClassicBeanTransformer(ConditionalInstallationService service, BeanManager manager) {
+        this(service.getInstallableManagedBeanBescriptors(), service.getInstallableFactoryDescriptors(), service
+                .getInstallableObserverMethodDescriptors(), manager);
+    }
+
+    public ClassicBeanTransformer(Set<ManagedBeanDescriptor> managedBeanDescriptors,
+            Set<AbstractFactoryDescriptor> factoryDescriptors, Set<AbstractObserverMethodDescriptor> observerMethods,
+            BeanManager manager) {
+        transformBeans(managedBeanDescriptors, manager);
+        transformFactories(factoryDescriptors, manager);
+        transformObserverMethods(observerMethods, manager);
+    }
+
+    protected void transformBeans(Set<ManagedBeanDescriptor> beans, BeanManager manager) {
         for (ManagedBeanDescriptor bean : beans) {
             for (RoleDescriptor role : bean.getRoles()) {
                 AnnotatedTypeBuilder<?> builder = createAnnotatedTypeBuilder(bean.getJavaClass());
@@ -81,7 +94,7 @@ public class ClassicBeanTransformer {
         }
     }
 
-    public Set<Bean<?>> processLegacyFactories(Set<AbstractFactoryDescriptor> factoryDescriptors, BeanManager manager) {
+    protected void transformFactories(Set<AbstractFactoryDescriptor> factoryDescriptors, BeanManager manager) {
         for (AbstractFactoryDescriptor descriptor : factoryDescriptors) {
             if (descriptor instanceof FactoryDescriptor) {
                 FactoryDescriptor beanFactoryDescriptor = (FactoryDescriptor) descriptor;
@@ -91,11 +104,9 @@ public class ClassicBeanTransformer {
                 factoryMethodsToRegister.add(new LegacyElFactory(factoryDescriptor, manager));
             }
         }
-        return factoryMethodsToRegister;
     }
 
-    public Set<ObserverMethod<?>> processLegacyObserverMethods(Set<AbstractObserverMethodDescriptor> observerMethods,
-            BeanManager manager) {
+    protected void transformObserverMethods(Set<AbstractObserverMethodDescriptor> observerMethods, BeanManager manager) {
 
         for (AbstractObserverMethodDescriptor om : observerMethods) {
             for (TransactionPhase phase : new TransactionPhase[] { TransactionPhase.IN_PROGRESS,
@@ -113,11 +124,6 @@ public class ClassicBeanTransformer {
                 }
             }
         }
-        return observerMethodsToRegister;
-    }
-
-    public Set<UnwrappedBean> getUnwrappedBeansToRegister() {
-        return unwrappedBeansToRegister;
     }
 
     private <T> AnnotatedTypeBuilder<T> createAnnotatedTypeBuilder(Class<T> javaClass) {
@@ -126,6 +132,10 @@ public class ClassicBeanTransformer {
 
     private <T> void registerInterceptors(AnnotatedTypeBuilder<T> builder) {
         builder.addToClass(BijectionInterceptor.Bijected.BijectedLiteral.INSTANCE);
+    }
+
+    public Set<UnwrappedBean> getUnwrappedBeansToRegister() {
+        return unwrappedBeansToRegister;
     }
 
     private <T> void registerUnwrappedBean(String name, Class<?> hostType, Type type, Method method, BeanManager manager) {
@@ -138,5 +148,9 @@ public class ClassicBeanTransformer {
 
     public Set<ObserverMethod<?>> getObserverMethodsToRegister() {
         return observerMethodsToRegister;
+    }
+
+    public Set<Bean<?>> getFactoryMethodsToRegister() {
+        return factoryMethodsToRegister;
     }
 }

@@ -25,14 +25,18 @@ public class OutjectionPointDescriptor extends AbstractManagedFieldDescriptor {
         super(out.value(), out.required(), out.scope(), field, bean);
     }
 
-    public Object get(Object target)
-    {
+    public OutjectionPointDescriptor(OutjectionPointDescriptor descriptor, ManagedBeanDescriptor bean) {
+        this(descriptor.getSpecifiedName(), descriptor.isRequired(), descriptor.getSpecifiedScope(), descriptor.getField(),
+                bean);
+    }
+
+    public Object get(Object target) {
         if (!getField().isAccessible()) {
             Reflections.setAccessible(getField());
         }
         return Reflections.getFieldValue(getField(), target);
     }
-    
+
     /**
      * Translates Seam 2 ScopeType to matching CDI scope. Default scope rules for Seam 2 outjected fields are considered.
      */

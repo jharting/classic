@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(Arquillian.class)
-public class ConfigTest {
+public class EventAndFactoryTest {
 
     @Inject
     private InjectedBean bean;
@@ -21,7 +21,7 @@ public class ConfigTest {
     @Deployment
     public static WebArchive getDeployment() {
         return createSeamWebApp("test.war", true, InjectedBean.class, Foo.class, ObservingBean.class).addAsResource(
-                "org/jboss/seam/classic/test/config/components.xml", "META-INF/components.xml");
+                "org/jboss/seam/classic/test/config/event-factory-components.xml", "META-INF/components.xml");
     }
 
     @Test

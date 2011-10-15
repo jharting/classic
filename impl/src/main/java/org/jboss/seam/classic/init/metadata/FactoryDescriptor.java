@@ -23,6 +23,11 @@ public class FactoryDescriptor extends AbstractFactoryDescriptor {
         this.method = method;
         this.productType = method.getReturnType();
     }
+    
+    public FactoryDescriptor(FactoryDescriptor original, ManagedBeanDescriptor bean)
+    {
+        this(original.getName(), original.getScope(), original.isAutoCreate(), bean, original.getMethod());
+    }
 
     public ManagedBeanDescriptor getBean() {
         return bean;

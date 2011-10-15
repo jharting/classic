@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jboss.seam.classic.init.metadata.AbstractFactoryDescriptor;
+import org.jboss.seam.classic.init.metadata.AbstractObserverMethodDescriptor;
+import org.jboss.seam.classic.init.metadata.ElFactoryDescriptor;
+import org.jboss.seam.classic.init.metadata.ElObserverMethodDescriptor;
 import org.jboss.seam.classic.init.metadata.FactoryDescriptor;
 import org.jboss.seam.classic.init.metadata.ManagedBeanDescriptor;
 import org.jboss.seam.classic.init.metadata.ObserverMethodDescriptor;
@@ -28,16 +32,34 @@ import com.google.common.collect.Multimap;
  * 
  */
 public class ConditionalInstallationService {
+    
+    private PrecedenceComparator comparator = new PrecedenceComparator();
 
+    // lookup maps
     private final Multimap<String, ManagedBeanDescriptor> descriptors;
     private Map<String, ManagedBeanDescriptor> currentTest;
-    private PrecedenceComparator comparator = new PrecedenceComparator();
+    // configured factories - these are always installed, so these can satisfy @Install dependencies of other beans
+    private Map<String, ElFactoryDescriptor> configuredFactories = new HashMap<String, ElFactoryDescriptor>();
+    // installable stuff
     private final Map<String, ManagedBeanDescriptor> installableComponents = new HashMap<String, ManagedBeanDescriptor>();
-    private final Set<FactoryDescriptor> factories = new HashSet<FactoryDescriptor>();
-    private final Set<ObserverMethodDescriptor> observerMethods = new HashSet<ObserverMethodDescriptor>();
+    private final Set<AbstractFactoryDescriptor> factories = new HashSet<AbstractFactoryDescriptor>();
+    private final Set<AbstractObserverMethodDescriptor> observerMethods = new HashSet<AbstractObserverMethodDescriptor>();
 
-    public ConditionalInstallationService(Collection<ManagedBeanDescriptor> incommingDescriptors) {
+    public ConditionalInstallationService(Collection<ManagedBeanDescriptor> incommingDescriptors, Set<ElFactoryDescriptor> configuredFactories, Set<ElObserverMethodDescriptor> configuredObserverMethods) {
         this.descriptors = createLookupMap(incommingDescriptors);
+        for (ElFactoryDescriptor descriptor : configuredFactories)
+        {
+            this.configuredFactories.put(descriptor.getName(), descriptor);
+        }
+        for (ElObserverMethodDescriptor observerMethodDescriptor : configuredObserverMethods)
+        {
+            observerMethods.add(observerMethodDescriptor);
+        }
+    }
+    
+    public ConditionalInstallationService(Collection<ManagedBeanDescriptor> incommingDescriptors)
+    {
+        this(incommingDescriptors, new HashSet<ElFactoryDescriptor>(), new HashSet<ElObserverMethodDescriptor>());
     }
 
     public void filterInstallableComponents() {
@@ -51,6 +73,10 @@ public class ConditionalInstallationService {
         for (Map.Entry<String, ManagedBeanDescriptor> entry : installableComponents.entrySet())
         {
             for (FactoryDescriptor factory : entry.getValue().getFactories())
+            {
+                factories.add(factory);
+            }
+            for (ElFactoryDescriptor factory : configuredFactories.values())
             {
                 factories.add(factory);
             }
@@ -72,12 +98,12 @@ public class ConditionalInstallationService {
         return Collections.unmodifiableMap(installableComponents);
     }
     
-    public Set<FactoryDescriptor> getInstallableFactoryDescriptors()
+    public Set<AbstractFactoryDescriptor> getInstallableFactoryDescriptors()
     {
         return factories;
     }
     
-    public Set<ObserverMethodDescriptor> getInstallableObserverMethodDescriptors()
+    public Set<AbstractObserverMethodDescriptor> getInstallableObserverMethodDescriptors()
     {
         return observerMethods;
     }
@@ -169,6 +195,10 @@ public class ConditionalInstallationService {
         for (ManagedBeanDescriptor descriptor : incommingDescriptors) {
             for (RoleDescriptor role : descriptor.getRoles()) {
                 descriptors.put(role.getName(), descriptor);
+            }
+            for (FactoryDescriptor factory : descriptor.getFactories())
+            {
+                descriptors.put(factory.getName(), descriptor);
             }
         }
         return descriptors;

@@ -14,6 +14,11 @@ public class ObserverMethodDescriptor extends AbstractObserverMethodDescriptor {
         this.method = method;
         this.autoCreate = autoCreate;
     }
+    
+    public ObserverMethodDescriptor(ObserverMethodDescriptor original, ManagedBeanDescriptor bean)
+    {
+        this(original.getType(), bean, original.getMethod(), original.isAutoCreate());
+    }
 
     public ManagedBeanDescriptor getBean() {
         return bean;

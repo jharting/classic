@@ -1,6 +1,5 @@
 package org.jboss.seam.classic.test.init;
 
-import static org.jboss.seam.classic.test.utils.Archives.createSeamClassic;
 import static org.jboss.seam.classic.test.utils.Archives.createSeamWebApp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -22,8 +21,7 @@ public class BeanRegistrationTest {
 
     @Deployment
     public static WebArchive getDeployment() {
-        return createSeamWebApp("test.war", Alpha.class, Bravo.class, Charlie.class, Delta.class, DeltaFactory.class)
-                .addAsLibrary(createSeamClassic());
+        return createSeamWebApp("test.war", Alpha.class, Bravo.class, Charlie.class, Delta.class, DeltaFactory.class);
     }
 
     @Test
