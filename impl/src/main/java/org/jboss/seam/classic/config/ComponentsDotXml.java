@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -32,6 +33,7 @@ public class ComponentsDotXml {
     public static final String COMPONENT_NAMESPACE = "http://jboss.com/products/seam/components";
 
     private final Map<String, NamespaceDescriptor> namespaces;
+    private final Properties replacements;
 
     private Element root;
     private boolean componentsParsed = false;
@@ -55,8 +57,9 @@ public class ComponentsDotXml {
         }
     });
 
-    public ComponentsDotXml(InputStream stream, Map<String, NamespaceDescriptor> namespaces) {
+    public ComponentsDotXml(InputStream stream, Map<String, NamespaceDescriptor> namespaces, Properties replacements) {
         this.namespaces = namespaces;
+        this.replacements = replacements;
         try {
             this.root = XML.getRootElementSafely(stream);
         } catch (Exception e) {
@@ -204,15 +207,15 @@ public class ComponentsDotXml {
     protected void parseComponent(Element component, String componentName, String className) throws ClassNotFoundException {
         Map<String, Conversions.PropertyValue> initialValuesForComponent = new HashMap<String, Conversions.PropertyValue>();
 
-        String installed = component.attributeValue("installed");
-        String scope = component.attributeValue("scope");
-        String startup = component.attributeValue("startup");
-        String startupDepends = component.attributeValue("startupDepends");
-        Class<?> clazz = (className != null) ? Class.forName(className) : null;
-        String jndiName = component.attributeValue("jndi-name");
-        String precedence = component.attributeValue("precedence");
-        String autoCreate = component.attributeValue("auto-create");
-        String name = componentName;
+        String installed = replace(component.attributeValue("installed"));
+        String scope = replace(component.attributeValue("scope"));
+        String startup = replace(component.attributeValue("startup"));
+        String startupDepends = replace(component.attributeValue("startupDepends"));
+        Class<?> clazz = (className != null) ? Class.forName(replace(className)) : null;
+        String jndiName = replace(component.attributeValue("jndi-name"));
+        String precedence = replace(component.attributeValue("precedence"));
+        String autoCreate = replace(component.attributeValue("auto-create"));
+        String name = replace(componentName);
 
         if (name == null) {
             if (clazz == null) {
@@ -230,7 +233,6 @@ public class ComponentsDotXml {
         configuredManagedBeans.add(bean);
 
         // process initial values
-
         for (Element prop : (List<Element>) component.elements()) {
             String propName = prop.attributeValue("name");
             if (propName == null) {
@@ -262,7 +264,6 @@ public class ComponentsDotXml {
     // Seam 2 code
 
     @SuppressWarnings("unchecked")
-    // private Conversions.PropertyValue getPropertyValue(Element prop, String propName, Properties replacements) {
     private Conversions.PropertyValue getPropertyValue(Element prop, String componentName, String propName) {
         String typeName = prop.attributeValue("type");
         Class<?> type = null;
@@ -306,16 +307,6 @@ public class ComponentsDotXml {
         return new Conversions.FlatPropertyValue(trimmedText(prop));
     }
 
-    // private String trimmedText(Element element, String propName, Properties replacements)
-    private String trimmedText(Element element, String propName) {
-        String text = element.getTextTrim();
-        if (text == null) {
-            throw new IllegalArgumentException("property value must be specified in element body: " + propName);
-        }
-        // return replace(text, replacements);
-        return text;
-    }
-
     // private String trimmedText(Attribute attribute, Properties replacements)
     private String trimmedText(Attribute attribute) {
         // return replace( attribute.getText(), replacements );
@@ -349,5 +340,20 @@ public class ComponentsDotXml {
         if (!componentsParsed) {
             parseComponents();
         }
+    }
+
+    private String trimmedText(Element element, String propName) {
+        String text = element.getTextTrim();
+        if (text == null) {
+            throw new IllegalArgumentException("property value must be specified in element body: " + propName);
+        }
+        return replace(text);
+    }
+
+    private String replace(String value) {
+        if (value != null && value.startsWith("@")) {
+            value = replacements.getProperty(value.substring(1, value.length() - 1));
+        }
+        return value;
     }
 }

@@ -74,7 +74,7 @@ public class SeamClassicExtension implements Extension {
             discoveredManagedBeanDescriptors.put(beanDescriptor.getImplicitRole().getName(), beanDescriptor);
         }
 
-        configuration.loadConfigurationFiles(this.namespaces);
+        configuration.loadConfiguration(this.namespaces);
 
         Multimap<String, ManagedBeanDescriptor> managedBeanDescriptors = mergeManagedBeanConfiguration(
                 discoveredManagedBeanDescriptors, configuration.getConfiguredManagedBeans());
