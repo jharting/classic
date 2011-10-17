@@ -17,6 +17,7 @@ import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Startup;
 import org.jboss.seam.annotations.Unwrap;
 import org.jboss.seam.classic.config.ConfiguredManagedBean;
+import org.jboss.seam.solder.reflection.Reflections;
 
 public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
 
@@ -59,8 +60,7 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
         this.implicitRole = processRoles(implicitRoleName, implicitRoleScope, javaClass);
         // process methods (@Factory, @Observer, @Unwrap)
         this.unwrappingMethod = processMethods(javaClass);
-        processInjectionPoints(javaClass);
-        processOutjectionPoints(javaClass);
+        processFields(javaClass);
 
     }
 
@@ -89,8 +89,7 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
         this.implicitRole = processRoles(implicitRoleName, implicitRoleScope, javaClass);
         // process methods (@Factory, @Observer, @Unwrap)
         this.unwrappingMethod = processMethods(javaClass);
-        processInjectionPoints(javaClass);
-        processOutjectionPoints(javaClass);
+        processFields(javaClass);
     }
 
     public ManagedBeanDescriptor(ConfiguredManagedBean configuredManagedBean, ManagedBeanDescriptor managedBeanDescriptor) {
@@ -161,42 +160,44 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
 
     private Method processMethods(Class<?> javaClass) {
         Method unwrappingMethod = null; // bypassing the final field check
-        for (Method method : javaClass.getDeclaredMethods()) {
-            // Register @Factory
-            if (method.isAnnotationPresent(Factory.class)) {
-                Factory factory = method.getAnnotation(Factory.class);
-                factories.add(new FactoryDescriptor(factory.value(), factory.scope(), factory.autoCreate(), this, method));
-            }
-            if (method.isAnnotationPresent(Observer.class)) {
-                Observer observer = method.getAnnotation(Observer.class);
-                for (String type : observer.value()) {
-                    observerMethods.add(new ObserverMethodDescriptor(type, this, method, observer.create()));
+        for (Class<?> clazz = javaClass; clazz != Object.class; clazz = clazz.getSuperclass()) {
+            for (Method method : clazz.getDeclaredMethods()) {
+                // Register @Factory
+                if (method.isAnnotationPresent(Factory.class)) {
+                    Factory factory = method.getAnnotation(Factory.class);
+                    factories.add(new FactoryDescriptor(factory.value(), factory.scope(), factory.autoCreate(), this, method));
                 }
-            }
-            if (method.isAnnotationPresent(Unwrap.class)) {
-                if (unwrappingMethod != null) {
-                    throw new IllegalStateException("component has multiple @Unwrap methods: " + javaClass.getName());
+                if (method.isAnnotationPresent(Observer.class)) {
+                    Observer observer = method.getAnnotation(Observer.class);
+                    for (String type : observer.value()) {
+                        observerMethods.add(new ObserverMethodDescriptor(type, this, method, observer.create()));
+                    }
                 }
-                unwrappingMethod = method;
+                if (method.isAnnotationPresent(Unwrap.class)) {
+                    if (unwrappingMethod != null) {
+                        throw new IllegalStateException("component has multiple @Unwrap methods: " + javaClass.getName());
+                    }
+                    unwrappingMethod = method;
+                    Reflections.setAccessible(unwrappingMethod);
+                }
             }
         }
         return unwrappingMethod;
     }
 
-    private void processInjectionPoints(Class<?> javaClass) {
-        for (Field field : javaClass.getDeclaredFields()) {
-            if (field.isAnnotationPresent(In.class)) {
-                In in = field.getAnnotation(In.class);
-                injectionPoints.add(new InjectionPointDescriptor(in, field, this));
+    private void processFields(Class<?> javaClass) {
+        for (Class<?> clazz = javaClass; clazz != Object.class; clazz = clazz.getSuperclass()) {
+            for (Field field : clazz.getDeclaredFields()) {
+                if (field.isAnnotationPresent(In.class)) {
+                    In in = field.getAnnotation(In.class);
+                    injectionPoints.add(new InjectionPointDescriptor(in, field, this));
+                }
             }
-        }
-    }
-
-    private void processOutjectionPoints(Class<?> javaClass) {
-        for (Field field : javaClass.getDeclaredFields()) {
-            if (field.isAnnotationPresent(Out.class)) {
-                Out out = field.getAnnotation(Out.class);
-                outjectionPoints.add(new OutjectionPointDescriptor(out, field, this));
+            for (Field field : clazz.getDeclaredFields()) {
+                if (field.isAnnotationPresent(Out.class)) {
+                    Out out = field.getAnnotation(Out.class);
+                    outjectionPoints.add(new OutjectionPointDescriptor(out, field, this));
+                }
             }
         }
     }

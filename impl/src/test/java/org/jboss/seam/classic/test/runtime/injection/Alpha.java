@@ -18,6 +18,8 @@ public class Alpha {
     private Foxtrot foxtrot;
     @In
     private CyclicBean1 cyclicBean1;
+    @In(create = true)
+    private HotelSubclass hotelSubclass;
 
     public Bravo getBravo() {
         return bravo;
@@ -42,4 +44,9 @@ public class Alpha {
     public CyclicBean1 getCyclicBean1() {
         return cyclicBean1;
     }
+
+    public HotelSubclass getHotelSubclass() {
+        return hotelSubclass;
+    }
+
 }

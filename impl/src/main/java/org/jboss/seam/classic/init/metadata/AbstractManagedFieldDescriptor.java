@@ -3,6 +3,7 @@ package org.jboss.seam.classic.init.metadata;
 import java.lang.reflect.Field;
 
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.solder.reflection.Reflections;
 
 public abstract class AbstractManagedFieldDescriptor {
 
@@ -19,16 +20,15 @@ public abstract class AbstractManagedFieldDescriptor {
         this.specifiedScope = specifiedScope;
         this.field = field;
         this.bean = bean;
+        Reflections.setAccessible(field);
     }
 
     public String getSpecifiedName() {
         return specifiedName;
     }
-    
-    public String getName()
-    {
-        if (specifiedName.isEmpty())
-        {
+
+    public String getName() {
+        if (specifiedName.isEmpty()) {
             return field.getName();
         }
         return specifiedName;
@@ -49,17 +49,15 @@ public abstract class AbstractManagedFieldDescriptor {
     public ManagedBeanDescriptor getBean() {
         return bean;
     }
-    
-    public String getPath()
-    {
+
+    public String getPath() {
         return bean.getJavaClass().getName() + "." + field.getName();
     }
 
     @Override
     public String toString() {
-        return "AbstractManagedFieldDescriptor [name=" + getName() + ", required=" + required
-                + ", specifiedScope=" + specifiedScope + ", field=" + field + "]";
+        return "AbstractManagedFieldDescriptor [name=" + getName() + ", required=" + required + ", specifiedScope="
+                + specifiedScope + ", field=" + field + "]";
     }
-    
-    
+
 }

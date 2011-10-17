@@ -39,7 +39,7 @@ public class LegacyFactory extends AbstractLegacyFactory<Object> {
         try {
             if (isVoid)
             {
-                Reflections.invokeMethod(true, method, beanClass, host.getInstance());
+                Reflections.invokeMethod(false, method, beanClass, host.getInstance());
                 /*
                  * this value must be overriden by an outjected value
                  * otherwise, an attempt to inject it results in an exception

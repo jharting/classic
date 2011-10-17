@@ -9,6 +9,7 @@ import javax.enterprise.context.RequestScoped;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.classic.scope.StatelessScoped;
 import org.jboss.seam.classic.util.ClassicScopeUtils;
+import org.jboss.seam.solder.reflection.Reflections;
 
 public class FactoryDescriptor extends AbstractFactoryDescriptor {
 
@@ -22,10 +23,10 @@ public class FactoryDescriptor extends AbstractFactoryDescriptor {
         this.bean = bean;
         this.method = method;
         this.productType = method.getReturnType();
+        Reflections.setAccessible(method);
     }
-    
-    public FactoryDescriptor(FactoryDescriptor original, ManagedBeanDescriptor bean)
-    {
+
+    public FactoryDescriptor(FactoryDescriptor original, ManagedBeanDescriptor bean) {
         this(original.getName(), original.getScope(), original.isAutoCreate(), bean, original.getMethod());
     }
 
@@ -41,8 +42,7 @@ public class FactoryDescriptor extends AbstractFactoryDescriptor {
      * Translates Seam 2 ScopeType to matching CDI scope. Default scope rules for Seam 2 factories are considered.
      */
     public Class<? extends Annotation> getCdiScope() {
-        if (isVoid())
-        {
+        if (isVoid()) {
             return StatelessScoped.class;
         }
         if (getScope().equals(ScopeType.UNSPECIFIED)) {

@@ -2,6 +2,8 @@ package org.jboss.seam.classic.init.metadata;
 
 import java.lang.reflect.Method;
 
+import org.jboss.seam.solder.reflection.Reflections;
+
 public class ObserverMethodDescriptor extends AbstractObserverMethodDescriptor {
 
     private final ManagedBeanDescriptor bean;
@@ -13,6 +15,7 @@ public class ObserverMethodDescriptor extends AbstractObserverMethodDescriptor {
         this.bean = bean;
         this.method = method;
         this.autoCreate = autoCreate;
+        Reflections.setAccessible(method);
     }
     
     public ObserverMethodDescriptor(ObserverMethodDescriptor original, ManagedBeanDescriptor bean)

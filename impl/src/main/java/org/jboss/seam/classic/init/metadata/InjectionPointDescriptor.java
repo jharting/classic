@@ -16,8 +16,8 @@ public class InjectionPointDescriptor extends AbstractManagedFieldDescriptor {
     }
 
     public InjectionPointDescriptor(InjectionPointDescriptor original, ManagedBeanDescriptor bean) {
-        this(original.getSpecifiedName(), original.isRequired(), original.getSpecifiedScope(), original.getField(), bean, original
-                .isCreate());
+        this(original.getSpecifiedName(), original.isRequired(), original.getSpecifiedScope(), original.getField(), bean,
+                original.isCreate());
     }
 
     public InjectionPointDescriptor(String name, boolean required, ScopeType specifiedScope, Field field,
@@ -31,7 +31,6 @@ public class InjectionPointDescriptor extends AbstractManagedFieldDescriptor {
     }
 
     public void set(Object target, Object value) {
-        Reflections.setFieldValue(true, getField(), target, value);
+        Reflections.setFieldValue(false, getField(), target, value);
     }
-
 }

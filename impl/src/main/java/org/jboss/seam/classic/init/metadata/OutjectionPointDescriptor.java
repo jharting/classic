@@ -31,9 +31,6 @@ public class OutjectionPointDescriptor extends AbstractManagedFieldDescriptor {
     }
 
     public Object get(Object target) {
-        if (!getField().isAccessible()) {
-            Reflections.setAccessible(getField());
-        }
         return Reflections.getFieldValue(getField(), target);
     }
 

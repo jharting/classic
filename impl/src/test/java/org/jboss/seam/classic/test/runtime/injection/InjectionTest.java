@@ -73,4 +73,9 @@ public class InjectionTest {
             // expected
         }
     }
+
+    @Test
+    public void testClassHierarchy() {
+        alpha.getHotelSubclass().checkInjection(); // will throw AssertionError if injection does not work
+    }
 }
