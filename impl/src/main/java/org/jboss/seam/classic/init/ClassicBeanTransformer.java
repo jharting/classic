@@ -14,6 +14,7 @@ import javax.enterprise.inject.spi.ObserverMethod;
 
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Destroy;
+import org.jboss.seam.annotations.web.RequestParameter;
 import org.jboss.seam.classic.init.event.LegacyElObserverMethod;
 import org.jboss.seam.classic.init.event.LegacyObserverMethod;
 import org.jboss.seam.classic.init.factory.LegacyFactory;
@@ -29,6 +30,7 @@ import org.jboss.seam.classic.init.metadata.ObserverMethodDescriptor;
 import org.jboss.seam.classic.init.metadata.RoleDescriptor;
 import org.jboss.seam.classic.init.redefiners.CreateAnnotationRedefiner;
 import org.jboss.seam.classic.init.redefiners.DestroyAnnotationRedefiner;
+import org.jboss.seam.classic.init.redefiners.RequestParameterRedefiner;
 import org.jboss.seam.classic.runtime.BijectionInterceptor;
 import org.jboss.seam.classic.util.CdiScopeUtils;
 import org.jboss.solder.literal.DefaultLiteral;
@@ -82,6 +84,7 @@ public class ClassicBeanTransformer {
                 // Process annotation redefiners
                 builder.redefine(Create.class, new CreateAnnotationRedefiner());
                 builder.redefine(Destroy.class, new DestroyAnnotationRedefiner());
+                builder.redefine(RequestParameter.class, new RequestParameterRedefiner());
 
                 // TODO interceptors
 

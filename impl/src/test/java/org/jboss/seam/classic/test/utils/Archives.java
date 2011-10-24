@@ -4,6 +4,7 @@ import javax.enterprise.inject.spi.Extension;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.web.RequestParameter;
 import org.jboss.seam.async.Schedule;
 import org.jboss.seam.classic.Seam2ManagedBean;
 import org.jboss.seam.classic.config.ComponentsDotXml;
@@ -51,6 +52,7 @@ public class Archives {
                 // api
                 .addPackage(ScopeType.class.getPackage())
                 .addPackages(true, Name.class.getPackage(), Events.class.getPackage(), StaticLookup.class.getPackage())
+                .addPackage(RequestParameter.class.getPackage())
 
                 .addAsServiceProvider(Extension.class, SeamClassicExtension.class)
                 .addAsManifestResource("META-INF/beans.xml", "beans.xml");
