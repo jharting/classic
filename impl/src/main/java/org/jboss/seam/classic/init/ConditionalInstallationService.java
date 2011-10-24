@@ -18,7 +18,7 @@ import org.jboss.seam.classic.init.metadata.FactoryDescriptor;
 import org.jboss.seam.classic.init.metadata.ManagedBeanDescriptor;
 import org.jboss.seam.classic.init.metadata.ObserverMethodDescriptor;
 import org.jboss.seam.classic.init.metadata.RoleDescriptor;
-import org.jboss.seam.solder.reflection.Reflections;
+import org.jboss.solder.reflection.Reflections;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;

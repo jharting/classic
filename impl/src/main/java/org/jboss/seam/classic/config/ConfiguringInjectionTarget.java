@@ -26,7 +26,7 @@ import org.jboss.seam.classic.util.Reflections;
 import org.jboss.seam.core.Expressions;
 import org.jboss.seam.core.Expressions.MethodExpression;
 import org.jboss.seam.core.Expressions.ValueExpression;
-import org.jboss.seam.solder.bean.ForwardingInjectionTarget;
+import org.jboss.solder.bean.ForwardingInjectionTarget;
 
 public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> {
 

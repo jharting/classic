@@ -11,7 +11,7 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 
-import org.jboss.seam.solder.literal.NamedLiteral;
+import org.jboss.solder.literal.NamedLiteral;
 
 public abstract class AbstractLegacyFactory<T> implements Bean<T> {
 

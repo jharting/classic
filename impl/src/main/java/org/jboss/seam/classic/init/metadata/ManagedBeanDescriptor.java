@@ -17,7 +17,7 @@ import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Startup;
 import org.jboss.seam.annotations.Unwrap;
 import org.jboss.seam.classic.config.ConfiguredManagedBean;
-import org.jboss.seam.solder.reflection.Reflections;
+import org.jboss.solder.reflection.Reflections;
 
 public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
 

@@ -7,7 +7,7 @@ import javax.enterprise.inject.spi.BeanManager;
 
 import org.jboss.seam.classic.init.metadata.FactoryDescriptor;
 import org.jboss.seam.classic.util.CdiUtils;
-import org.jboss.seam.solder.reflection.Reflections;
+import org.jboss.solder.reflection.Reflections;
 
 public class LegacyFactory extends AbstractLegacyFactory<Object> {
 

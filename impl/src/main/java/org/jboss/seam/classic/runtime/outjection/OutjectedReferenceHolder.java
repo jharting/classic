@@ -16,7 +16,7 @@ import javax.enterprise.context.NormalScope;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Qualifier;
 
-import org.jboss.seam.solder.core.Veto;
+import org.jboss.solder.core.Veto;
 
 @Veto
 public class OutjectedReferenceHolder implements Serializable {

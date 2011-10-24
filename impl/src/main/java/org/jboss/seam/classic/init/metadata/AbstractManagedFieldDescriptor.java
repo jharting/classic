@@ -3,7 +3,7 @@ package org.jboss.seam.classic.init.metadata;
 import java.lang.reflect.Field;
 
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.solder.reflection.Reflections;
+import org.jboss.solder.reflection.Reflections;
 
 public abstract class AbstractManagedFieldDescriptor {
 

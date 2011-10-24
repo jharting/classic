@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
-import org.jboss.seam.solder.reflection.Reflections;
+import org.jboss.solder.reflection.Reflections;
 
 public class InjectionPointDescriptor extends AbstractManagedFieldDescriptor {
 

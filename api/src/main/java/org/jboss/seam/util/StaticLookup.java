@@ -7,7 +7,7 @@ import javax.enterprise.inject.UnsatisfiedResolutionException;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 
-import org.jboss.seam.solder.beanManager.BeanManagerLocator;
+import org.jboss.solder.beanManager.BeanManagerLocator;
 
 public class StaticLookup {
 

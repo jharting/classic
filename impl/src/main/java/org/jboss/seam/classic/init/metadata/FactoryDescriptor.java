@@ -9,7 +9,7 @@ import javax.enterprise.context.RequestScoped;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.classic.scope.StatelessScoped;
 import org.jboss.seam.classic.util.ClassicScopeUtils;
-import org.jboss.seam.solder.reflection.Reflections;
+import org.jboss.solder.reflection.Reflections;
 
 public class FactoryDescriptor extends AbstractFactoryDescriptor {
 

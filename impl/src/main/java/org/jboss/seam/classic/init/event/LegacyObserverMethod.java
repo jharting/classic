@@ -7,7 +7,7 @@ import javax.enterprise.inject.spi.BeanManager;
 
 import org.jboss.seam.classic.init.metadata.ObserverMethodDescriptor;
 import org.jboss.seam.classic.util.CdiUtils;
-import org.jboss.seam.solder.reflection.Reflections;
+import org.jboss.solder.reflection.Reflections;
 
 /**
  * Represents a Seam 2 observer method.

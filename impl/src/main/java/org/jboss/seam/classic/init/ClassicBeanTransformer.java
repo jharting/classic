@@ -31,9 +31,9 @@ import org.jboss.seam.classic.init.redefiners.CreateAnnotationRedefiner;
 import org.jboss.seam.classic.init.redefiners.DestroyAnnotationRedefiner;
 import org.jboss.seam.classic.runtime.BijectionInterceptor;
 import org.jboss.seam.classic.util.CdiScopeUtils;
-import org.jboss.seam.solder.literal.DefaultLiteral;
-import org.jboss.seam.solder.literal.NamedLiteral;
-import org.jboss.seam.solder.reflection.annotated.AnnotatedTypeBuilder;
+import org.jboss.solder.literal.DefaultLiteral;
+import org.jboss.solder.literal.NamedLiteral;
+import org.jboss.solder.reflection.annotated.AnnotatedTypeBuilder;
 import org.jboss.seam.classic.Seam2ManagedBean;
 
 /**

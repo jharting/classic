@@ -39,9 +39,9 @@ import org.jboss.seam.classic.init.scan.ScannotationScanner;
 import org.jboss.seam.classic.runtime.outjection.OutjectedReferenceHolder;
 import org.jboss.seam.classic.scope.StatelessContext;
 import org.jboss.seam.classic.util.CdiScopeUtils;
-import org.jboss.seam.logging.Logger;
-import org.jboss.seam.solder.core.Veto;
-import org.jboss.seam.solder.reflection.annotated.AnnotatedTypeBuilder;
+import org.jboss.solder.logging.Logger;
+import org.jboss.solder.core.Veto;
+import org.jboss.solder.reflection.annotated.AnnotatedTypeBuilder;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;

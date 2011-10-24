@@ -10,11 +10,11 @@ import org.jboss.seam.core.Expressions;
 public class ExpressionsImpl extends Expressions {
 
     private static final long serialVersionUID = -2788774416068475103L;
-    private org.jboss.seam.solder.el.Expressions expressions;
+    private org.jboss.solder.el.Expressions expressions;
     private ELContext context;
 
     @Inject
-    public void init(org.jboss.seam.solder.el.Expressions expressions) {
+    public void init(org.jboss.solder.el.Expressions expressions) {
         this.expressions = expressions;
         this.context = expressions.getELContext();
     }

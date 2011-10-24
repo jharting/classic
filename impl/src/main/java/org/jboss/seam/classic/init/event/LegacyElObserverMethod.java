@@ -5,7 +5,7 @@ import javax.enterprise.inject.spi.BeanManager;
 
 import org.jboss.seam.classic.init.metadata.ElObserverMethodDescriptor;
 import org.jboss.seam.classic.util.CdiUtils;
-import org.jboss.seam.solder.el.Expressions;
+import org.jboss.solder.el.Expressions;
 
 public class LegacyElObserverMethod extends AbstractLegacyObserverMethod {
 

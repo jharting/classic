@@ -2,7 +2,7 @@ package org.jboss.seam.classic.init.metadata;
 
 import java.lang.reflect.Method;
 
-import org.jboss.seam.solder.reflection.Reflections;
+import org.jboss.solder.reflection.Reflections;
 
 public class ObserverMethodDescriptor extends AbstractObserverMethodDescriptor {
 

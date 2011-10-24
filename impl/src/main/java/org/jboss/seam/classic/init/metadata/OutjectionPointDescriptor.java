@@ -9,7 +9,7 @@ import javax.enterprise.context.RequestScoped;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Out;
 import org.jboss.seam.classic.util.ClassicScopeUtils;
-import org.jboss.seam.solder.reflection.Reflections;
+import org.jboss.solder.reflection.Reflections;
 
 public class OutjectionPointDescriptor extends AbstractManagedFieldDescriptor {
 

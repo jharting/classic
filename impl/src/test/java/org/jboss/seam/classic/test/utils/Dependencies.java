@@ -7,7 +7,7 @@ import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 
 public interface Dependencies {
     public static final Archive<?>[] SEAM_SOLDER = DependencyResolvers.use(MavenDependencyResolver.class)
-            .loadMetadataFromPom("pom.xml").artifact("org.jboss.seam.solder:seam-solder").resolveAs(GenericArchive.class)
+            .loadMetadataFromPom("pom.xml").artifact("org.jboss.solder:solder-impl").resolveAs(GenericArchive.class)
             .toArray(new Archive<?>[0]);
 
     public static final Archive<?>[] SCANNOTATION = DependencyResolvers.use(MavenDependencyResolver.class)

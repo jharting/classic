@@ -8,7 +8,7 @@ import javax.enterprise.inject.spi.BeanManager;
 
 import org.jboss.seam.classic.scope.StatelessScoped;
 import org.jboss.seam.classic.util.CdiUtils;
-import org.jboss.seam.solder.reflection.Reflections;
+import org.jboss.solder.reflection.Reflections;
 
 
 public class UnwrappedBean extends AbstractLegacyFactory<Object> {

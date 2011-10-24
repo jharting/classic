@@ -21,7 +21,6 @@
         <scannotation.version>1.1-SNAPSHOT</scannotation.version>
         <jbossas6.version>6.1.0.Final</jbossas6.version>
         <jbossas7.version>7.0.2.Final</jbossas7.version>
-        <seam.solder.version>3.1.0-SNAPSHOT</seam.solder.version>
         <dom4j.version>1.6.1</dom4j.version>
     </properties>
 
@@ -31,15 +30,10 @@
             <artifactId>seam-classic-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
         <dependency>
-            <groupId>org.jboss.seam.solder</groupId>
-            <artifactId>seam-solder</artifactId>
-            <version>${seam.solder.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.seam.solder</groupId>
-            <artifactId>seam-solder-api</artifactId>
-            <version>${seam.solder.version}</version>
+            <groupId>org.jboss.solder</groupId>
+            <artifactId>solder-impl</artifactId>
         </dependency>
 
         <dependency>

@@ -9,11 +9,11 @@ import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
 
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.solder.literal.ApplicationScopedLiteral;
-import org.jboss.seam.solder.literal.ConversationScopedLiteral;
-import org.jboss.seam.solder.literal.DependentLiteral;
-import org.jboss.seam.solder.literal.RequestScopedLiteral;
-import org.jboss.seam.solder.literal.SessionScopedLiteral;
+import org.jboss.solder.literal.ApplicationScopedLiteral;
+import org.jboss.solder.literal.ConversationScopedLiteral;
+import org.jboss.solder.literal.DependentLiteral;
+import org.jboss.solder.literal.RequestScopedLiteral;
+import org.jboss.solder.literal.SessionScopedLiteral;
 
 public class CdiScopeUtils {
 

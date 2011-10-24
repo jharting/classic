@@ -30,8 +30,8 @@
 			<artifactId>jboss-el-api_2.2_spec</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.seam.solder</groupId>
-			<artifactId>seam-solder</artifactId>
+			<groupId>org.jboss.solder</groupId>
+			<artifactId>solder-impl</artifactId>
 		</dependency>
 	</dependencies>
 </project>

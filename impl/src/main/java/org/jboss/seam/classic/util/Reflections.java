@@ -1,4 +1,3 @@
-//$Id: Reflections.java 9572 2008-11-15 22:33:10Z shane.bryzak@jboss.com $
 package org.jboss.seam.classic.util;
 
 import java.beans.Introspector;
