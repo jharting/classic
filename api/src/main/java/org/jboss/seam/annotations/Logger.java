@@ -8,6 +8,9 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import javax.enterprise.util.Nonbinding;
+import javax.inject.Qualifier;
+
 /**
  * Injects a log
  * 
@@ -16,9 +19,10 @@ import java.lang.annotation.Target;
 @Target({ FIELD, METHOD })
 @Retention(RUNTIME)
 @Documented
+@Qualifier
 public @interface Logger {
     /**
      * @return the log category
      */
-    String value() default "";
+    @Nonbinding String value() default "";
 }

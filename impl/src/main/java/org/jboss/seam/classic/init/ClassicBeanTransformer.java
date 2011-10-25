@@ -14,6 +14,7 @@ import javax.enterprise.inject.spi.ObserverMethod;
 
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Destroy;
+import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.web.RequestParameter;
 import org.jboss.seam.classic.init.event.LegacyElObserverMethod;
 import org.jboss.seam.classic.init.event.LegacyObserverMethod;
@@ -30,6 +31,7 @@ import org.jboss.seam.classic.init.metadata.ObserverMethodDescriptor;
 import org.jboss.seam.classic.init.metadata.RoleDescriptor;
 import org.jboss.seam.classic.init.redefiners.CreateAnnotationRedefiner;
 import org.jboss.seam.classic.init.redefiners.DestroyAnnotationRedefiner;
+import org.jboss.seam.classic.init.redefiners.LoggerRedefiner;
 import org.jboss.seam.classic.init.redefiners.RequestParameterRedefiner;
 import org.jboss.seam.classic.runtime.BijectionInterceptor;
 import org.jboss.seam.classic.util.CdiScopeUtils;
@@ -81,10 +83,14 @@ public class ClassicBeanTransformer {
                 // Set scope
                 Class<? extends Annotation> scope = role.getCdiScope();
                 builder.addToClass(CdiScopeUtils.getScopeLiteral(scope));
+                
                 // Process annotation redefiners
+                // Lifecycle event interceptor methods
                 builder.redefine(Create.class, new CreateAnnotationRedefiner());
                 builder.redefine(Destroy.class, new DestroyAnnotationRedefiner());
+                // Special injection points
                 builder.redefine(RequestParameter.class, new RequestParameterRedefiner());
+                builder.redefine(Logger.class, new LoggerRedefiner());
 
                 // TODO interceptors
 

@@ -10,6 +10,7 @@ import org.jboss.seam.classic.Seam2ManagedBean;
 import org.jboss.seam.classic.config.ComponentsDotXml;
 import org.jboss.seam.classic.init.SeamClassicExtension;
 import org.jboss.seam.classic.init.event.EventsImpl;
+import org.jboss.seam.classic.log.LogImpl;
 import org.jboss.seam.classic.runtime.BijectionInterceptor;
 import org.jboss.seam.classic.runtime.outjection.RewritableContextManager;
 import org.jboss.seam.classic.scope.StatelessScoped;
@@ -17,6 +18,7 @@ import org.jboss.seam.classic.startup.StartupListener;
 import org.jboss.seam.classic.util.CdiScopeUtils;
 import org.jboss.seam.classic.util.literals.PreDestroyLiteral;
 import org.jboss.seam.core.Events;
+import org.jboss.seam.log.Log;
 import org.jboss.seam.util.StaticLookup;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -37,6 +39,8 @@ public class Archives {
                 .addPackage(ComponentsDotXml.class.getPackage())
                 // org.jboss.seam.classic.init
                 .addPackage(BijectionInterceptor.class.getPackage())
+                // org.jboss.seam.classic.log
+                .addPackage(LogImpl.class.getPackage())
                 // org.jboss.seam.classic.runtime
                 .addPackages(true, PreDestroyLiteral.class.getPackage())
                 // org.jboss.seam.classic.event
@@ -53,6 +57,7 @@ public class Archives {
                 .addPackage(ScopeType.class.getPackage())
                 .addPackages(true, Name.class.getPackage(), Events.class.getPackage(), StaticLookup.class.getPackage())
                 .addPackage(RequestParameter.class.getPackage())
+                .addPackage(Log.class.getPackage())
 
                 .addAsServiceProvider(Extension.class, SeamClassicExtension.class)
                 .addAsManifestResource("META-INF/beans.xml", "beans.xml");
