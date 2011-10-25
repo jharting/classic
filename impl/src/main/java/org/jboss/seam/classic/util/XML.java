@@ -11,6 +11,11 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+/**
+ * XML utilities. Copied from Seam 2.2
+ * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ *
+ */
 public class XML
 {
    /**

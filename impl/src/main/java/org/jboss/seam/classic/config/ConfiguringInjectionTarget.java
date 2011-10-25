@@ -22,11 +22,12 @@ import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.InjectionTarget;
 
 import org.jboss.seam.classic.config.Conversions.PropertyValue;
-import org.jboss.seam.classic.util.Reflections;
+import org.jboss.seam.classic.util.ClassicReflections;
 import org.jboss.seam.core.Expressions;
 import org.jboss.seam.core.Expressions.MethodExpression;
 import org.jboss.seam.core.Expressions.ValueExpression;
 import org.jboss.solder.bean.ForwardingInjectionTarget;
+import org.jboss.solder.reflection.Reflections;
 
 public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> {
 
@@ -45,7 +46,7 @@ public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> 
 
             Method setterMethod = null;
             try {
-                setterMethod = Reflections.getSetterMethod(annotatedType.getJavaClass(), key);
+                setterMethod = ClassicReflections.getSetterMethod(annotatedType.getJavaClass(), key);
             } catch (IllegalArgumentException ignored) {
             }
             if (setterMethod != null) {
@@ -56,7 +57,7 @@ public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> 
                 Type parameterType = setterMethod.getGenericParameterTypes()[0];
                 methodInitializers.put(setterMethod, getInitialValue(propertyValue, parameterClass, parameterType));
             } else {
-                Field field = Reflections.getField(annotatedType.getJavaClass(), key);
+                Field field = ClassicReflections.getField(annotatedType.getJavaClass(), key);
                 if (!field.isAccessible()) {
                     field.setAccessible(true);
                 }
@@ -185,7 +186,7 @@ public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> 
         public SetInitialValue(PropertyValue propertyValue, Class<?> collectionClass, Type collectionType) {
             String[] expressions = propertyValue.getMultiValues();
             initialValues = new InitialValue[expressions.length];
-            elementType = Reflections.getCollectionElementType(collectionType);
+            elementType = ClassicReflections.getCollectionElementType(collectionType);
             if (propertyValue.getType() != null) {
                 this.collectionClass = propertyValue.getType();
             } else {
@@ -243,7 +244,7 @@ public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> 
             String[] expressions = propertyValue.getMultiValues();
             initialValues = new InitialValue[expressions.length];
             isArray = collectionClass.isArray();
-            elementType = isArray ? collectionClass.getComponentType() : Reflections.getCollectionElementType(collectionType);
+            elementType = isArray ? collectionClass.getComponentType() : ClassicReflections.getCollectionElementType(collectionType);
             if (propertyValue.getType() != null) {
                 this.collectionClass = propertyValue.getType();
             } else {
@@ -305,8 +306,8 @@ public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> 
         public MapInitialValue(PropertyValue propertyValue, Class<?> collectionClass, Type collectionType) {
             Map<String, String> expressions = propertyValue.getKeyedValues();
             initialValues = new LinkedHashMap<InitialValue, InitialValue>(expressions.size());
-            elementType = Reflections.getCollectionElementType(collectionType);
-            keyType = Reflections.getMapKeyType(collectionType);
+            elementType = ClassicReflections.getCollectionElementType(collectionType);
+            keyType = ClassicReflections.getMapKeyType(collectionType);
             if (propertyValue.getType() != null) {
                 this.collectionClass = propertyValue.getType();
             } else {
@@ -357,7 +358,7 @@ public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> 
 
     private void setPropertyValue(Object bean, Method method, String name, Object value) {
         try {
-            Reflections.invoke(method, bean, value);
+            Reflections.invokeMethod(method, bean, value);
         } catch (Exception e) {
             throw new IllegalArgumentException("could not set property value: " + getAttributeMessage(name), e);
         }
@@ -365,7 +366,7 @@ public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> 
 
     private void setFieldValue(Object bean, Field field, String name, Object value) {
         try {
-            Reflections.set(field, bean, value);
+            Reflections.setFieldValue(field, bean, value);
         } catch (Exception e) {
             throw new IllegalArgumentException("could not set field value: " + getAttributeMessage(name), e);
         }

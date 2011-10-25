@@ -13,6 +13,9 @@ import java.io.InputStream;
 import java.util.StringTokenizer;
 
 /**
+ * String utilities. Copied from Seam 2.2
+ * 
+ * @author Jozef Hartinger
  * @author <a href="mailto:theute@jboss.org">Thomas Heute</a>
  */
 public class Strings

@@ -12,8 +12,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.jboss.seam.classic.util.Reflections;
+import org.jboss.seam.classic.util.ClassicReflections;
 import org.jboss.seam.classic.util.Strings;
+import org.jboss.solder.reflection.Reflections;
 @SuppressWarnings("serial")
 public class Conversions
 {
@@ -180,7 +181,7 @@ public class Conversions
       public Set<?> toObject(PropertyValue values, Type type)
       {
          String[] strings = values.getMultiValues();
-         Class<?> elementType = Reflections.getCollectionElementType(type);
+         Class<?> elementType = ClassicReflections.getCollectionElementType(type);
          Set<Object> set = new HashSet<Object>(strings.length);
          Converter<?> elementConverter = converters.get(elementType);
          for (int i=0; i<strings.length; i++)
@@ -197,7 +198,7 @@ public class Conversions
       public List<?> toObject(PropertyValue values, Type type)
       {
          String[] strings = values.getMultiValues();
-         Class<?> elementType = Reflections.getCollectionElementType(type);
+         Class<?> elementType = ClassicReflections.getCollectionElementType(type);
          List<Object> list = new ArrayList<Object>(strings.length);
          Converter<?> elementConverter = converters.get(elementType);
          for (int i=0; i<strings.length; i++)
@@ -228,7 +229,7 @@ public class Conversions
       public Map<?, ?> toObject(PropertyValue values, Type type)
       {
          Map<String, String> keyedValues = values.getKeyedValues();
-         Class<?> elementType = Reflections.getCollectionElementType(type);
+         Class<?> elementType = ClassicReflections.getCollectionElementType(type);
          Map<Object, Object> map = new HashMap<Object, Object>( keyedValues.size() );
          Converter<?> elementConverter = converters.get(elementType);
          for ( Map.Entry<String, String> me: keyedValues.entrySet() )
