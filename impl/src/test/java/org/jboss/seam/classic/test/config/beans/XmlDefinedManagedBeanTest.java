@@ -26,7 +26,7 @@ public class XmlDefinedManagedBeanTest {
 
     @Deployment
     public static WebArchive getDeployment() {
-        return createSeamWebApp("test.war", true, Eagle.class, Falcon.class, Pigeon.class, UltimatePigeon.class, Sparrow.class)
+        return createSeamWebApp("test.war", Eagle.class, Falcon.class, Pigeon.class, UltimatePigeon.class, Sparrow.class)
                 .addPackage(Sparrow.class.getPackage())
                 .addAsResource("org/jboss/seam/classic/test/config/beans/components.xml", "META-INF/components.xml")
                 .addAsResource("org/jboss/seam/classic/test/config/beans/components.properties", "components.properties");

@@ -39,8 +39,8 @@ import org.jboss.seam.classic.init.scan.ScannotationScanner;
 import org.jboss.seam.classic.runtime.outjection.OutjectedReferenceHolder;
 import org.jboss.seam.classic.scope.StatelessContext;
 import org.jboss.seam.classic.util.CdiScopeUtils;
-import org.jboss.solder.logging.Logger;
 import org.jboss.solder.core.Veto;
+import org.jboss.solder.logging.Logger;
 import org.jboss.solder.reflection.annotated.AnnotatedTypeBuilder;
 
 import com.google.common.collect.HashMultimap;
@@ -53,6 +53,7 @@ public class SeamClassicExtension implements Extension {
     private final Map<String, NamespaceDescriptor> namespaces = new HashMap<String, NamespaceDescriptor>();
 
     private ClassicBeanTransformer beanTransformer;
+
     private MetadataRegistry registry;
     private ConfigurationService configuration = new ConfigurationService();
 
@@ -62,8 +63,11 @@ public class SeamClassicExtension implements Extension {
         log.debug("Scanning for Seam 2 beans.");
         ScannotationScanner scanner = new ScannotationScanner(this.getClass().getClassLoader());
         scanner.scan();
-        Set<Class<?>> classes = scanner.getClasses(Name.class.getName());
-        Set<Class<?>> namespaces = scanner.getClasses(Namespace.class.getName());
+
+        manager.fireEvent(new ScanningCompleteEvent(scanner, event));
+
+        Set<Class<?>> classes = scanner.getClasses(Name.class);
+        Set<Class<?>> namespaces = scanner.getClasses(Namespace.class);
         registerNamespaces(namespaces);
         log.debugv("Scan finished. {0} classes were loaded. {1} namespace declaring packages were loaded.", classes.size(),
                 namespaces.size());

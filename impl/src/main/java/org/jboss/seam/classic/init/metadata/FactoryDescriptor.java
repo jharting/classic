@@ -8,7 +8,7 @@ import javax.enterprise.context.RequestScoped;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.classic.scope.StatelessScoped;
-import org.jboss.seam.classic.util.ClassicScopeUtils;
+import org.jboss.seam.classic.util.Seam2Utils;
 import org.jboss.solder.reflection.Reflections;
 
 public class FactoryDescriptor extends AbstractFactoryDescriptor {
@@ -52,7 +52,7 @@ public class FactoryDescriptor extends AbstractFactoryDescriptor {
             }
             return hostScope;
         } else {
-            return ClassicScopeUtils.transformExplicitLegacyScopeToCdiScope(getScope());
+            return Seam2Utils.transformExplicitLegacyScopeToCdiScope(getScope());
         }
     }
 

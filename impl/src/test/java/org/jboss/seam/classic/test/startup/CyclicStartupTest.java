@@ -17,7 +17,7 @@ public class CyclicStartupTest {
     @Deployment
     @ShouldThrowException(Exception.class)
     public static WebArchive getDeployment() {
-        return createSeamWebApp("test.war", true, Cyclic1.class, Cyclic2.class);
+        return createSeamWebApp("test.war", Cyclic1.class, Cyclic2.class);
     }
 
     @Test

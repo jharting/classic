@@ -10,7 +10,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.persistence.Entity;
 
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.classic.util.ClassicScopeUtils;
+import org.jboss.seam.classic.util.Seam2Utils;
 
 public class RoleDescriptor {
 
@@ -58,7 +58,7 @@ public class RoleDescriptor {
                 return RequestScoped.class;
             }
         } else {
-            return ClassicScopeUtils.transformExplicitLegacyScopeToCdiScope(specifiedScope);
+            return Seam2Utils.transformExplicitLegacyScopeToCdiScope(specifiedScope);
         }
     }
 

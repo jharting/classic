@@ -3,6 +3,7 @@ package org.jboss.seam.classic.init.scan;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -17,7 +18,7 @@ import java.util.Set;
 import org.jboss.solder.logging.Logger;
 import org.scannotation.AnnotationDB;
 
-public class ScannotationScanner {
+public class ScannotationScanner implements Scanner {
 
     public static final String[] RESOURCE_NAMES = { "seam.properties", "META-INF/seam.properties", "META-INF/components.xml" };
 
@@ -79,7 +80,7 @@ public class ScannotationScanner {
         AnnotationDB db = new AnnotationDB();
         db.setScanClassAnnotations(true);
         db.setScanFieldAnnotations(false);
-        db.setScanMethodAnnotations(false);
+        db.setScanMethodAnnotations(true); // interceptors
         db.setScanParameterAnnotations(false);
         try {
             db.scanArchives(archives.toArray(new URL[0]));
@@ -94,6 +95,7 @@ public class ScannotationScanner {
      * @param name FQN of an annotation
      * @return classes annotated with the annotation
      */
+    @Override
     public Set<String> getClassNames(String name) {
         Set<String> namedClasses = annotationIndex.get(name);
         if (namedClasses == null) {
@@ -102,8 +104,9 @@ public class ScannotationScanner {
         return namedClasses;
     }
 
-    public Set<Class<?>> getClasses(String name) {
-        Set<String> classNames = getClassNames(name);
+    @Override
+    public Set<Class<?>> getClasses(Class<? extends Annotation> annotation) {
+        Set<String> classNames = getClassNames(annotation.getName());
         Set<Class<?>> classes = new HashSet<Class<?>>();
         for (String className : classNames) {
             log.debugv("Loading {0}", className);

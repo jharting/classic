@@ -5,7 +5,7 @@ import java.lang.annotation.Annotation;
 import javax.enterprise.context.RequestScoped;
 
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.classic.util.ClassicScopeUtils;
+import org.jboss.seam.classic.util.Seam2Utils;
 
 public abstract class AbstractFactoryDescriptor extends AbstractManagedInstanceDescriptor {
 
@@ -34,6 +34,6 @@ public abstract class AbstractFactoryDescriptor extends AbstractManagedInstanceD
         {
             return RequestScoped.class;
         }
-        return ClassicScopeUtils.transformExplicitLegacyScopeToCdiScope(scope);
+        return Seam2Utils.transformExplicitLegacyScopeToCdiScope(scope);
     }
 }

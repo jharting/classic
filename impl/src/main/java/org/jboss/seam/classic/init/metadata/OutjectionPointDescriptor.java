@@ -8,7 +8,7 @@ import javax.enterprise.context.RequestScoped;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Out;
-import org.jboss.seam.classic.util.ClassicScopeUtils;
+import org.jboss.seam.classic.util.Seam2Utils;
 import org.jboss.solder.reflection.Reflections;
 
 public class OutjectionPointDescriptor extends AbstractManagedFieldDescriptor {
@@ -46,6 +46,6 @@ public class OutjectionPointDescriptor extends AbstractManagedFieldDescriptor {
             }
             return hostScope;
         }
-        return ClassicScopeUtils.transformExplicitLegacyScopeToCdiScope(getSpecifiedScope());
+        return Seam2Utils.transformExplicitLegacyScopeToCdiScope(getSpecifiedScope());
     }
 }

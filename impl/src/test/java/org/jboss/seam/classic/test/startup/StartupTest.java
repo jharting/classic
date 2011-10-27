@@ -22,7 +22,7 @@ public class StartupTest {
 
     @Deployment
     public static WebArchive getDeployment() {
-        return createSeamWebApp("test.war", true, Alpha.class, Bravo.class, Charlie.class, Delta.class, Echo.class,
+        return createSeamWebApp("test.war", Alpha.class, Bravo.class, Charlie.class, Delta.class, Echo.class,
                 StartupEventListener.class, Superclass.class);
     }
 

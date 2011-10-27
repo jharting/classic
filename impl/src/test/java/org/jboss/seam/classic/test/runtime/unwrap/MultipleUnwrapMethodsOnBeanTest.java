@@ -16,7 +16,7 @@ public class MultipleUnwrapMethodsOnBeanTest {
     @Deployment
     @ShouldThrowException(Exception.class)
     public static WebArchive getDeployment() {
-        return createSeamWebApp("test.war", true, BrokenBean.class);
+        return createSeamWebApp("test.war", BrokenBean.class);
     }
     
     @Test

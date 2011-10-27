@@ -26,7 +26,7 @@ public class UnwrapTest {
 
     @Deployment
     public static WebArchive getDeployment() {
-        return createSeamWebApp("test.war", true, Model.class, Objects.class);
+        return createSeamWebApp("test.war", Model.class, Objects.class);
     }
 
     @Test

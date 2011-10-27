@@ -32,7 +32,7 @@ public class EarTest extends WarTest {
         ear.addAsLibrary(createSeamClassic());
         ear.setApplicationXML("org/jboss/seam/classic/test/init/scan/application.xml");
 
-        WebArchive war = createSeamWebApp("test.war", false, Alpha.class);
+        WebArchive war = createSeamWebApp("test.war", Alpha.class);
         ear.addAsModule(war);
         return ear;
     }
@@ -41,7 +41,7 @@ public class EarTest extends WarTest {
     public void testScanning() {
         ScannotationScanner scanner = new ScannotationScanner(this.getClass().getClassLoader());
         scanner.scan();
-        Set<Class<?>> classes = scanner.getClasses(Name.class.getName());
+        Set<Class<?>> classes = scanner.getClasses(Name.class);
         assertEquals(2, classes.size());
         assertTrue(classes.contains(Alpha.class));
         assertTrue(classes.contains(Bravo.class));

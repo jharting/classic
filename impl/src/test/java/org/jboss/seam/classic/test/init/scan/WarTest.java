@@ -34,7 +34,7 @@ public class WarTest {
     @Deployment
     public static Archive<?> getDeployment() {
 
-        WebArchive war = createSeamWebApp("test.war", true, Alpha.class).addPackage(AlphaJet.class.getPackage());
+        WebArchive war = createSeamWebApp("test.war", Alpha.class).addPackage(AlphaJet.class.getPackage());
         war.addAsLibrary(createSeamJar("bravo.jar", Bravo.class));
         war.addAsLibrary(createSeamJar("charlie.jar", Charlie.class));
         war.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
@@ -45,13 +45,13 @@ public class WarTest {
     public void testScanning() {
         ScannotationScanner scanner = new ScannotationScanner(this.getClass().getClassLoader());
         scanner.scan();
-        Set<Class<?>> classes = scanner.getClasses(Name.class.getName());
+        Set<Class<?>> classes = scanner.getClasses(Name.class);
         assertEquals(3, classes.size());
         assertTrue(classes.contains(Alpha.class));
         assertTrue(classes.contains(Bravo.class));
         assertTrue(classes.contains(Charlie.class));
         
-        Set<Class<?>> namespaces = scanner.getClasses(Namespace.class.getName());
+        Set<Class<?>> namespaces = scanner.getClasses(Namespace.class);
         assertEquals(1, namespaces.size());
         Class<?> namespace = namespaces.iterator().next();
         assertTrue(namespace.isAnnotationPresent(Namespace.class));

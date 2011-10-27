@@ -35,6 +35,7 @@ import org.jboss.seam.classic.init.redefiners.LoggerRedefiner;
 import org.jboss.seam.classic.init.redefiners.RequestParameterRedefiner;
 import org.jboss.seam.classic.runtime.BijectionInterceptor;
 import org.jboss.seam.classic.util.CdiScopeUtils;
+import org.jboss.seam.classic.util.Seam2Utils;
 import org.jboss.solder.literal.DefaultLiteral;
 import org.jboss.solder.literal.NamedLiteral;
 import org.jboss.solder.reflection.annotated.AnnotatedTypeBuilder;
@@ -91,8 +92,9 @@ public class ClassicBeanTransformer {
                 // Special injection points
                 builder.redefine(RequestParameter.class, new RequestParameterRedefiner());
                 builder.redefine(Logger.class, new LoggerRedefiner());
-
-                // TODO interceptors
+                // Interceptor bindings
+                // TODO: take @BypassInterceptors into account
+//                Seam2Utils.transformLegacyInterceptorBindings(builder);
 
                 // Register interceptors
                 // TODO: take @BypassInterceptors into account

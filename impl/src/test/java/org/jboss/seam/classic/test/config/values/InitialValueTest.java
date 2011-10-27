@@ -24,7 +24,7 @@ public class InitialValueTest {
 
     @Deployment
     public static WebArchive getDeployment() {
-        return createSeamWebApp("test.war", true, ConfiguredBean.class, ConfiguredBeanWithSetters.class).addAsResource(
+        return createSeamWebApp("test.war", ConfiguredBean.class, ConfiguredBeanWithSetters.class).addAsResource(
                 "org/jboss/seam/classic/test/config/values/initial-value-components.xml", "META-INF/components.xml");
     }
 

@@ -4,12 +4,15 @@ import javax.enterprise.inject.spi.Extension;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.intercept.Interceptors;
 import org.jboss.seam.annotations.web.RequestParameter;
 import org.jboss.seam.async.Schedule;
 import org.jboss.seam.classic.Seam2ManagedBean;
 import org.jboss.seam.classic.config.ComponentsDotXml;
 import org.jboss.seam.classic.init.SeamClassicExtension;
 import org.jboss.seam.classic.init.event.EventsImpl;
+import org.jboss.seam.classic.intercept.ClassicInterceptor;
+import org.jboss.seam.classic.intercept.InterceptorExtension;
 import org.jboss.seam.classic.log.LogImpl;
 import org.jboss.seam.classic.runtime.BijectionInterceptor;
 import org.jboss.seam.classic.runtime.outjection.RewritableContextManager;
@@ -18,6 +21,7 @@ import org.jboss.seam.classic.startup.StartupListener;
 import org.jboss.seam.classic.util.CdiScopeUtils;
 import org.jboss.seam.classic.util.literals.PreDestroyLiteral;
 import org.jboss.seam.core.Events;
+import org.jboss.seam.intercept.InvocationContext;
 import org.jboss.seam.log.Log;
 import org.jboss.seam.util.StaticLookup;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -25,6 +29,7 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
+@SuppressWarnings("deprecation")
 public class Archives {
 
     public static JavaArchive createSeamClassic() {
@@ -39,6 +44,8 @@ public class Archives {
                 .addPackage(ComponentsDotXml.class.getPackage())
                 // org.jboss.seam.classic.init
                 .addPackage(BijectionInterceptor.class.getPackage())
+                // org.jboss.seam.classic.initercept
+                .addPackage(ClassicInterceptor.class.getPackage())
                 // org.jboss.seam.classic.log
                 .addPackage(LogImpl.class.getPackage())
                 // org.jboss.seam.classic.runtime
@@ -56,10 +63,11 @@ public class Archives {
                 // api
                 .addPackage(ScopeType.class.getPackage())
                 .addPackages(true, Name.class.getPackage(), Events.class.getPackage(), StaticLookup.class.getPackage())
-                .addPackage(RequestParameter.class.getPackage())
-                .addPackage(Log.class.getPackage())
+                .addPackage(RequestParameter.class.getPackage()).addPackage(Log.class.getPackage())
+                .addPackage(Interceptors.class.getPackage()).addPackage(Log.class.getPackage())
+                .addPackage(InvocationContext.class.getPackage()).addPackage(Log.class.getPackage())
 
-                .addAsServiceProvider(Extension.class, SeamClassicExtension.class)
+                .addAsServiceProvider(Extension.class, SeamClassicExtension.class, InterceptorExtension.class)
                 .addAsManifestResource("META-INF/beans.xml", "beans.xml");
     }
 
@@ -69,14 +77,17 @@ public class Archives {
     }
 
     public static WebArchive createSeamWebApp(String name, Class<?>... classes) {
-        return createSeamWebApp(name, true, classes);
+        return createSeamWebApp(name, true, true, classes);
     }
 
-    public static WebArchive createSeamWebApp(String name, boolean bundleSeamClassic, Class<?>... classes) {
+    public static WebArchive createSeamWebApp(String name, boolean bundleSeamClassic, boolean bundleBeansDotXml,
+            Class<?>... classes) {
         WebArchive war = ShrinkWrap.create(WebArchive.class, name).addAsResource(EmptyAsset.INSTANCE, "seam.properties")
                 .addClasses(classes);
-        // beans.xml should not be required, but we bundle it since we want CDI to be enabled for tests
-        war.addAsWebInfResource("META-INF/beans.xml", "beans.xml");
+        if (bundleBeansDotXml) {
+            // beans.xml should not be required, but we bundle it since we want CDI to be enabled for tests
+            war.addAsWebInfResource("META-INF/beans.xml", "beans.xml");
+        }
 
         if (bundleSeamClassic) {
             war.addAsLibrary(createSeamClassic()).addAsLibraries(Dependencies.SEAM_SOLDER, Dependencies.SCANNOTATION,

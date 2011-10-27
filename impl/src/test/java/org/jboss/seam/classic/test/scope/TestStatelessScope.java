@@ -19,7 +19,7 @@ public class TestStatelessScope {
 
     @Deployment
     public static WebArchive getDeployment() {
-        return createSeamWebApp("test.war", true, Book.class);
+        return createSeamWebApp("test.war", Book.class);
     }
 
     @Test
