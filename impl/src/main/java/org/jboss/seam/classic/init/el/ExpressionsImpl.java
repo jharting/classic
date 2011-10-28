@@ -45,6 +45,7 @@ public class ExpressionsImpl extends Expressions {
         return new ForwardingValueExpression<T>(delegate, context);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public <T> MethodExpression<T> createMethodExpression(String expression, Class<T> type, Class... argTypes) {
         javax.el.MethodExpression delegate = expressions.getExpressionFactory().createMethodExpression(context, expression, type, argTypes);

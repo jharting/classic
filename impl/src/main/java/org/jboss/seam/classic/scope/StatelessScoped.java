@@ -10,9 +10,12 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.enterprise.context.NormalScope;
-
-@NormalScope
+/**
+ * Stateless scoped beans are created for every method invocation. Their state is not kept by the container.
+ * 
+ * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * 
+ */
 @Inherited
 @Target({ TYPE, METHOD, FIELD })
 @Retention(RUNTIME)

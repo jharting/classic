@@ -8,6 +8,13 @@ import javax.enterprise.context.spi.Context;
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 
+/**
+ * A new instance of bean is created on every invocation. An instance is destroyed just before another bean of the same type is
+ * created (which may be long after the former bean was created).
+ * 
+ * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * 
+ */
 public class StatelessContext implements Context {
 
     private ConcurrentMap<Contextual<?>, LastInstance<?>> lastInstances = new ConcurrentHashMap<Contextual<?>, LastInstance<?>>();
@@ -23,7 +30,8 @@ public class StatelessContext implements Context {
         T newInstance = contextual.create(creationalContext);
 
         @SuppressWarnings("unchecked")
-        LastInstance<T> lastInstance = (LastInstance<T>) lastInstances.put(contextual, new LastInstance<T>(newInstance, creationalContext));
+        LastInstance<T> lastInstance = (LastInstance<T>) lastInstances.put(contextual, new LastInstance<T>(newInstance,
+                creationalContext));
         if (lastInstance != null) {
             // we won't need this anymore
             contextual.destroy(lastInstance.getInstance(), lastInstance.getCreationalContext());
@@ -65,9 +73,8 @@ public class StatelessContext implements Context {
             destroyInstance(contextual);
         }
     }
-    
-    private <T> void destroyInstance(Contextual<T> contextual)
-    {
+
+    private <T> void destroyInstance(Contextual<T> contextual) {
         @SuppressWarnings("unchecked")
         LastInstance<T> lastInstance = (LastInstance<T>) lastInstances.get(contextual);
         contextual.destroy(lastInstance.getInstance(), lastInstance.getCreationalContext());

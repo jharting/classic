@@ -16,6 +16,7 @@ import org.jboss.seam.classic.intercept.InterceptorExtension;
 import org.jboss.seam.classic.log.LogImpl;
 import org.jboss.seam.classic.runtime.BijectionInterceptor;
 import org.jboss.seam.classic.runtime.outjection.RewritableContextManager;
+import org.jboss.seam.classic.scope.ScopeExtension;
 import org.jboss.seam.classic.scope.StatelessScoped;
 import org.jboss.seam.classic.startup.StartupListener;
 import org.jboss.seam.classic.util.CdiScopeUtils;
@@ -67,7 +68,7 @@ public class Archives {
                 .addPackage(Interceptors.class.getPackage()).addPackage(Log.class.getPackage())
                 .addPackage(InvocationContext.class.getPackage()).addPackage(Log.class.getPackage())
 
-                .addAsServiceProvider(Extension.class, SeamClassicExtension.class, InterceptorExtension.class)
+                .addAsServiceProvider(Extension.class, SeamClassicExtension.class, InterceptorExtension.class, ScopeExtension.class)
                 .addAsManifestResource("META-INF/beans.xml", "beans.xml");
     }
 

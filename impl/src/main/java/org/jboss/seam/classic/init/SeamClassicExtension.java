@@ -18,7 +18,6 @@ import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
-import javax.enterprise.inject.spi.BeforeShutdown;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.InjectionTarget;
 import javax.enterprise.inject.spi.ObserverMethod;
@@ -37,7 +36,6 @@ import org.jboss.seam.classic.init.metadata.MetadataRegistry;
 import org.jboss.seam.classic.init.metadata.NamespaceDescriptor;
 import org.jboss.seam.classic.init.scan.ScannotationScanner;
 import org.jboss.seam.classic.runtime.outjection.OutjectedReferenceHolder;
-import org.jboss.seam.classic.scope.StatelessContext;
 import org.jboss.seam.classic.util.CdiScopeUtils;
 import org.jboss.solder.core.Veto;
 import org.jboss.solder.logging.Logger;
@@ -56,8 +54,6 @@ public class SeamClassicExtension implements Extension {
 
     private MetadataRegistry registry;
     private ConfigurationService configuration = new ConfigurationService();
-
-    private final StatelessContext statelessContext = new StatelessContext();
 
     void init(@Observes BeforeBeanDiscovery event, BeanManager manager) {
         log.debug("Scanning for Seam 2 beans.");
@@ -146,10 +142,6 @@ public class SeamClassicExtension implements Extension {
         }
     }
 
-    void registerScopes(@Observes AfterBeanDiscovery event, BeanManager manager) {
-        event.addContext(statelessContext);
-    }
-
     void registerFactories(@Observes AfterBeanDiscovery event, BeanManager manager) {
         log.debugv("Registering {0} factories.", beanTransformer.getFactoryMethodsToRegister().size());
         for (Bean<?> factory : beanTransformer.getFactoryMethodsToRegister()) {
@@ -171,10 +163,6 @@ public class SeamClassicExtension implements Extension {
             log.debugv("Registering {0}", observerMethod);
             event.addObserverMethod(observerMethod);
         }
-    }
-
-    void shutdownStatelessContext(@Observes BeforeShutdown event) {
-        statelessContext.destroyInstances();
     }
 
     <T> void registerConfiguringInjectionTargets(@Observes ProcessInjectionTarget<T> event) {
