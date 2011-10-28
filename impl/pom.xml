@@ -15,7 +15,7 @@
     <url>http://seamframework.org/</url>
 
     <properties>
-        <arquillian.version>1.0.0.CR3</arquillian.version>
+        <arquillian.version>1.0.0.CR4</arquillian.version>
         <arquillian.jbossas6.version>1.0.0.CR1</arquillian.jbossas6.version>
         <shrinkwrap.resolver.version>1.0.0-beta-5</shrinkwrap.resolver.version>
         <scannotation.version>1.1-SNAPSHOT</scannotation.version>
@@ -30,7 +30,7 @@
             <artifactId>seam-classic-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.jboss.solder</groupId>
             <artifactId>solder-impl</artifactId>
@@ -89,6 +89,12 @@
             <version>${shrinkwrap.resolver.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.protocol</groupId>
+            <artifactId>arquillian-protocol-servlet</artifactId>
+            <version>${arquillian.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>

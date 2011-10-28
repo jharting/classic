@@ -26,14 +26,12 @@ public class Book {
     public void postConstruct()
     {
         this.id = identifier.getAndIncrement();
-        System.out.println("Created: " + id);
     }
     
     @PreDestroy
     public void preDestroy()
     {
         lastDestroyed = id;
-        System.out.println("Destroyed: " + id);
     }
 
     public static int getLastDestroyed() {

@@ -31,8 +31,9 @@ public class EarTest extends WarTest {
         ear.addAsLibraries(SEAM_SOLDER).addAsLibraries(SCANNOTATION).addAsLibraries(SCANNOTATION_VFS);
         ear.addAsLibrary(createSeamClassic());
         ear.setApplicationXML("org/jboss/seam/classic/test/init/scan/application.xml");
+        ear.addAsManifestResource("META-INF/jboss-deployment-structure.xml", "jboss-deployment-structure.xml");
 
-        WebArchive war = createSeamWebApp("test.war", Alpha.class);
+        WebArchive war = createSeamWebApp("test.war", false, false, Alpha.class);
         ear.addAsModule(war);
         return ear;
     }
