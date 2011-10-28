@@ -16,16 +16,17 @@ import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Destroy;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.web.RequestParameter;
+import org.jboss.seam.classic.Seam2ManagedBean;
 import org.jboss.seam.classic.init.event.LegacyElObserverMethod;
 import org.jboss.seam.classic.init.event.LegacyObserverMethod;
-import org.jboss.seam.classic.init.factory.LegacyFactory;
 import org.jboss.seam.classic.init.factory.LegacyElFactory;
+import org.jboss.seam.classic.init.factory.LegacyFactory;
 import org.jboss.seam.classic.init.factory.UnwrappedBean;
 import org.jboss.seam.classic.init.metadata.AbstractFactoryDescriptor;
 import org.jboss.seam.classic.init.metadata.AbstractObserverMethodDescriptor;
-import org.jboss.seam.classic.init.metadata.FactoryDescriptor;
 import org.jboss.seam.classic.init.metadata.ElFactoryDescriptor;
 import org.jboss.seam.classic.init.metadata.ElObserverMethodDescriptor;
+import org.jboss.seam.classic.init.metadata.FactoryDescriptor;
 import org.jboss.seam.classic.init.metadata.ManagedBeanDescriptor;
 import org.jboss.seam.classic.init.metadata.ObserverMethodDescriptor;
 import org.jboss.seam.classic.init.metadata.RoleDescriptor;
@@ -35,11 +36,9 @@ import org.jboss.seam.classic.init.redefiners.LoggerRedefiner;
 import org.jboss.seam.classic.init.redefiners.RequestParameterRedefiner;
 import org.jboss.seam.classic.runtime.BijectionInterceptor;
 import org.jboss.seam.classic.util.CdiScopeUtils;
-import org.jboss.seam.classic.util.Seam2Utils;
 import org.jboss.solder.literal.DefaultLiteral;
 import org.jboss.solder.literal.NamedLiteral;
 import org.jboss.solder.reflection.annotated.AnnotatedTypeBuilder;
-import org.jboss.seam.classic.Seam2ManagedBean;
 
 /**
  * This class is responsible for transforming metadata gathered during the scanning phase to CDI SPI objects.
