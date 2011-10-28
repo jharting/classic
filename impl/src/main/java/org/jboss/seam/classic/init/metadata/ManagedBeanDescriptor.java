@@ -16,10 +16,17 @@ import org.jboss.seam.annotations.Roles;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Startup;
 import org.jboss.seam.annotations.Unwrap;
+import org.jboss.seam.annotations.datamodel.DataModel;
+import org.jboss.seam.annotations.datamodel.DataModelSelection;
+import org.jboss.seam.annotations.datamodel.DataModelSelectionIndex;
 import org.jboss.seam.classic.config.ConfiguredManagedBean;
+import org.jboss.solder.logging.Logger;
 import org.jboss.solder.reflection.Reflections;
+import org.jboss.solder.util.Sortable;
 
-public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
+public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor implements Sortable {
+
+    private static final Logger log = Logger.getLogger(ManagedBeanDescriptor.class);
 
     private final Class<?> javaClass;
     private final InstallDescriptor install;
@@ -192,11 +199,13 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
                     In in = field.getAnnotation(In.class);
                     injectionPoints.add(new InjectionPointDescriptor(in, field, this));
                 }
-            }
-            for (Field field : clazz.getDeclaredFields()) {
                 if (field.isAnnotationPresent(Out.class)) {
                     Out out = field.getAnnotation(Out.class);
                     outjectionPoints.add(new OutjectionPointDescriptor(out, field, this));
+                }
+                if (field.isAnnotationPresent(DataModel.class) || field.isAnnotationPresent(DataModelSelection.class)
+                        || field.isAnnotationPresent(DataModelSelectionIndex.class)) {
+                    log.warn("DataModels are not supported. " + field);
                 }
             }
         }
@@ -261,5 +270,10 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor {
     @Override
     public String toString() {
         return "ManagedBeanDescriptor [javaClass=" + javaClass + ", implicitRole=" + implicitRole + "]";
+    }
+
+    @Override
+    public int getPrecedence() {
+        return install.getPrecedence();
     }
 }

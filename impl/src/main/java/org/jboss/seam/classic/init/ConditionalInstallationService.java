@@ -19,6 +19,7 @@ import org.jboss.seam.classic.init.metadata.ManagedBeanDescriptor;
 import org.jboss.seam.classic.init.metadata.ObserverMethodDescriptor;
 import org.jboss.seam.classic.init.metadata.RoleDescriptor;
 import org.jboss.solder.reflection.Reflections;
+import org.jboss.solder.util.Sortable;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -32,8 +33,8 @@ import com.google.common.collect.Multimap;
  * 
  */
 public class ConditionalInstallationService {
-    
-    private PrecedenceComparator comparator = new PrecedenceComparator();
+
+    private Comparator<Sortable> comparator = new Sortable.Comparator();
 
     // lookup maps
     private final Multimap<String, ManagedBeanDescriptor> descriptors;
@@ -45,20 +46,18 @@ public class ConditionalInstallationService {
     private final Set<AbstractFactoryDescriptor> factories = new HashSet<AbstractFactoryDescriptor>();
     private final Set<AbstractObserverMethodDescriptor> observerMethods = new HashSet<AbstractObserverMethodDescriptor>();
 
-    public ConditionalInstallationService(Collection<ManagedBeanDescriptor> incommingDescriptors, Set<ElFactoryDescriptor> configuredFactories, Set<ElObserverMethodDescriptor> configuredObserverMethods) {
+    public ConditionalInstallationService(Collection<ManagedBeanDescriptor> incommingDescriptors,
+            Set<ElFactoryDescriptor> configuredFactories, Set<ElObserverMethodDescriptor> configuredObserverMethods) {
         this.descriptors = createLookupMap(incommingDescriptors);
-        for (ElFactoryDescriptor descriptor : configuredFactories)
-        {
+        for (ElFactoryDescriptor descriptor : configuredFactories) {
             this.configuredFactories.put(descriptor.getName(), descriptor);
         }
-        for (ElObserverMethodDescriptor observerMethodDescriptor : configuredObserverMethods)
-        {
+        for (ElObserverMethodDescriptor observerMethodDescriptor : configuredObserverMethods) {
             observerMethods.add(observerMethodDescriptor);
         }
     }
-    
-    public ConditionalInstallationService(Collection<ManagedBeanDescriptor> incommingDescriptors)
-    {
+
+    public ConditionalInstallationService(Collection<ManagedBeanDescriptor> incommingDescriptors) {
         this(incommingDescriptors, new HashSet<ElFactoryDescriptor>(), new HashSet<ElObserverMethodDescriptor>());
     }
 
@@ -70,41 +69,33 @@ public class ConditionalInstallationService {
             }
             currentTest = null;
         }
-        for (Map.Entry<String, ManagedBeanDescriptor> entry : installableComponents.entrySet())
-        {
-            for (FactoryDescriptor factory : entry.getValue().getFactories())
-            {
+        for (Map.Entry<String, ManagedBeanDescriptor> entry : installableComponents.entrySet()) {
+            for (FactoryDescriptor factory : entry.getValue().getFactories()) {
                 factories.add(factory);
             }
-            for (ElFactoryDescriptor factory : configuredFactories.values())
-            {
+            for (ElFactoryDescriptor factory : configuredFactories.values()) {
                 factories.add(factory);
             }
-            for (ObserverMethodDescriptor observerMethod : entry.getValue().getObserverMethods())
-            {
+            for (ObserverMethodDescriptor observerMethod : entry.getValue().getObserverMethods()) {
                 observerMethods.add(observerMethod);
             }
         }
     }
-    
-    public Set<ManagedBeanDescriptor> getInstallableManagedBeanBescriptors()
-    {
+
+    public Set<ManagedBeanDescriptor> getInstallableManagedBeanBescriptors() {
         return new HashSet<ManagedBeanDescriptor>(installableComponents.values());
     }
-    
+
     // for tests
-    public Map<String, ManagedBeanDescriptor> getInstallableManagedBeanDescriptorMap()
-    {
+    public Map<String, ManagedBeanDescriptor> getInstallableManagedBeanDescriptorMap() {
         return Collections.unmodifiableMap(installableComponents);
     }
-    
-    public Set<AbstractFactoryDescriptor> getInstallableFactoryDescriptors()
-    {
+
+    public Set<AbstractFactoryDescriptor> getInstallableFactoryDescriptors() {
         return factories;
     }
-    
-    public Set<AbstractObserverMethodDescriptor> getInstallableObserverMethodDescriptors()
-    {
+
+    public Set<AbstractObserverMethodDescriptor> getInstallableObserverMethodDescriptors() {
         return observerMethods;
     }
 
@@ -130,11 +121,11 @@ public class ConditionalInstallationService {
 
     /**
      * Register a bean.
-     * @return true if all bean's dependencies (including transitive) have been met. 
+     * 
+     * @return true if all bean's dependencies (including transitive) have been met.
      */
     private boolean installImplementation(String name, ManagedBeanDescriptor descriptor) {
-        if (!descriptor.getInstallDescriptor().isInstalled())
-        {
+        if (!descriptor.getInstallDescriptor().isInstalled()) {
             return false;
         }
         currentTest.put(name, descriptor);
@@ -196,8 +187,7 @@ public class ConditionalInstallationService {
             for (RoleDescriptor role : descriptor.getRoles()) {
                 descriptors.put(role.getName(), descriptor);
             }
-            for (FactoryDescriptor factory : descriptor.getFactories())
-            {
+            for (FactoryDescriptor factory : descriptor.getFactories()) {
                 descriptors.put(factory.getName(), descriptor);
             }
         }
@@ -257,12 +247,4 @@ public class ConditionalInstallationService {
         }
         return candidates;
     }
-
-    public static class PrecedenceComparator implements Comparator<ManagedBeanDescriptor> {
-        public int compare(ManagedBeanDescriptor o1, ManagedBeanDescriptor o2) {
-            return o2.getInstallDescriptor().getPrecedence() - o1.getInstallDescriptor().getPrecedence();
-        }
-
-    }
-
 }
