@@ -76,9 +76,8 @@ public class SeamClassicExtension implements Extension {
 
         configuration.loadConfiguration(this.namespaces);
 
-        Multimap<String, ManagedBeanDescriptor> managedBeanDescriptors = mergeManagedBeanConfiguration(
-                discoveredManagedBeanDescriptors, configuration.getConfiguredManagedBeans());
-
+        Multimap<String, ManagedBeanDescriptor> managedBeanDescriptors = configuration.mergeManagedBeanConfiguration(discoveredManagedBeanDescriptors);
+        
         ConditionalInstallationService installationService = new ConditionalInstallationService(
                 managedBeanDescriptors.values(), configuration.getFactories(), configuration.getObserverMethods());
         installationService.filterInstallableComponents();
@@ -92,46 +91,6 @@ public class SeamClassicExtension implements Extension {
             log.debugv("Registering {0}", annotatedType.getJavaClass());
             event.addAnnotatedType(annotatedType);
         }
-    }
-
-    // TODO move out of here
-    private Multimap<String, ManagedBeanDescriptor> mergeManagedBeanConfiguration(
-            Multimap<String, ManagedBeanDescriptor> discoveredManagedBeanDescriptors,
-            Set<ConfiguredManagedBean> configuredManagedBeans) {
-        for (ConfiguredManagedBean configuredBean : configuredManagedBeans) {
-            Collection<ManagedBeanDescriptor> descriptors = discoveredManagedBeanDescriptors.get(configuredBean.getName());
-            if (configuredBean.getClazz() == null) // the XML element specifies not scope
-            {
-                if (descriptors.size() == 1) {
-                    Iterator<ManagedBeanDescriptor> iterator = descriptors.iterator();
-                    ManagedBeanDescriptor reconfigured = new ManagedBeanDescriptor(configuredBean, iterator.next());
-                    iterator.remove();
-                    descriptors.add(reconfigured);
-                } else {
-                    throw new IllegalStateException("Cannot reconfigure bean: " + configuredBean.getName()
-                            + ". Exactly one candidate required but there are: " + descriptors.toString());
-                }
-            } else {
-                Set<ManagedBeanDescriptor> replacements = new HashSet<ManagedBeanDescriptor>();
-                for (Iterator<ManagedBeanDescriptor> iterator = descriptors.iterator(); iterator.hasNext();) {
-                    ManagedBeanDescriptor descriptor = iterator.next();
-                    if (configuredBean.getClazz().equals(descriptor.getJavaClass())) {
-                        // remove the original bean, install the replacement later
-                        replacements.add(new ManagedBeanDescriptor(configuredBean, descriptor));
-                        iterator.remove();
-                    }
-                }
-                if (replacements.isEmpty()) {
-                    // if the configured bean did not match any discovered bean, add it as a new bean
-                    descriptors.add(new ManagedBeanDescriptor(configuredBean));
-                } else {
-                    // install reconfigured beans
-                    descriptors.addAll(replacements);
-                }
-
-            }
-        }
-        return discoveredManagedBeanDescriptors;
     }
 
     void vetoClassicBeans(@Observes ProcessAnnotatedType<?> event) {
