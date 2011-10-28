@@ -64,12 +64,15 @@ public class Archives {
                 // api
                 .addPackage(ScopeType.class.getPackage())
                 .addPackages(true, Name.class.getPackage(), Events.class.getPackage(), StaticLookup.class.getPackage())
-                .addPackage(RequestParameter.class.getPackage()).addPackage(Log.class.getPackage())
-                .addPackage(Interceptors.class.getPackage()).addPackage(Log.class.getPackage())
-                .addPackage(InvocationContext.class.getPackage()).addPackage(Log.class.getPackage())
+                .addPackage(RequestParameter.class.getPackage())
+                .addPackage(Log.class.getPackage())
+                .addPackage(Interceptors.class.getPackage())
+                .addPackage(Log.class.getPackage())
+                .addPackage(InvocationContext.class.getPackage())
+                .addPackage(Log.class.getPackage())
 
-                .addAsServiceProvider(Extension.class, SeamClassicExtension.class, InterceptorExtension.class, ScopeExtension.class)
-                .addAsManifestResource("META-INF/beans.xml", "beans.xml");
+                .addAsServiceProvider(Extension.class, SeamClassicExtension.class, InterceptorExtension.class,
+                        ScopeExtension.class).addAsManifestResource("META-INF/beans.xml", "beans.xml");
     }
 
     public static JavaArchive createSeamJar(String name, Class<?>... classes) {
@@ -91,8 +94,7 @@ public class Archives {
         }
 
         if (bundleSeamClassic) {
-            war.addAsLibrary(createSeamClassic()).addAsLibraries(Dependencies.SEAM_SOLDER, Dependencies.SCANNOTATION,
-                    Dependencies.SCANNOTATION_VFS, Dependencies.DOM4J, Dependencies.GUAVA);
+            war.addAsLibrary(createSeamClassic()).addAsLibraries(Dependencies.SEAM_SOLDER, Dependencies.DOM4J, Dependencies.GUAVA, Dependencies.REFLECTIONS);
         }
         return war;
     }

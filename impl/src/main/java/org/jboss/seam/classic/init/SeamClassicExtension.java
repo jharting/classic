@@ -3,8 +3,6 @@ package org.jboss.seam.classic.init;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,13 +26,13 @@ import javax.inject.Named;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Namespace;
 import org.jboss.seam.classic.config.ConfigurationService;
-import org.jboss.seam.classic.config.ConfiguredManagedBean;
 import org.jboss.seam.classic.config.ConfiguringInjectionTarget;
 import org.jboss.seam.classic.init.factory.UnwrappedBean;
 import org.jboss.seam.classic.init.metadata.ManagedBeanDescriptor;
 import org.jboss.seam.classic.init.metadata.MetadataRegistry;
 import org.jboss.seam.classic.init.metadata.NamespaceDescriptor;
-import org.jboss.seam.classic.init.scan.ScannotationScanner;
+import org.jboss.seam.classic.init.scan.ReflectionsScanner;
+import org.jboss.seam.classic.init.scan.Scanner;
 import org.jboss.seam.classic.runtime.outjection.OutjectedReferenceHolder;
 import org.jboss.seam.classic.util.CdiScopeUtils;
 import org.jboss.solder.core.Veto;
@@ -57,13 +55,13 @@ public class SeamClassicExtension implements Extension {
 
     void init(@Observes BeforeBeanDiscovery event, BeanManager manager) {
         log.debug("Scanning for Seam 2 beans.");
-        ScannotationScanner scanner = new ScannotationScanner(this.getClass().getClassLoader());
+        Scanner scanner = new ReflectionsScanner(this.getClass().getClassLoader());
         scanner.scan();
 
         manager.fireEvent(new ScanningCompleteEvent(scanner, event));
 
-        Set<Class<?>> classes = scanner.getClasses(Name.class);
-        Set<Class<?>> namespaces = scanner.getClasses(Namespace.class);
+        Set<Class<?>> classes = scanner.getTypesAnnotatedWith(Name.class);
+        Set<Class<?>> namespaces = scanner.getTypesAnnotatedWith(Namespace.class);
         registerNamespaces(namespaces);
         log.debugv("Scan finished. {0} classes were loaded. {1} namespace declaring packages were loaded.", classes.size(),
                 namespaces.size());

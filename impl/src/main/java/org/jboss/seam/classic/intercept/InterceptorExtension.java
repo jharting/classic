@@ -35,7 +35,7 @@ public class InterceptorExtension implements Extension {
 
     @SuppressWarnings("unchecked")
     void searchForInterceptorBindings(@Observes ScanningCompleteEvent event) {
-        Set<Class<?>> possibleInterceptorBindings = event.getScanner().getClasses(Interceptors.class);
+        Set<Class<?>> possibleInterceptorBindings = event.getScanner().getTypesAnnotatedWith(Interceptors.class);
 
         for (Class<?> clazz : possibleInterceptorBindings) {
             if (clazz.isAnnotation()) {

@@ -6,6 +6,7 @@ import org.jboss.seam.annotations.Name;
 
 @Name("bravo")
 @Stateless
+@Foo
 public class Bravo {
 
 }

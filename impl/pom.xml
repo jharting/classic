@@ -22,6 +22,7 @@
         <jbossas6.version>6.1.0.Final</jbossas6.version>
         <jbossas7.version>7.0.2.Final</jbossas7.version>
         <dom4j.version>1.6.1</dom4j.version>
+        <reflections.version>0.9.6_jboss_errai_r2</reflections.version>
     </properties>
 
     <dependencies>
@@ -66,14 +67,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.scannotation</groupId>
-            <artifactId>scannotation</artifactId>
-            <version>${scannotation.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scannotation</groupId>
-            <artifactId>scannotation-vfs</artifactId>
-            <version>${scannotation.version}</version>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>${reflections.version}</version>
         </dependency>
 
         <!-- Test dependencies -->
