@@ -9,7 +9,7 @@ import org.jboss.seam.annotations.web.RequestParameter;
 import org.jboss.seam.async.Schedule;
 import org.jboss.seam.classic.Seam2ManagedBean;
 import org.jboss.seam.classic.config.ComponentsDotXml;
-import org.jboss.seam.classic.init.SeamClassicExtension;
+import org.jboss.seam.classic.init.CoreExtension;
 import org.jboss.seam.classic.init.event.EventsImpl;
 import org.jboss.seam.classic.intercept.ClassicInterceptor;
 import org.jboss.seam.classic.intercept.InterceptorExtension;
@@ -36,7 +36,7 @@ public class Archives {
     public static JavaArchive createSeamClassic() {
         return ShrinkWrap
                 .create(JavaArchive.class, "seam-classic.jar")
-                .addPackages(true, SeamClassicExtension.class.getPackage())
+                .addPackages(true, CoreExtension.class.getPackage())
                 // org.jboss.seam.classic
                 .addPackage(Seam2ManagedBean.class.getPackage())
                 // org.jboss.seam.classic.async
@@ -71,7 +71,7 @@ public class Archives {
                 .addPackage(InvocationContext.class.getPackage())
                 .addPackage(Log.class.getPackage())
 
-                .addAsServiceProvider(Extension.class, SeamClassicExtension.class, InterceptorExtension.class,
+                .addAsServiceProvider(Extension.class, CoreExtension.class, InterceptorExtension.class,
                         ScopeExtension.class).addAsManifestResource("META-INF/beans.xml", "beans.xml");
     }
 

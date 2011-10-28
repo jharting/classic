@@ -42,45 +42,45 @@ import org.jboss.solder.reflection.annotated.AnnotatedTypeBuilder;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-public class SeamClassicExtension implements Extension {
+public class CoreExtension implements Extension {
 
-    private static final Logger log = Logger.getLogger(SeamClassicExtension.class);
-
-    private final Map<String, NamespaceDescriptor> namespaces = new HashMap<String, NamespaceDescriptor>();
+    private static final Logger log = Logger.getLogger(CoreExtension.class);
 
     private ClassicBeanTransformer beanTransformer;
 
     private MetadataRegistry registry;
     private ConfigurationService configuration = new ConfigurationService();
 
-    void init(@Observes BeforeBeanDiscovery event, BeanManager manager) {
+    void scan(@Observes BeforeBeanDiscovery event, BeanManager manager) {
         log.debug("Scanning for Seam 2 beans.");
         Scanner scanner = new ReflectionsScanner(this.getClass().getClassLoader());
         scanner.scan();
-
         manager.fireEvent(new ScanningCompleteEvent(scanner, event));
+    }
 
-        Set<Class<?>> classes = scanner.getTypesAnnotatedWith(Name.class);
-        Set<Class<?>> namespaces = scanner.getTypesAnnotatedWith(Namespace.class);
-        registerNamespaces(namespaces);
-        log.debugv("Scan finished. {0} classes were loaded. {1} namespace declaring packages were loaded.", classes.size(),
-                namespaces.size());
+    void init(@Observes ScanningCompleteEvent event, BeanManager manager) {
 
+        // process found components
+        Set<Class<?>> classes = event.getScanner().getTypesAnnotatedWith(Name.class);
         Multimap<String, ManagedBeanDescriptor> discoveredManagedBeanDescriptors = HashMultimap.create();
         for (Class<?> clazz : classes) {
             ManagedBeanDescriptor beanDescriptor = new ManagedBeanDescriptor(clazz);
             discoveredManagedBeanDescriptors.put(beanDescriptor.getImplicitRole().getName(), beanDescriptor);
         }
 
-        configuration.loadConfiguration(this.namespaces);
+        // process namespaces so that we can load XML configuration
+        Set<Class<?>> namespaceAnnotations = event.getScanner().getTypesAnnotatedWith(Namespace.class);
+        Map<String, NamespaceDescriptor> namespaces = registerNamespaces(namespaceAnnotations);
 
-        Multimap<String, ManagedBeanDescriptor> managedBeanDescriptors = configuration.mergeManagedBeanConfiguration(discoveredManagedBeanDescriptors);
-        
+        // process XML configuration
+        configuration.loadConfiguration(namespaces);
+        Multimap<String, ManagedBeanDescriptor> managedBeanDescriptors = configuration
+                .mergeManagedBeanConfiguration(discoveredManagedBeanDescriptors);
+
+        // process conditional installation
         ConditionalInstallationService installationService = new ConditionalInstallationService(
                 managedBeanDescriptors.values(), configuration.getFactories(), configuration.getObserverMethods());
         installationService.filterInstallableComponents();
-
-        registry = new MetadataRegistry(installationService);
         beanTransformer = new ClassicBeanTransformer(installationService, manager);
 
         // register annotated types for managed beans
@@ -89,6 +89,9 @@ public class SeamClassicExtension implements Extension {
             log.debugv("Registering {0}", annotatedType.getJavaClass());
             event.addAnnotatedType(annotatedType);
         }
+        
+        // make metamodel accessible at runtime
+        registry = new MetadataRegistry(installationService);
     }
 
     void vetoClassicBeans(@Observes ProcessAnnotatedType<?> event) {
@@ -149,7 +152,8 @@ public class SeamClassicExtension implements Extension {
         return builder.create();
     }
 
-    private void registerNamespaces(Collection<Class<?>> packages) {
+    protected Map<String, NamespaceDescriptor> registerNamespaces(Collection<Class<?>> packages) {
+        Map<String, NamespaceDescriptor> namespaces = new HashMap<String, NamespaceDescriptor>();
         for (Class<?> pkg : packages) {
             Namespace namespaceAnnotation = pkg.getAnnotation(Namespace.class);
             if (namespaceAnnotation == null) {
@@ -164,6 +168,7 @@ public class SeamClassicExtension implements Extension {
                 namespaces.put(namespace, descriptor);
             }
         }
+        return namespaces;
     }
 
     public MetadataRegistry getRegistry() {

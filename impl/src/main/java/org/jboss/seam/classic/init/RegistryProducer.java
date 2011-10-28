@@ -10,7 +10,7 @@ public class RegistryProducer {
 
     @Produces
     @ApplicationScoped
-    public MetadataRegistry getRegistry(SeamClassicExtension extension) {
+    public MetadataRegistry getRegistry(CoreExtension extension) {
         return extension.getRegistry();
     }
 

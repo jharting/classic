@@ -8,7 +8,7 @@ import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import org.jboss.seam.classic.init.scan.Scanner;
 
 /**
- * The {@link SeamClassicExtension} uses this event during bootstrap to notify other extensions that scanning finished.
+ * The {@link CoreExtension} uses this event during bootstrap to notify other extensions that scanning finished.
  * Extensions can register qualifiers, scopes, etc. similarly to @{link BeforeBeanDiscovery}.
  * 
  * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
