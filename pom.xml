@@ -4,21 +4,19 @@
     <parent>
         <groupId>org.jboss.seam</groupId>
         <artifactId>seam-parent</artifactId>
-        <version>10</version>
+        <version>16</version>
     </parent>
 
-
-    <artifactId>seam-classic-parent</artifactId>
-    <groupId>org.jboss.seam.classic</groupId>
+    <groupId>cz.muni.fi.xharting.classic</groupId>
+    <artifactId>classic-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Seam Classic Parent</name>
-    <url>http://seamframework.org/</url>
+    <name>Classic Parent</name>
 
     <properties>
-        <seam.version>3.0.0.Final</seam.version>
         <solder.version>3.1.0.Beta4</solder.version>
+        <javaee.spec.version>2.0.0.Final</javaee.spec.version>
     </properties>
 
     <modules>
@@ -26,26 +24,47 @@
         <module>impl</module>
     </modules>
 
+    <dependencies>
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.spec.javax.ejb</groupId>
+            <artifactId>jboss-ejb-api_3.1_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.spec.javax.interceptor</groupId>
+            <artifactId>jboss-interceptors-api_1.1_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.spec.javax.el</groupId>
+            <artifactId>jboss-el-api_2.2_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.solder</groupId>
+            <artifactId>solder-impl</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.jboss.seam</groupId>
-                <artifactId>seam-bom</artifactId>
-                <version>${seam.version}</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-            <dependency>
                 <groupId>org.jboss.spec</groupId>
                 <artifactId>jboss-javaee-6.0</artifactId>
-                <version>2.0.0.Final</version>
+                <version>${javaee.spec.version}</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>org.jboss.solder</groupId>
                 <artifactId>solder-impl</artifactId>
-                <version>3.1.0.Beta4</version>
+                <version>${solder.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

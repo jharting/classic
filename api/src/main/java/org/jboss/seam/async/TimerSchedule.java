@@ -11,6 +11,7 @@ import java.util.Date;
  * @author Gavin King
  *
  */
+@SuppressWarnings("serial")
 public class TimerSchedule extends Schedule
 {
    private Long intervalDuration;

@@ -1,3 +1,3 @@
-org.jboss.seam.classic.init.CoreExtension
-org.jboss.seam.classic.intercept.InterceptorExtension
-org.jboss.seam.classic.scope.ScopeExtension
+cz.muni.fi.xharting.classic.bootstrap.CoreExtension
+cz.muni.fi.xharting.classic.intercept.InterceptorExtension
+cz.muni.fi.xharting.classic.scope.ScopeExtension

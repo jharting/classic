@@ -2,39 +2,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>seam-classic-parent</artifactId>
-        <groupId>org.jboss.seam.classic</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <groupId>cz.muni.fi.xharting.classic</groupId>
+        <artifactId>classic-parent</artifactId>
         <relativePath>../pom.xml</relativePath>
+        <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>seam-classic-api</artifactId>
+    <artifactId>classic-api</artifactId>
     <packaging>jar</packaging>
 
-    <name>Seam Classic API</name>
-    <url>http://seamframework.org/</url>
+    <name>Seam 2 API</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.ejb</groupId>
-            <artifactId>jboss-ejb-api_3.1_spec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.interceptor</groupId>
-            <artifactId>jboss-interceptors-api_1.1_spec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.el</groupId>
-            <artifactId>jboss-el-api_2.2_spec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.solder</groupId>
-            <artifactId>solder-impl</artifactId>
-        </dependency>
-    </dependencies>
 </project>

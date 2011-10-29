@@ -59,6 +59,7 @@ public abstract class Expressions implements Serializable
     * @param type the method return type
     * @param argTypes the method parameter types
     */
+   @SuppressWarnings("rawtypes")
    public abstract <T> MethodExpression<T> createMethodExpression(final String expression, final Class<T> type, final Class... argTypes);
    
    /**

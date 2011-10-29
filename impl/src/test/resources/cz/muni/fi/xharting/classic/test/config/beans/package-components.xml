@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns:subpackage="http://example.com/sparrow">
+
+    <component name="eagle2" auto-create="true" scope="application" class="cz.muni.fi.xharting.classic.test.config.beans.Eagle" />
+
+</components>

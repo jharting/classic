@@ -3,8 +3,6 @@ package org.jboss.seam.async;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.ejb.ScheduleExpression;
-
 /**
  * A "schedule" for a timed event executed by
  * a timer service which supports delayed
@@ -14,6 +12,7 @@ import javax.ejb.ScheduleExpression;
  * @author Michael Yuan
  *
  */
+@SuppressWarnings("serial")
 public class Schedule implements Serializable
 {
    private Long duration;
