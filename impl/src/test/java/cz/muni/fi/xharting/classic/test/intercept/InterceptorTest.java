@@ -12,6 +12,7 @@ import javax.enterprise.inject.spi.InterceptionType;
 import javax.enterprise.inject.spi.Interceptor;
 import javax.enterprise.inject.spi.PassivationCapable;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -33,7 +34,7 @@ public class InterceptorTest {
     @Deployment
     public static WebArchive getDeployment() {
         return createSeamWebApp("test.war", true, false, BooleanInterceptor.class, IntegerInterceptor.class,
-                InterceptedBean.class, InterceptorBindings.class).addAsWebInfResource(
+                InterceptedBean.class, InterceptorBindings.class, NotInterceptedBean.class).addAsWebInfResource(
                 "cz/muni/fi/xharting/classic/test/intercept/beans.xml", "beans.xml");
     }
 
@@ -56,6 +57,14 @@ public class InterceptorTest {
         assertTrue(bean.getBool2());
         assertEquals(0, bean.getInt1());
         assertEquals(10, bean.getInt2());
+    }
+
+    @Test
+    public void testInterceptorBypassing(@Named("notInterceptedBean") NotInterceptedBean bean) {
+        // should not throw NoConversationException
+        // should not throw IllegalStateException since injection is not performed
+        // result should not be modified by IntegerInterceptor
+        assertEquals(0, bean.ping());
     }
 
 }

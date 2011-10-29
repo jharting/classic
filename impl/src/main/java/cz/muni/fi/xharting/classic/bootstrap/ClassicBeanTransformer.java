@@ -6,15 +6,19 @@ import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.TransactionPhase;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.ObserverMethod;
+import javax.interceptor.InterceptorBinding;
 
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Destroy;
 import org.jboss.seam.annotations.Logger;
+import org.jboss.seam.annotations.intercept.BypassInterceptors;
+import org.jboss.seam.annotations.intercept.Interceptors;
 import org.jboss.seam.annotations.web.RequestParameter;
 import org.jboss.solder.literal.DefaultLiteral;
 import org.jboss.solder.literal.NamedLiteral;
@@ -39,7 +43,9 @@ import cz.muni.fi.xharting.classic.metadata.FactoryDescriptor;
 import cz.muni.fi.xharting.classic.metadata.ManagedBeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.ObserverMethodDescriptor;
 import cz.muni.fi.xharting.classic.metadata.RoleDescriptor;
+import cz.muni.fi.xharting.classic.scope.page.PageScoped;
 import cz.muni.fi.xharting.classic.util.CdiScopeUtils;
+import cz.muni.fi.xharting.classic.util.literal.SynchronizedLiteral;
 
 /**
  * This class is responsible for transforming metadata gathered during the scanning phase to CDI SPI objects.
@@ -84,7 +90,7 @@ public class ClassicBeanTransformer {
                 // Set scope
                 Class<? extends Annotation> scope = role.getCdiScope();
                 builder.addToClass(CdiScopeUtils.getScopeLiteral(scope));
-                
+
                 // Process annotation redefiners
                 // Lifecycle event interceptor methods
                 builder.redefine(Create.class, new CreateAnnotationRedefiner());
@@ -92,17 +98,48 @@ public class ClassicBeanTransformer {
                 // Special injection points
                 builder.redefine(RequestParameter.class, new RequestParameterRedefiner());
                 builder.redefine(Logger.class, new LoggerRedefiner());
-                // Interceptor bindings
-                // TODO: take @BypassInterceptors into account
-//                Seam2Utils.transformLegacyInterceptorBindings(builder);
 
+                // @BypassInterceptors
+                if (builder.getJavaClass().isAnnotationPresent(BypassInterceptors.class)) {
+                    removeInterceptorBindings(builder);
+                }
                 // Register interceptors
-                // TODO: take @BypassInterceptors into account
-                registerInterceptors(builder);
-
+                else {
+                    registerInterceptors(bean, role, builder);
+                }
                 annotatedTypesToRegister.add(builder.create());
             }
         }
+    }
+
+    /**
+     * Removes all CDI and Seam 2 interceptor bindings from the class as well as all its methods.
+     */
+    protected void removeInterceptorBindings(AnnotatedTypeBuilder<?> builder) {
+        Class<?> javaClass = builder.getJavaClass();
+        for (Annotation annotation : javaClass.getAnnotations()) {
+            if (isInterceptorBinding(annotation)) {
+                builder.removeFromClass(annotation.annotationType());
+            }
+        }
+        for (Class<?> clazz = javaClass; clazz != Object.class; clazz = clazz.getSuperclass()) {
+            for (Method method : clazz.getDeclaredMethods()) {
+                for (Annotation annotation : method.getAnnotations()) {
+                    if (isInterceptorBinding(annotation)) {
+                        builder.removeFromMethod(method, annotation.annotationType());
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns true if a given annotation is either CDI or Seam 2 interceptor binding.
+     */
+    protected boolean isInterceptorBinding(Annotation annotation) {
+        Class<? extends Annotation> annotationClass = annotation.annotationType();
+        return annotationClass.isAnnotationPresent(InterceptorBinding.class)
+                || annotationClass.isAnnotationPresent(Interceptors.class) || annotationClass.equals(Interceptors.class);
     }
 
     protected void transformFactories(Set<AbstractFactoryDescriptor> factoryDescriptors, BeanManager manager) {
@@ -141,8 +178,14 @@ public class ClassicBeanTransformer {
         return new AnnotatedTypeBuilder<T>().readFromType(javaClass);
     }
 
-    private <T> void registerInterceptors(AnnotatedTypeBuilder<T> builder) {
+    private <T> void registerInterceptors(ManagedBeanDescriptor descriptor, RoleDescriptor role, AnnotatedTypeBuilder<T> builder) {
+        // support for injection/outjection
         builder.addToClass(BijectionInterceptor.Bijected.BijectedLiteral.INSTANCE);
+        // session-scoped and page-scoped components are synchronized automatically
+        if (SessionScoped.class.equals(role.getCdiScope()) || PageScoped.class.equals(role.getCdiScope())) {
+            builder.addToClass(SynchronizedLiteral.DEFAULT_INSTANCE);
+        }
+
     }
 
     public Set<UnwrappedBean> getUnwrappedBeansToRegister() {

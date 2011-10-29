@@ -17,6 +17,7 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 
+import org.jboss.seam.annotations.Conversational;
 import org.jboss.solder.core.Veto;
 import org.jboss.solder.reflection.annotated.AnnotatedTypeBuilder;
 
@@ -52,6 +53,11 @@ public class ScopeExtension implements Extension {
         return statefulScopes;
     }
 
+    void registerConversational(@Observes BeforeBeanDiscovery event)
+    {
+        event.addInterceptorBinding(Conversational.class);
+    }
+    
     void registerScopes(@Observes BeforeBeanDiscovery event) {
         event.addScope(StatelessScoped.class, true, false);
         event.addScope(PageScoped.class, true, true);

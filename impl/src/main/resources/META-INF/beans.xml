@@ -3,6 +3,8 @@
     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd">
 
     <interceptors>
+        <class>cz.muni.fi.xharting.classic.synchronization.SynchronizationInterceptor</class>
+        <class>cz.muni.fi.xharting.classic.scope.conversation.ConversationalInterceptor</class>
         <class>cz.muni.fi.xharting.classic.bijection.BijectionInterceptor</class>
         <class>cz.muni.fi.xharting.classic.event.RaiseEventInterceptor</class>
     </interceptors>
