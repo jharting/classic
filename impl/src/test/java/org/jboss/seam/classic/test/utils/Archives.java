@@ -13,6 +13,7 @@ import org.jboss.seam.async.Schedule;
 import org.jboss.seam.classic.Seam2ManagedBean;
 import org.jboss.seam.classic.config.ComponentsDotXml;
 import org.jboss.seam.classic.init.CoreExtension;
+import org.jboss.seam.classic.init.el.ElExtension;
 import org.jboss.seam.classic.init.event.EventsImpl;
 import org.jboss.seam.classic.intercept.ClassicInterceptor;
 import org.jboss.seam.classic.intercept.InterceptorExtension;
@@ -24,6 +25,7 @@ import org.jboss.seam.classic.scope.StatelessScoped;
 import org.jboss.seam.classic.startup.StartupListener;
 import org.jboss.seam.classic.util.CdiScopeUtils;
 import org.jboss.seam.classic.util.literals.PreDestroyLiteral;
+import org.jboss.seam.classic.util.spi.AbstractBean;
 import org.jboss.seam.core.Events;
 import org.jboss.seam.intercept.InvocationContext;
 import org.jboss.seam.log.Log;
@@ -66,6 +68,8 @@ public class Archives {
                 .addPackages(true, StartupListener.class.getPackage())
                 // org.jboss.seam.classic.util
                 .addPackage(CdiScopeUtils.class.getPackage())
+                // org.jboss.seam.classic.util.spi
+                .addPackage(AbstractBean.class.getPackage())
                 // api
                 .addPackage(ScopeType.class.getPackage())
                 .addPackages(true, Name.class.getPackage(), Events.class.getPackage(), StaticLookup.class.getPackage())
@@ -77,7 +81,7 @@ public class Archives {
                 .addPackage(Log.class.getPackage())
 
                 .addAsServiceProvider(Extension.class, CoreExtension.class, InterceptorExtension.class,
-                        ScopeExtension.class).addAsManifestResource("META-INF/beans.xml", "beans.xml");
+                        ScopeExtension.class, ElExtension.class).addAsManifestResource("META-INF/beans.xml", "beans.xml");
         addDependencyToManifest(jar, "org.slf4j.impl");
         return jar;
     }

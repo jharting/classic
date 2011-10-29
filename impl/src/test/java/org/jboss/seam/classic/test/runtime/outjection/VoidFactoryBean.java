@@ -11,7 +11,7 @@ import org.jboss.seam.annotations.Scope;
 public class VoidFactoryBean {
     
     @SuppressWarnings("unused")
-    @Out(scope = ScopeType.APPLICATION)
+    @Out(scope = ScopeType.EVENT)
     private String hotel;
 
     @Factory(autoCreate = true, value = "hotel")

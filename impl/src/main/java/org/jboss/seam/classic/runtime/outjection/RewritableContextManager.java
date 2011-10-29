@@ -8,6 +8,8 @@ import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
+import org.jboss.seam.classic.util.CdiUtils;
+
 @ApplicationScoped
 public class RewritableContextManager {
 
@@ -18,9 +20,19 @@ public class RewritableContextManager {
     private Instance<OutjectedReferenceHolder> instance;
 
     public Object get(String name, Class<? extends Annotation> scope) {
-        if (manager.getContext(scope).isActive()) {
+        if (CdiUtils.isContextActive(scope, manager)) {
             OutjectedReferenceHolder holder = getOutjectedReferenceHolder(scope);
             return holder.get(name);
+        }
+        return null;
+    }
+
+    public Object get(String name) {
+        for (Class<? extends Annotation> scope : CdiUtils.getStatefulScopes()) {
+            Object result = get(name, scope);
+            if (result != null) {
+                return result;
+            }
         }
         return null;
     }

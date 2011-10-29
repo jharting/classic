@@ -1,0 +1,22 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+   xmlns:ui="http://java.sun.com/jsf/facelets"
+   xmlns:h="http://java.sun.com/jsf/html"
+   xmlns:f="http://java.sun.com/jsf/core">
+   <head></head>
+   <body>
+   <f:metadata>  
+      <f:event type="preRenderView" listener="#{outjectingBean.ping}"/>
+   </f:metadata>  
+      <ul>
+         <li>alpha:<h:outputText value="#{alpha.value}" /></li>
+         <li>bravo:<h:outputText value="#{bravo.value}" /></li>
+         <li>charlie:<h:outputText value="#{charlie.value}" /></li>
+         <li>delta:<h:outputText value="#{delta.value}" /></li>
+         <li>echo:<h:outputText value="#{echo.value}" /></li>
+         <li>foxtrot:<h:outputText value="#{foxtrot.value}" /></li>
+         <li>hotel:<h:outputText value="#{hotel}" /></li>
+      </ul>
+   </body>
+</html>

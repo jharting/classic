@@ -9,14 +9,10 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.ContextNotActiveException;
-import javax.enterprise.context.ConversationScoped;
-import javax.enterprise.context.RequestScoped;
-import javax.enterprise.context.SessionScoped;
 import javax.enterprise.context.spi.Context;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
@@ -36,6 +32,7 @@ import org.jboss.seam.classic.init.metadata.ManagedBeanDescriptor;
 import org.jboss.seam.classic.init.metadata.MetadataRegistry;
 import org.jboss.seam.classic.init.metadata.OutjectionPointDescriptor;
 import org.jboss.seam.classic.runtime.outjection.RewritableContextManager;
+import org.jboss.seam.classic.util.CdiUtils;
 
 @Interceptor
 @BijectionInterceptor.Bijected
@@ -115,14 +112,12 @@ public class BijectionInterceptor implements Serializable {
         }
     }
 
-    @SuppressWarnings("unchecked")
     protected Object getInjectableReference(InjectionPointDescriptor injectionPoint) {
-        return getInjectableReference(injectionPoint, false, RequestScoped.class, ConversationScoped.class, SessionScoped.class,
-                ApplicationScoped.class);
+        return getInjectableReference(injectionPoint, false, CdiUtils.getStatefulScopes());
     }
 
     protected Object getInjectableReference(InjectionPointDescriptor injectionPoint, boolean readOnly,
-            Class<? extends Annotation>... scopes) {
+            List<Class<? extends Annotation>> scopes) {
         String injectionPointName = injectionPoint.getName();
         AbstractManagedInstanceDescriptor candidate = registry.getManagedInstanceDescriptorByName(injectionPointName);
 
@@ -132,7 +127,7 @@ public class BijectionInterceptor implements Serializable {
         boolean create = injectionPoint.isCreate() || (candidate != null && candidate.isAutoCreate());
 
         for (Class<? extends Annotation> scope : scopes) {
-            if (!isContextActive(scope)) {
+            if (!CdiUtils.isContextActive(scope, manager)) {
                 continue;
             }
 
@@ -167,16 +162,6 @@ public class BijectionInterceptor implements Serializable {
             }
         }
         return null;
-    }
-
-    // TODO is there a better way to find out?
-    protected boolean isContextActive(Class<? extends Annotation> scope) {
-        try {
-            manager.getContext(scope);
-            return true;
-        } catch (ContextNotActiveException e) {
-            return false;
-        }
     }
 
     protected void outject(Object target, boolean enforce) {

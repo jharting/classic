@@ -21,4 +21,9 @@ public class Void {
     public void forceBeanCreation() {
         // noop
     }
+
+    @Override
+    public String toString() {
+        return "void";
+    }
 }
