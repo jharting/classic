@@ -49,7 +49,7 @@ public class CoreExtension implements Extension {
     private ClassicBeanTransformer beanTransformer;
 
     private MetadataRegistry registry;
-    private ConfigurationService configuration = new ConfigurationService();
+    private ConfigurationService configuration;
 
     void scan(@Observes BeforeBeanDiscovery event, BeanManager manager) {
         log.debug("Scanning for Seam 2 beans.");
@@ -60,6 +60,8 @@ public class CoreExtension implements Extension {
 
     void init(@Observes ScanningCompleteEvent event, BeanManager manager) {
 
+        configuration = new ConfigurationService(event.getScanner());
+        
         // process found components
         Set<Class<?>> classes = event.getScanner().getTypesAnnotatedWith(Name.class);
         Multimap<String, ManagedBeanDescriptor> discoveredManagedBeanDescriptors = HashMultimap.create();

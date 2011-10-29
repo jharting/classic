@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 
 import org.reflections.Configuration;
 import org.reflections.Reflections;
@@ -26,7 +27,7 @@ import org.reflections.vfs.Vfs;
 public class ReflectionsScanner extends AbstractScanner {
 
     private final Reflections reflections;
-    private ExecutorService executorService = Executors.newCachedThreadPool();
+    private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
 
     public ReflectionsScanner(ClassLoader loader) {
         Collection<URL> urls = getSeamArchives(loader);
@@ -60,5 +61,10 @@ public class ReflectionsScanner extends AbstractScanner {
             }
         }
         return nonAnnotationTypes;
+    }
+    
+    public Set<String> getResources(Pattern pattern)
+    {
+        return reflections.getResources(pattern);
     }
 }

@@ -1,7 +1,10 @@
 package org.jboss.seam.classic.test.utils;
 
+import java.io.InputStream;
+
 import javax.enterprise.inject.spi.Extension;
 
+import org.jboss.osgi.testing.ManifestBuilder;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.intercept.Interceptors;
@@ -26,7 +29,9 @@ import org.jboss.seam.intercept.InvocationContext;
 import org.jboss.seam.log.Log;
 import org.jboss.seam.util.StaticLookup;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.container.ManifestContainer;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
@@ -34,7 +39,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 public class Archives {
 
     public static JavaArchive createSeamClassic() {
-        return ShrinkWrap
+        JavaArchive jar =  ShrinkWrap
                 .create(JavaArchive.class, "seam-classic.jar")
                 .addPackages(true, CoreExtension.class.getPackage())
                 // org.jboss.seam.classic
@@ -73,6 +78,8 @@ public class Archives {
 
                 .addAsServiceProvider(Extension.class, CoreExtension.class, InterceptorExtension.class,
                         ScopeExtension.class).addAsManifestResource("META-INF/beans.xml", "beans.xml");
+        addDependencyToManifest(jar, "org.slf4j.impl");
+        return jar;
     }
 
     public static JavaArchive createSeamJar(String name, Class<?>... classes) {
@@ -98,5 +105,17 @@ public class Archives {
         }
         return war;
     }
+    
+    public static <T extends ManifestContainer<?>> T addDependencyToManifest(T archive, final String dependencies)
+    {
+        archive.setManifest(new Asset() {
 
+            @Override
+            public InputStream openStream() {
+                return ManifestBuilder.newInstance().addManifestHeader("Dependencies", dependencies)
+                        .openStream();
+            }
+        });
+        return archive;
+    }
 }

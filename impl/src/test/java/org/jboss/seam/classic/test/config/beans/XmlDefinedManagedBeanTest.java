@@ -29,6 +29,8 @@ public class XmlDefinedManagedBeanTest {
         return createSeamWebApp("test.war", Eagle.class, Falcon.class, Pigeon.class, UltimatePigeon.class, Sparrow.class)
                 .addPackage(Sparrow.class.getPackage())
                 .addAsResource("org/jboss/seam/classic/test/config/beans/components.xml", "META-INF/components.xml")
+                .addAsResource("org/jboss/seam/classic/test/config/beans/package-components.xml", "classes/org/jboss/seam/classic/test/config/beans/components.xml")
+                .addAsResource("org/jboss/seam/classic/test/config/beans/Eagle3.components.xml", "META-INF/Eagle3.components.xml")
                 .addAsResource("org/jboss/seam/classic/test/config/beans/components.properties", "components.properties");
     }
 
@@ -42,6 +44,22 @@ public class XmlDefinedManagedBeanTest {
         assertEquals("eagle", descriptor.getImplicitRole().getName());
         assertEquals(ScopeType.SESSION, descriptor.getImplicitRole().getSpecifiedScope());
         assertEquals(true, descriptor.isAutoCreate());
+    }
+    
+    @Test
+    public void testBeanRegistrationPackageLevelFile() {
+        ManagedBeanDescriptor descriptor = getManagedBeanDescriptorByName("eagle2");
+        assertEquals("eagle2", descriptor.getImplicitRole().getName());
+        assertEquals(ScopeType.APPLICATION, descriptor.getImplicitRole().getSpecifiedScope());
+        assertEquals(true, descriptor.isAutoCreate());
+    }
+    
+    @Test
+    public void testBeanRegistrationSingleComponentFile() {
+        ManagedBeanDescriptor descriptor = getManagedBeanDescriptorByName("eagle3");
+        assertEquals("eagle3", descriptor.getImplicitRole().getName());
+        assertEquals(ScopeType.EVENT, descriptor.getImplicitRole().getSpecifiedScope());
+        assertEquals(false, descriptor.isAutoCreate());
     }
 
     @Test

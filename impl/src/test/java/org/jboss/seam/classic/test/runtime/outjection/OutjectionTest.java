@@ -13,6 +13,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.seam.RequiredException;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.solder.el.Expressions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -23,6 +24,8 @@ public class OutjectionTest {
     private InjectingBean injectingBean;
     @Inject
     private OutjectingBean outjectingBean;
+    @Inject
+    private Expressions expressions;
 
     @Deployment
     public static WebArchive getDeployment() {
@@ -33,6 +36,7 @@ public class OutjectionTest {
     public void testExplicitScopeOutjection() {
         outjectingBean.ping();
         assertEquals("alpha", injectingBean.getAlpha().getValue());
+        assertEquals("foo", expressions.evaluateValueExpression("#{foo.value}").toString());
     }
 
     @Test

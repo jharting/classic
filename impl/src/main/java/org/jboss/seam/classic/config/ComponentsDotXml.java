@@ -143,58 +143,64 @@ public class ComponentsDotXml {
         if (componentsParsed) {
             throw new IllegalStateException("components.xml already parsed");
         }
+
         try {
-            for (Element component : elements(root, "component")) {
-                parseComponent(component, component.attributeValue("name"), component.attributeValue("class"));
-            }
+            if ("component".equals(root.getName())) {
+                parseComponent(root, root.attributeValue("name"), root.attributeValue("class"));
+            } else {
 
-            for (Element element : (List<Element>) root.elements()) {
-                String ns = element.getNamespace().getURI();
-                if (COMPONENT_NAMESPACE.equals(ns.toString()) || Strings.isEmpty(ns)) {
-                    continue;
-                }
-                NamespaceDescriptor descriptor = namespaces.get(ns.toString());
-                if (descriptor == null) {
-                    log.warnv("namespace declared in components.xml does not resolve to a package: {0}", ns);
+                for (Element component : elements(root, "component")) {
+                    parseComponent(component, component.attributeValue("name"), component.attributeValue("class"));
                 }
 
-                String name = element.attributeValue("name");
-                String elemName = toCamelCase(element.getName(), true);
-                String className = element.attributeValue("class");
+                for (Element element : (List<Element>) root.elements()) {
+                    String ns = element.getNamespace().getURI();
+                    if (COMPONENT_NAMESPACE.equals(ns.toString()) || Strings.isEmpty(ns)) {
+                        continue;
+                    }
+                    NamespaceDescriptor descriptor = namespaces.get(ns.toString());
+                    if (descriptor == null) {
+                        log.warnv("namespace declared in components.xml does not resolve to a package: {0}", ns);
+                    }
 
-                if (className == null) {
-                    for (String packageName : descriptor.getPackageNames()) {
-                        try {
-                            className = packageName + "." + elemName;
-                            Class.forName(className);
-                        } catch (ClassNotFoundException e) {
-                            className = null;
+                    String name = element.attributeValue("name");
+                    String elemName = toCamelCase(element.getName(), true);
+                    String className = element.attributeValue("class");
+
+                    if (className == null) {
+                        for (String packageName : descriptor.getPackageNames()) {
+                            try {
+                                className = packageName + "." + elemName;
+                                Class.forName(className);
+                            } catch (ClassNotFoundException e) {
+                                className = null;
+                            }
+                        }
+                        if (className == null) {
+                            throw new IllegalArgumentException("No class associated with element " + element.getName());
                         }
                     }
-                    if (className == null) {
-                        throw new IllegalArgumentException("No class associated with element " + element.getName());
-                    }
-                }
-                if (name == null) {
-                    Class<?> clazz = null;
-                    try {
-                        clazz = Class.forName(className);
-                    } catch (ClassNotFoundException e) {
-                        throw new IllegalArgumentException("Unable to load class " + className, e);
-                    }
-                    if (clazz.isAnnotationPresent(Name.class)) {
-                        name = clazz.getAnnotation(Name.class).value();
-                    }
                     if (name == null) {
-                        // finally, if we could not get the name from the XML name attribute,
-                        // or from an @Name annotation on the class, imply it
-                        String prefix = descriptor.getComponentPrefix();
-                        String componentName = toCamelCase(element.getName(), false);
-                        name = Strings.isEmpty(prefix) ? componentName : prefix + '.' + componentName;
+                        Class<?> clazz = null;
+                        try {
+                            clazz = Class.forName(className);
+                        } catch (ClassNotFoundException e) {
+                            throw new IllegalArgumentException("Unable to load class " + className, e);
+                        }
+                        if (clazz.isAnnotationPresent(Name.class)) {
+                            name = clazz.getAnnotation(Name.class).value();
+                        }
+                        if (name == null) {
+                            // finally, if we could not get the name from the XML name attribute,
+                            // or from an @Name annotation on the class, imply it
+                            String prefix = descriptor.getComponentPrefix();
+                            String componentName = toCamelCase(element.getName(), false);
+                            name = Strings.isEmpty(prefix) ? componentName : prefix + '.' + componentName;
+                        }
                     }
-                }
-                parseComponent(element, name, className);
+                    parseComponent(element, name, className);
 
+                }
             }
             componentsParsed = true;
         } catch (Throwable e) {

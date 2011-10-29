@@ -11,22 +11,29 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.jboss.seam.classic.config.Conversions.PropertyValue;
 import org.jboss.seam.classic.init.metadata.ElFactoryDescriptor;
 import org.jboss.seam.classic.init.metadata.ElObserverMethodDescriptor;
 import org.jboss.seam.classic.init.metadata.ManagedBeanDescriptor;
 import org.jboss.seam.classic.init.metadata.NamespaceDescriptor;
+import org.jboss.seam.classic.init.scan.Scanner;
 
 import com.google.common.collect.Multimap;
 
 public class ConfigurationService {
 
-    private static final String[] CONFIGURATION_FILE_NAMES = { "META-INF/components.xml", "components.xml" };
-    private static final String REPLACEMENT_FILE_NAME = "components.properties";
+    private static final Pattern CONFIGURATION_FILE_PATTERN = Pattern.compile(".*components.xml");
+    private static final String[] REPLACEMENT_FILE_NAMES = { "components.properties" };
 
     private final Set<ComponentsDotXml> configurationFiles = new HashSet<ComponentsDotXml>();
     private final Properties replacements = new Properties();
+    private Scanner scanner;
+
+    public ConfigurationService(Scanner scanner) {
+        this.scanner = scanner;
+    }
 
     public void loadConfiguration(Map<String, NamespaceDescriptor> namespaces) {
         loadReplacements();
@@ -34,10 +41,10 @@ public class ConfigurationService {
     }
 
     protected void loadConfigurationFiles(Map<String, NamespaceDescriptor> namespaces) {
-        for (String configurationFileName : CONFIGURATION_FILE_NAMES) {
-            InputStream stream = null;
+        InputStream stream = null;
+        for (String fileName : scanner.getResources(CONFIGURATION_FILE_PATTERN)) {
             try {
-                Enumeration<URL> urls = this.getClass().getClassLoader().getResources(configurationFileName);
+                Enumeration<URL> urls = this.getClass().getClassLoader().getResources(fileName);
                 while (urls.hasMoreElements()) {
                     URL resource = urls.nextElement();
                     stream = resource.openStream();
@@ -58,19 +65,21 @@ public class ConfigurationService {
 
     protected void loadReplacements() {
         InputStream stream = null;
-        try {
-            Enumeration<URL> urls = this.getClass().getClassLoader().getResources(REPLACEMENT_FILE_NAME);
-            while (urls.hasMoreElements()) {
-                stream = urls.nextElement().openStream();
-                replacements.load(stream);
-            }
-        } catch (IOException ioe) {
-            throw new RuntimeException("error reading components.properties", ioe);
-        } finally {
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (Exception ignored) {
+        for (String fileName : REPLACEMENT_FILE_NAMES) {
+            try {
+                Enumeration<URL> urls = this.getClass().getClassLoader().getResources(fileName);
+                while (urls.hasMoreElements()) {
+                    stream = urls.nextElement().openStream();
+                    replacements.load(stream);
+                }
+            } catch (IOException ioe) {
+                throw new RuntimeException("error reading components.properties", ioe);
+            } finally {
+                if (stream != null) {
+                    try {
+                        stream.close();
+                    } catch (Exception ignored) {
+                    }
                 }
             }
         }
