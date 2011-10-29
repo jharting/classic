@@ -16,6 +16,7 @@ import javax.enterprise.inject.spi.InterceptionType;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.InvocationContext;
 
+import org.jboss.seam.classic.util.spi.AbstractInterceptor;
 import org.jboss.solder.reflection.Reflections;
 
 @SuppressWarnings("deprecation")

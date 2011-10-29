@@ -1,4 +1,4 @@
-package org.jboss.seam.classic.intercept;
+package org.jboss.seam.classic.util.spi;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
