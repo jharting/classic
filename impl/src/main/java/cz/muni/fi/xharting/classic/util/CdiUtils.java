@@ -1,18 +1,10 @@
 package cz.muni.fi.xharting.classic.util;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.ContextNotActiveException;
-import javax.enterprise.context.ConversationScoped;
 import javax.enterprise.context.Dependent;
-import javax.enterprise.context.RequestScoped;
-import javax.enterprise.context.SessionScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.UnsatisfiedResolutionException;
 import javax.enterprise.inject.spi.Bean;
@@ -25,23 +17,6 @@ public class CdiUtils {
     private CdiUtils() {
     }
     
-    private static final List<Class<? extends Annotation>> statefulScopes;
-    
-    static {
-        List<Class<? extends Annotation>> statefulScopesBuilder = new LinkedList<Class<? extends Annotation>>();
-        statefulScopesBuilder = new ArrayList<Class<? extends Annotation>>();
-        statefulScopesBuilder.add(RequestScoped.class);
-        statefulScopesBuilder.add(ConversationScoped.class);
-        statefulScopesBuilder.add(SessionScoped.class);
-        statefulScopesBuilder.add(ApplicationScoped.class);
-        statefulScopes = Collections.unmodifiableList(statefulScopesBuilder);
-    }
-    
-    public static List<Class<? extends Annotation>> getStatefulScopes()
-    {
-        return statefulScopes;
-    }
-
     public static <T> ManagedBeanInstance<T> lookupBean(Class<T> clazz, BeanManager manager) {
         Set<Bean<?>> beans = manager.getBeans(clazz);
         return lookupBean(beans, clazz, manager);

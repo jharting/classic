@@ -13,6 +13,7 @@ import org.jboss.seam.annotations.intercept.Interceptors;
 import org.jboss.solder.reflection.annotated.AnnotatedTypeBuilder;
 
 import cz.muni.fi.xharting.classic.intercept.ClassicInterceptorBinding;
+import cz.muni.fi.xharting.classic.scope.page.PageScoped;
 import cz.muni.fi.xharting.classic.scope.stateless.StatelessScoped;
 
 public class Seam2Utils {
@@ -32,7 +33,7 @@ public class Seam2Utils {
             case EVENT:
                 return RequestScoped.class;
             case PAGE:
-                throw new UnsupportedOperationException("Scope not supported"); // TODO
+                return PageScoped.class;
             case CONVERSATION:
                 return ConversationScoped.class;
             case SESSION:

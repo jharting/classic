@@ -1,4 +1,4 @@
-package cz.muni.fi.xharting.classic.scope.stateless;
+package cz.muni.fi.xharting.classic.scope.page;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -13,19 +13,17 @@ import java.lang.annotation.Target;
 import javax.enterprise.util.AnnotationLiteral;
 
 /**
- * Stateless scoped beans are created for every method invocation. Their state is not kept by the container.
- * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
- * 
+ * The page context. Begins during the invoke application phase prior to rendering a page, and lasts until the end of any invoke
+ * application phase of a faces request originating from that page. Non-faces requests do not propagate the page scope.
  */
 @Inherited
 @Target({ TYPE, METHOD, FIELD })
 @Retention(RUNTIME)
 @Documented
-public @interface StatelessScoped {
+public @interface PageScoped {
 
     @SuppressWarnings("all")
-    public static class StatelessScopedLiteral extends AnnotationLiteral<StatelessScoped> implements StatelessScoped {
-        public static final StatelessScoped INSTALNCE = new StatelessScopedLiteral();
+    public static class PageScopedLiteral extends AnnotationLiteral<PageScoped> implements PageScoped {
+        public static final PageScoped INSTANCE = new PageScopedLiteral();
     }
 }

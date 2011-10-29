@@ -8,6 +8,7 @@ import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
+import cz.muni.fi.xharting.classic.scope.ScopeExtension;
 import cz.muni.fi.xharting.classic.util.CdiUtils;
 
 @ApplicationScoped
@@ -18,6 +19,8 @@ public class RewritableContextManager {
     @Inject
     @Any
     private Instance<OutjectedReferenceHolder> instance;
+    @Inject
+    private ScopeExtension extension;
 
     public Object get(String name, Class<? extends Annotation> scope) {
         if (CdiUtils.isContextActive(scope, manager)) {
@@ -28,7 +31,7 @@ public class RewritableContextManager {
     }
 
     public Object get(String name) {
-        for (Class<? extends Annotation> scope : CdiUtils.getStatefulScopes()) {
+        for (Class<? extends Annotation> scope : extension.getStatefulScopes()) {
             Object result = get(name, scope);
             if (result != null) {
                 return result;

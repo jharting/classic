@@ -1,15 +1,10 @@
 package cz.muni.fi.xharting.classic.bootstrap;
 
-import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.ConversationScoped;
-import javax.enterprise.context.RequestScoped;
-import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AnnotatedType;
@@ -25,14 +20,11 @@ import javax.inject.Named;
 
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Namespace;
-import org.jboss.solder.core.Veto;
 import org.jboss.solder.logging.Logger;
-import org.jboss.solder.reflection.annotated.AnnotatedTypeBuilder;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import cz.muni.fi.xharting.classic.bijection.OutjectedReferenceHolder;
 import cz.muni.fi.xharting.classic.bootstrap.scan.ReflectionsScanner;
 import cz.muni.fi.xharting.classic.bootstrap.scan.Scanner;
 import cz.muni.fi.xharting.classic.config.ConfigurationService;
@@ -41,7 +33,6 @@ import cz.muni.fi.xharting.classic.factory.UnwrappedBean;
 import cz.muni.fi.xharting.classic.metadata.ManagedBeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.MetadataRegistry;
 import cz.muni.fi.xharting.classic.metadata.NamespaceDescriptor;
-import cz.muni.fi.xharting.classic.util.CdiScopeUtils;
 
 public class CoreExtension implements Extension {
 
@@ -137,22 +128,6 @@ public class CoreExtension implements Extension {
                     named.value()), delegate, annotatedType, named.value());
             event.setInjectionTarget(replacement);
         }
-    }
-
-    void registerOutjectedReferenceHolders(@Observes BeforeBeanDiscovery event, BeanManager manager) {
-        event.addAnnotatedType(createOutjectedReferenceHolder(RequestScoped.class));
-        event.addAnnotatedType(createOutjectedReferenceHolder(ConversationScoped.class));
-        event.addAnnotatedType(createOutjectedReferenceHolder(SessionScoped.class));
-        event.addAnnotatedType(createOutjectedReferenceHolder(ApplicationScoped.class));
-    }
-
-    private AnnotatedType<?> createOutjectedReferenceHolder(Class<? extends Annotation> scope) {
-        AnnotatedTypeBuilder<OutjectedReferenceHolder> builder = new AnnotatedTypeBuilder<OutjectedReferenceHolder>();
-        builder.readFromType(OutjectedReferenceHolder.class);
-        builder.addToClass(CdiScopeUtils.getScopeLiteral(scope));
-        builder.addToClass(OutjectedReferenceHolder.ScopeQualifier.ScopeQualifierLiteral.valueOf(scope));
-        builder.removeFromClass(Veto.class);
-        return builder.create();
     }
 
     protected Map<String, NamespaceDescriptor> registerNamespaces(Collection<Class<?>> packages) {

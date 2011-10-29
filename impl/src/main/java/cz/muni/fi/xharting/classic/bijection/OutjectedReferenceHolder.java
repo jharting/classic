@@ -56,9 +56,6 @@ public class OutjectedReferenceHolder implements Serializable {
             private Class<? extends Annotation> value;
 
             private ScopeQualifierLiteral(Class<? extends Annotation> value) {
-                if (!value.isAnnotationPresent(NormalScope.class)) {
-                    throw new IllegalArgumentException("Only normal-scope annotations are supported.");
-                }
                 this.value = value;
             }
 
@@ -70,9 +67,6 @@ public class OutjectedReferenceHolder implements Serializable {
             private static Map<Class<? extends Annotation>, ScopeQualifierLiteral> values = new HashMap<Class<? extends Annotation>, ScopeQualifier.ScopeQualifierLiteral>();
 
             public static ScopeQualifierLiteral valueOf(Class<? extends Annotation> context) {
-                if (!context.isAnnotationPresent(NormalScope.class)) {
-                    throw new IllegalArgumentException("Only normal-scope annotations are supported.");
-                }
                 if (!values.containsKey(context)) {
                     values.put(context, new ScopeQualifierLiteral(context));
                 }

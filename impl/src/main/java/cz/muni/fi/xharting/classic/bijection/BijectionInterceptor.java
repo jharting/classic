@@ -32,6 +32,7 @@ import cz.muni.fi.xharting.classic.metadata.InjectionPointDescriptor;
 import cz.muni.fi.xharting.classic.metadata.ManagedBeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.MetadataRegistry;
 import cz.muni.fi.xharting.classic.metadata.OutjectionPointDescriptor;
+import cz.muni.fi.xharting.classic.scope.ScopeExtension;
 import cz.muni.fi.xharting.classic.util.CdiUtils;
 
 @Interceptor
@@ -46,6 +47,8 @@ public class BijectionInterceptor implements Serializable {
     private BeanManager manager;
     @Inject
     private RewritableContextManager rewritableContextManager;
+    @Inject
+    private ScopeExtension extension;
 
     private ManagedBeanDescriptor descriptor;
 
@@ -113,7 +116,7 @@ public class BijectionInterceptor implements Serializable {
     }
 
     protected Object getInjectableReference(InjectionPointDescriptor injectionPoint) {
-        return getInjectableReference(injectionPoint, false, CdiUtils.getStatefulScopes());
+        return getInjectableReference(injectionPoint, false, extension.getStatefulScopes());
     }
 
     protected Object getInjectableReference(InjectionPointDescriptor injectionPoint, boolean readOnly,
