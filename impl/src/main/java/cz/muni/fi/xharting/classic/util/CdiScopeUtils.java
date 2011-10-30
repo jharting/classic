@@ -2,7 +2,6 @@ package cz.muni.fi.xharting.classic.util;
 
 import java.lang.annotation.Annotation;
 
-import javax.ejb.Stateless;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.ConversationScoped;
 import javax.enterprise.context.Dependent;
@@ -39,7 +38,7 @@ public class CdiScopeUtils {
         if (Dependent.class.equals(clazz)) {
             return DependentLiteral.INSTANCE;
         }
-        if (Stateless.class.equals(clazz)) {
+        if (StatelessScoped.class.equals(clazz)) {
             return StatelessScoped.StatelessScopedLiteral.INSTALNCE;
         }
         if (PageScoped.class.equals(clazz)) {

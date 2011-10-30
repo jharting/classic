@@ -44,7 +44,7 @@ public class RoleDescriptor {
     public ScopeType getSpecifiedScope() {
         return specifiedScope;
     }
-    
+
     /**
      * Translates Seam 2 ScopeType to matching CDI scope. Default scope rules for Seam 2 beans are considered.
      */
@@ -58,6 +58,8 @@ public class RoleDescriptor {
             } else {
                 return RequestScoped.class;
             }
+        } else if (bean.getJavaClass().isAnnotationPresent(Stateless.class)) {
+            return Dependent.class;
         } else {
             return Seam2Utils.transformExplicitLegacyScopeToCdiScope(specifiedScope);
         }

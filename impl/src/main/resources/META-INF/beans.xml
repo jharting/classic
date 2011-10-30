@@ -8,4 +8,8 @@
         <class>cz.muni.fi.xharting.classic.bijection.BijectionInterceptor</class>
         <class>cz.muni.fi.xharting.classic.event.RaiseEventInterceptor</class>
     </interceptors>
+    
+<!--     <alternatives> -->
+<!--         <class>cz.muni.fi.xharting.classic.el.ElResolverProducer</class> -->
+<!--     </alternatives> -->
 </beans>

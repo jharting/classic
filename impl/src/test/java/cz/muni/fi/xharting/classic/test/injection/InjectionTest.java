@@ -1,7 +1,10 @@
 package cz.muni.fi.xharting.classic.test.injection;
 
-import static cz.muni.fi.xharting.classic.test.util.Archives.createSeamClassic;
 import static cz.muni.fi.xharting.classic.test.util.Archives.createSeamWebApp;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -14,8 +17,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.*;
-
 @RunWith(Arquillian.class)
 public class InjectionTest {
 
@@ -24,7 +25,7 @@ public class InjectionTest {
 
     @Deployment
     public static WebArchive getDeployment() {
-        return createSeamWebApp("test.war").addPackage(InjectionTest.class.getPackage()).addAsLibrary(createSeamClassic());
+        return createSeamWebApp("test.war").addPackage(InjectionTest.class.getPackage());
     }
 
     @Test
@@ -77,5 +78,12 @@ public class InjectionTest {
     @Test
     public void testClassHierarchy() {
         alpha.getHotelSubclass().checkInjection(); // will throw AssertionError if injection does not work
+    }
+    
+    @Test
+    public void testInjectionOfEjbAndIntoEjb()
+    {
+        assertNotNull(alpha.getIndia());
+        assertTrue(alpha.getIndia().injected());
     }
 }

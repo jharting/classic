@@ -1,3 +1,4 @@
 cz.muni.fi.xharting.classic.bootstrap.CoreExtension
 cz.muni.fi.xharting.classic.intercept.InterceptorExtension
 cz.muni.fi.xharting.classic.scope.ScopeExtension
+cz.muni.fi.xharting.classic.el.ElExtension

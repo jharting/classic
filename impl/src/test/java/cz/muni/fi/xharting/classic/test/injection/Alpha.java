@@ -20,6 +20,8 @@ public class Alpha {
     private CyclicBean1 cyclicBean1;
     @In(create = true)
     private HotelSubclass hotelSubclass;
+    @In
+    private IndiaLocal india;
 
     public Bravo getBravo() {
         return bravo;
@@ -49,4 +51,7 @@ public class Alpha {
         return hotelSubclass;
     }
 
+    public IndiaLocal getIndia() {
+        return india;
+    }
 }

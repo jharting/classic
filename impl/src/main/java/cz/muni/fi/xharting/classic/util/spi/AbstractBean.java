@@ -23,14 +23,19 @@ public abstract class AbstractBean<T> implements Bean<T> {
     private final boolean nullable;
 
     public AbstractBean(Class<T> beanClass, Class<?> types, Class<? extends Annotation> scope, String name,
-            boolean alternative, boolean nullable, Annotation... qualifiers) {
+            boolean alternative, boolean nullable, Set<Annotation> qualifiers) {
         this.beanClass = beanClass;
         this.types = new HierarchyDiscovery(types).getTypeClosure();
         this.scope = scope;
         this.name = name;
         this.alternative = alternative;
         this.nullable = nullable;
-        this.qualifiers = new HashSet<Annotation>(Arrays.asList(qualifiers));
+        this.qualifiers = qualifiers;
+    }
+
+    public AbstractBean(Class<T> beanClass, Class<?> types, Class<? extends Annotation> scope, String name,
+            boolean alternative, boolean nullable, Annotation... qualifiers) {
+        this(beanClass, types, scope, name, alternative, nullable, new HashSet<Annotation>(Arrays.asList(qualifiers)));
     }
 
     public AbstractBean(Class<T> beanClass, Class<? extends Annotation> scope, String name, boolean alternative,

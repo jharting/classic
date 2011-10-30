@@ -1,7 +1,10 @@
 package cz.muni.fi.xharting.classic.util;
 
 import java.lang.annotation.Annotation;
+import java.util.HashSet;
 import java.util.Set;
+
+import javax.enterprise.inject.spi.BeanManager;
 
 /**
  * Various annotation utilities
@@ -28,6 +31,19 @@ public class Annotations {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns qualifiers applied to a given bean.
+     */
+    public static Set<Annotation> getQualifiers(Class<?> clazz, BeanManager manager) {
+        Set<Annotation> result = new HashSet<Annotation>();
+        for (Annotation annotation : clazz.getAnnotations()) {
+            if (manager.isScope(annotation.annotationType())) {
+                result.add(annotation);
+            }
+        }
+        return result;
     }
 
 }

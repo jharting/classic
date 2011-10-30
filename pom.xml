@@ -24,34 +24,6 @@
         <module>impl</module>
     </modules>
 
-    <dependencies>
-        <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.ejb</groupId>
-            <artifactId>jboss-ejb-api_3.1_spec</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.interceptor</groupId>
-            <artifactId>jboss-interceptors-api_1.1_spec</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.el</groupId>
-            <artifactId>jboss-el-api_2.2_spec</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.solder</groupId>
-            <artifactId>solder-impl</artifactId>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -63,9 +35,24 @@
             </dependency>
             <dependency>
                 <groupId>org.jboss.solder</groupId>
+                <artifactId>solder-api</artifactId>
+                <version>${solder.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.solder</groupId>
                 <artifactId>solder-impl</artifactId>
                 <version>${solder.version}</version>
             </dependency>
+        <dependency>
+            <groupId>cz.muni.fi.xharting.classic</groupId>
+            <artifactId>classic-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cz.muni.fi.xharting.classic</groupId>
+            <artifactId>classic-impl</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         </dependencies>
     </dependencyManagement>
 

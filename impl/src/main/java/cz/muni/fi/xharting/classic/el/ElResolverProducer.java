@@ -24,11 +24,13 @@ import cz.muni.fi.xharting.classic.bijection.OutjectedReferenceElResolver;
  * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
  * 
  */
+//@Alternative
 public class ElResolverProducer extends ELResolverProducer {
 
     @Produces
     @Composite
     @ApplicationScoped
+//    @Alternative
     public ELResolver getELResolver(@Resolver Instance<ELResolver> resolvers, BeanManager beanManager, OutjectedReferenceElResolver classicResolver) {
         // Create the default el resolvers
         CompositeELResolver compositeResolver = new CompositeELResolver();

@@ -7,17 +7,19 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.UnsatisfiedResolutionException;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
-
-import org.jboss.solder.beanManager.BeanManagerLocator;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 public class StaticLookup {
 
+    private static final String DEFAULT_LOCATION = "java:comp/BeanManager";
+    
     public static BeanManager lookupBeanManager() {
-        BeanManagerLocator locator = new BeanManagerLocator();
-        if (locator.isBeanManagerAvailable()) {
-            return locator.getBeanManager();
+        try {
+            return (BeanManager) new InitialContext().lookup(DEFAULT_LOCATION);
+        } catch (NamingException e) {
+            throw new IllegalStateException("Unable to lookup BeanManager");
         }
-        throw new IllegalStateException("Unable to lookup BeanManager");
     }
 
     @SuppressWarnings("unchecked")

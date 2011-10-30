@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.spi.BeanManager;
@@ -21,7 +22,8 @@ public class BeanRegistrationTest {
 
     @Deployment
     public static WebArchive getDeployment() {
-        return createSeamWebApp("test.war", Alpha.class, Bravo.class, Charlie.class, Delta.class, DeltaFactory.class);
+        return createSeamWebApp("test.war", Alpha.class, Bravo.class, Charlie.class, Delta.class, DeltaFactory.class,
+                Echo.class, EchoLocal.class);
     }
 
     @Test
@@ -31,6 +33,7 @@ public class BeanRegistrationTest {
         assertEquals(SessionScoped.class, manager.resolve(manager.getBeans("b1")).getScope());
         assertEquals(RequestScoped.class, manager.resolve(manager.getBeans("b2")).getScope());
         assertEquals(RequestScoped.class, manager.resolve(manager.getBeans("charlie")).getScope());
+        assertEquals(Dependent.class, manager.resolve(manager.getBeans("echo")).getScope());
     }
 
     @Test

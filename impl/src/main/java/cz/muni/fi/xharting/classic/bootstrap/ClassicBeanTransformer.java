@@ -1,9 +1,13 @@
 package cz.muni.fi.xharting.classic.bootstrap;
 
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.context.SessionScoped;
@@ -43,6 +47,10 @@ import cz.muni.fi.xharting.classic.metadata.FactoryDescriptor;
 import cz.muni.fi.xharting.classic.metadata.ManagedBeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.ObserverMethodDescriptor;
 import cz.muni.fi.xharting.classic.metadata.RoleDescriptor;
+import cz.muni.fi.xharting.classic.persistence.entity.DirectReferenceHolderBean;
+import cz.muni.fi.xharting.classic.persistence.entity.EntityProducer;
+import cz.muni.fi.xharting.classic.persistence.entity.PassivationCapableDirectReferenceHolderBean;
+import cz.muni.fi.xharting.classic.persistence.entity.PassivationCapableEntityProducer;
 import cz.muni.fi.xharting.classic.scope.page.PageScoped;
 import cz.muni.fi.xharting.classic.util.CdiScopeUtils;
 import cz.muni.fi.xharting.classic.util.literal.SynchronizedLiteral;
@@ -55,10 +63,14 @@ import cz.muni.fi.xharting.classic.util.literal.SynchronizedLiteral;
  */
 public class ClassicBeanTransformer {
 
-    private Set<AnnotatedType<?>> annotatedTypesToRegister = new HashSet<AnnotatedType<?>>();
-    private Set<ObserverMethod<?>> observerMethodsToRegister = new HashSet<ObserverMethod<?>>();
-    private Set<Bean<?>> factoryMethodsToRegister = new HashSet<Bean<?>>();
-    private Set<UnwrappedBean> unwrappedBeansToRegister = new HashSet<UnwrappedBean>();
+    private final Map<Class<?>, AnnotatedType<?>> modifiedAnnotatedTypes = new HashMap<Class<?>, AnnotatedType<?>>();
+    private final Set<AnnotatedType<?>> additionalAnnotatedTypes = new HashSet<AnnotatedType<?>>();
+    private final Set<ObserverMethod<?>> observerMethodsToRegister = new HashSet<ObserverMethod<?>>();
+    private final Set<Bean<?>> factoryMethodsToRegister = new HashSet<Bean<?>>();
+    private final Set<UnwrappedBean> unwrappedBeansToRegister = new HashSet<UnwrappedBean>();
+    private final Set<EntityProducer<?>> entities = new HashSet<EntityProducer<?>>();
+    private final Set<DirectReferenceHolderBean<?>> entityHolders = new HashSet<DirectReferenceHolderBean<?>>();
+    private final BeanManager manager;
 
     public ClassicBeanTransformer(ConditionalInstallationService service, BeanManager manager) {
         this(service.getInstallableManagedBeanBescriptors(), service.getInstallableFactoryDescriptors(), service
@@ -68,14 +80,21 @@ public class ClassicBeanTransformer {
     public ClassicBeanTransformer(Set<ManagedBeanDescriptor> managedBeanDescriptors,
             Set<AbstractFactoryDescriptor> factoryDescriptors, Set<AbstractObserverMethodDescriptor> observerMethods,
             BeanManager manager) {
-        transformBeans(managedBeanDescriptors, manager);
-        transformFactories(factoryDescriptors, manager);
-        transformObserverMethods(observerMethods, manager);
+        this.manager = manager;
+        transformBeans(managedBeanDescriptors);
+        transformFactories(factoryDescriptors);
+        transformObserverMethods(observerMethods);
     }
 
-    protected void transformBeans(Set<ManagedBeanDescriptor> beans, BeanManager manager) {
+    protected void transformBeans(Set<ManagedBeanDescriptor> beans) {
         for (ManagedBeanDescriptor bean : beans) {
             for (RoleDescriptor role : bean.getRoles()) {
+                // entities require special treatment
+                if (bean.isEntity()) {
+                    transformEntity(bean, role, bean.getJavaClass());
+                    continue;
+                }
+
                 AnnotatedTypeBuilder<?> builder = createAnnotatedTypeBuilder(bean.getJavaClass());
                 // Set name
                 builder.addToClass(new Seam2ManagedBean.Seam2ManagedBeanLiteral(role.getName()));
@@ -107,7 +126,13 @@ public class ClassicBeanTransformer {
                 else {
                     registerInterceptors(bean, role, builder);
                 }
-                annotatedTypesToRegister.add(builder.create());
+
+                // We need the latter check since multiple xml-configured beans could share the same class
+                if (!modifiedAnnotatedTypes.containsKey(bean.getJavaClass()) && bean.isDefinedByClass()) {
+                    modifiedAnnotatedTypes.put(bean.getJavaClass(), builder.create());
+                } else {
+                    additionalAnnotatedTypes.add(builder.create());
+                }
             }
         }
     }
@@ -142,7 +167,7 @@ public class ClassicBeanTransformer {
                 || annotationClass.isAnnotationPresent(Interceptors.class) || annotationClass.equals(Interceptors.class);
     }
 
-    protected void transformFactories(Set<AbstractFactoryDescriptor> factoryDescriptors, BeanManager manager) {
+    protected void transformFactories(Set<AbstractFactoryDescriptor> factoryDescriptors) {
         for (AbstractFactoryDescriptor descriptor : factoryDescriptors) {
             if (descriptor instanceof FactoryDescriptor) {
                 FactoryDescriptor beanFactoryDescriptor = (FactoryDescriptor) descriptor;
@@ -154,7 +179,7 @@ public class ClassicBeanTransformer {
         }
     }
 
-    protected void transformObserverMethods(Set<AbstractObserverMethodDescriptor> observerMethods, BeanManager manager) {
+    protected void transformObserverMethods(Set<AbstractObserverMethodDescriptor> observerMethods) {
 
         for (AbstractObserverMethodDescriptor om : observerMethods) {
             for (TransactionPhase phase : new TransactionPhase[] { TransactionPhase.IN_PROGRESS,
@@ -172,6 +197,36 @@ public class ClassicBeanTransformer {
                 }
             }
         }
+    }
+
+    protected <T> void transformEntity(ManagedBeanDescriptor bean, RoleDescriptor role, Class<T> javaClass) {
+        if (!bean.isEntity()) {
+            throw new IllegalArgumentException(bean.getJavaClass() + " is not an entity.");
+        }
+        if (!bean.getInjectionPoints().isEmpty()) {
+            throw new IllegalArgumentException("Entities cannot inject values"); // TODO DefinitionException
+        }
+        if (!bean.getOutjectionPoints().isEmpty()) {
+            throw new IllegalArgumentException("Entities cannot outject values"); // TODO definitionException
+        }
+        if (!bean.getFactories().isEmpty()) {
+            throw new IllegalArgumentException("Entities cannot define factory methods"); // TODO definitionException
+        }
+        if (bean.hasUnwrappingMethod()) {
+            throw new IllegalArgumentException("Entities cannot define unwrap methods"); // TODO definitionException
+        }
+        
+        DirectReferenceHolderBean<T> holder;
+        EntityProducer<T> producer;
+        if (Serializable.class.isAssignableFrom(javaClass)) {
+            holder = new PassivationCapableDirectReferenceHolderBean<T>(javaClass, role.getName(), role.getCdiScope());
+            producer = new PassivationCapableEntityProducer<T>(holder, manager, javaClass, role.getName());
+        } else {
+            holder = new DirectReferenceHolderBean<T>(javaClass, role.getName(), role.getCdiScope());
+            producer = new EntityProducer<T>(holder, manager, javaClass, role.getName());
+        }
+        entityHolders.add(holder);
+        entities.add(producer);
     }
 
     private <T> AnnotatedTypeBuilder<T> createAnnotatedTypeBuilder(Class<T> javaClass) {
@@ -196,8 +251,17 @@ public class ClassicBeanTransformer {
         unwrappedBeansToRegister.add(new UnwrappedBean(name, hostType, type, method, manager));
     }
 
-    public Set<AnnotatedType<?>> getAnnotatedTypesToRegister() {
-        return annotatedTypesToRegister;
+    public Map<Class<?>, AnnotatedType<?>> getModifiedAnnotatedTypes() {
+        return Collections.unmodifiableMap(modifiedAnnotatedTypes);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> AnnotatedType<T> getModifiedAnnotatedType(Class<T> clazz) {
+        return (AnnotatedType<T>) modifiedAnnotatedTypes.get(clazz);
+    }
+
+    public Set<AnnotatedType<?>> getAdditionalAnnotatedTypes() {
+        return additionalAnnotatedTypes;
     }
 
     public Set<ObserverMethod<?>> getObserverMethodsToRegister() {
@@ -206,5 +270,13 @@ public class ClassicBeanTransformer {
 
     public Set<Bean<?>> getFactoryMethodsToRegister() {
         return factoryMethodsToRegister;
+    }
+
+    public Set<EntityProducer<?>> getEntities() {
+        return entities;
+    }
+
+    public Set<DirectReferenceHolderBean<?>> getEntityHolders() {
+        return entityHolders;
     }
 }

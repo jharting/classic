@@ -15,9 +15,6 @@ import org.jboss.seam.util.StaticLookup;
  * @author Gavin King
  * @author Jozef Hartinger
  */
-//@BypassInterceptors
-//@Install(precedence=BUILT_IN)
-//@Name("org.jboss.seam.core.expressions")
 public abstract class Expressions implements Serializable
 {
    private static final long serialVersionUID = -8104543331682592706L;

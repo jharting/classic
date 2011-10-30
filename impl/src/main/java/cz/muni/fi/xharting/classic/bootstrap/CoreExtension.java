@@ -33,6 +33,8 @@ import cz.muni.fi.xharting.classic.factory.UnwrappedBean;
 import cz.muni.fi.xharting.classic.metadata.ManagedBeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.MetadataRegistry;
 import cz.muni.fi.xharting.classic.metadata.NamespaceDescriptor;
+import cz.muni.fi.xharting.classic.persistence.entity.DirectReferenceHolderBean;
+import cz.muni.fi.xharting.classic.persistence.entity.EntityProducer;
 
 public class CoreExtension implements Extension {
 
@@ -53,7 +55,7 @@ public class CoreExtension implements Extension {
     void init(@Observes ScanningCompleteEvent event, BeanManager manager) {
 
         configuration = new ConfigurationService(event.getScanner());
-        
+
         // process found components
         Set<Class<?>> classes = event.getScanner().getTypesAnnotatedWith(Name.class);
         Multimap<String, ManagedBeanDescriptor> discoveredManagedBeanDescriptors = HashMultimap.create();
@@ -78,21 +80,28 @@ public class CoreExtension implements Extension {
         beanTransformer = new ClassicBeanTransformer(installationService, manager);
 
         // register annotated types for managed beans
-        log.debugv("Registering {0} annotated types.", beanTransformer.getAnnotatedTypesToRegister().size());
-        for (AnnotatedType<?> annotatedType : beanTransformer.getAnnotatedTypesToRegister()) {
-            log.debugv("Registering {0}", annotatedType.getJavaClass());
+        log.debugv("Registering {0} additional annotated types.", beanTransformer.getAdditionalAnnotatedTypes().size());
+        for (AnnotatedType<?> annotatedType : beanTransformer.getAdditionalAnnotatedTypes()) {
+            log.debugv("Registering {0}", annotatedType.getAnnotation(Named.class).value());
             event.addAnnotatedType(annotatedType);
         }
-        
+
         // make metamodel accessible at runtime
         registry = new MetadataRegistry(installationService);
     }
 
-    void vetoClassicBeans(@Observes ProcessAnnotatedType<?> event) {
-        // We transform and register every Seam 2 component during BBD.
-        // If a class get scanned by CDI as well, veto it.
+    /**
+     * We cannot simply veto all beans and register our ones since that does not work for EJBs.
+     */
+    <T> void modifyAnnotatedTypes(@Observes ProcessAnnotatedType<T> event) {
         if (event.getAnnotatedType().isAnnotationPresent(Name.class)) {
-            event.veto();
+            AnnotatedType<T> type = event.getAnnotatedType();
+            AnnotatedType<T> modifiedType = beanTransformer.getModifiedAnnotatedType(type.getJavaClass());
+            if (modifiedType != null) {
+                event.setAnnotatedType(modifiedType);
+            } else {
+                event.veto();
+            }
         }
     }
 
@@ -116,6 +125,15 @@ public class CoreExtension implements Extension {
         for (ObserverMethod<?> observerMethod : beanTransformer.getObserverMethodsToRegister()) {
             log.debugv("Registering {0}", observerMethod);
             event.addObserverMethod(observerMethod);
+        }
+    }
+
+    void registerEntities(@Observes AfterBeanDiscovery event) {
+        for (DirectReferenceHolderBean<?> holder : beanTransformer.getEntityHolders()) {
+            event.addBean(holder);
+        }
+        for (EntityProducer<?> entity : beanTransformer.getEntities()) {
+            event.addBean(entity);
         }
     }
 

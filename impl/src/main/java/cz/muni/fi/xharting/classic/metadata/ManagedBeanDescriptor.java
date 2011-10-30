@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Entity;
+
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;
 import org.jboss.seam.annotations.In;
@@ -276,5 +278,23 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor imp
     @Override
     public int getPrecedence() {
         return install.getPrecedence();
+    }
+
+    /**
+     * Returns true if and only if the component is define by the {@link Name} annotation - as oposed to being configured in XML
+     * with explicit class declaration where the class does not contain {@link Name}.
+     * 
+     * @return
+     */
+    public boolean isDefinedByClass() {
+        return javaClass.isAnnotationPresent(Name.class);
+    }
+    
+    /**
+     * Returns true if the underlying class is annotated with {@link Entity}.
+     */
+    public boolean isEntity()
+    {
+        return javaClass.isAnnotationPresent(Entity.class);
     }
 }
