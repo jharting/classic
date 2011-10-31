@@ -35,6 +35,7 @@ import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.MetadataRegistry;
 import cz.muni.fi.xharting.classic.metadata.OutjectionPointDescriptor;
 import cz.muni.fi.xharting.classic.persistence.InterpolatingEntityManagerDecorator;
+import cz.muni.fi.xharting.classic.persistence.entity.EntityProducer;
 import cz.muni.fi.xharting.classic.scope.ScopeExtension;
 import cz.muni.fi.xharting.classic.util.CdiUtils;
 
@@ -166,7 +167,7 @@ public class BijectionInterceptor implements Serializable {
         }
 
         // create using CDI
-        if (bean != null && create && !readOnly) {
+        if (bean != null && !readOnly && (create || bean instanceof EntityProducer<?>)) {
             CreationalContext<?> ctx = manager.createCreationalContext(bean);
             Object product = manager.getReference(bean, Object.class, ctx);
 
