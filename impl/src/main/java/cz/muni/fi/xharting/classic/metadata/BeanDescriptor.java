@@ -5,7 +5,12 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.ejb.Singleton;
+import javax.ejb.Stateful;
+import javax.ejb.Stateless;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Factory;
@@ -27,11 +32,22 @@ import org.jboss.solder.util.Sortable;
 
 import cz.muni.fi.xharting.classic.config.ConfiguredManagedBean;
 
-public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor implements Sortable {
+/**
+ * Represents a class-based Seam 2 component (managed bean or session bean).
+ * 
+ * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * 
+ */
+public class BeanDescriptor extends AbstractManagedInstanceDescriptor implements Sortable {
 
-    private static final Logger log = Logger.getLogger(ManagedBeanDescriptor.class);
+    public enum BeanType {
+        MANAGED_BEAN, STATELESS, STATEFUL, SINGLETON, ENTITY;
+    }
+
+    private static final Logger log = Logger.getLogger(BeanDescriptor.class);
 
     private final Class<?> javaClass;
+    private final BeanType beanType;
     private final InstallDescriptor install;
 
     private final boolean startup;
@@ -44,21 +60,24 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor imp
     private final Set<FactoryDescriptor> factories = new HashSet<FactoryDescriptor>();
     private final Set<InjectionPointDescriptor> injectionPoints = new HashSet<InjectionPointDescriptor>();
     private final Set<OutjectionPointDescriptor> outjectionPoints = new HashSet<OutjectionPointDescriptor>();
+    // these are EE-injected fields which we want to decorate
+    private final Set<DecoratingInjectionPoint<EntityManager>> persistenceContextFields = new HashSet<DecoratingInjectionPoint<EntityManager>>();
     private final Set<ObserverMethodDescriptor> observerMethods = new HashSet<ObserverMethodDescriptor>();
     private final Method unwrappingMethod;
 
-    public ManagedBeanDescriptor(Class<?> javaClass) {
+    public BeanDescriptor(Class<?> javaClass) {
         super(javaClass);
 
         if (!javaClass.isAnnotationPresent(Name.class)) {
             throw new IllegalArgumentException(javaClass.getName() + " is not a legacy bean.");
         }
 
+        this.javaClass = javaClass;
+        this.beanType = determineBeanType();
         install = new InstallDescriptor(javaClass);
         startup = javaClass.isAnnotationPresent(Startup.class);
         startupDependencies = processStartupDependencies(javaClass);
 
-        this.javaClass = javaClass;
 
         // Register the implicit role - @Name + @Scope
         String implicitRoleName = javaClass.getAnnotation(Name.class).value();
@@ -74,14 +93,14 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor imp
 
     }
 
-    public ManagedBeanDescriptor(ConfiguredManagedBean configuredManagedBean) {
+    public BeanDescriptor(ConfiguredManagedBean configuredManagedBean) {
         this(configuredManagedBean, configuredManagedBean.getClazz());
     }
 
-    public ManagedBeanDescriptor(ConfiguredManagedBean configuredManagedBean, Class<?> javaClass) {
+    public BeanDescriptor(ConfiguredManagedBean configuredManagedBean, Class<?> javaClass) {
         super(configuredManagedBean.getAutoCreate(), javaClass);
         this.javaClass = javaClass;
-
+        this.beanType = determineBeanType();
         install = new InstallDescriptor(javaClass, configuredManagedBean.getInstalled(), configuredManagedBean.getPrecedence());
         startup = (configuredManagedBean.getStartup() != null) ? configuredManagedBean.getStartup() : javaClass
                 .isAnnotationPresent(Startup.class);
@@ -102,13 +121,14 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor imp
         processFields(javaClass);
     }
 
-    public ManagedBeanDescriptor(ConfiguredManagedBean configuredManagedBean, ManagedBeanDescriptor managedBeanDescriptor) {
+    public BeanDescriptor(ConfiguredManagedBean configuredManagedBean, BeanDescriptor managedBeanDescriptor) {
         super(configuredManagedBean.getAutoCreate(), managedBeanDescriptor.getJavaClass());
         if (configuredManagedBean.getClazz() != null
                 && !configuredManagedBean.getClazz().equals(managedBeanDescriptor.getJavaClass())) {
             throw new IllegalStateException("Cannot redefine metadata for a different class");
         }
         this.javaClass = managedBeanDescriptor.getJavaClass();
+        this.beanType = determineBeanType();
         this.install = new InstallDescriptor(managedBeanDescriptor.getInstallDescriptor(),
                 configuredManagedBean.getInstalled(), configuredManagedBean.getPrecedence());
         startup = (configuredManagedBean.getStartup() != null) ? configuredManagedBean.getStartup() : managedBeanDescriptor
@@ -210,6 +230,9 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor imp
                         || field.isAnnotationPresent(DataModelSelectionIndex.class)) {
                     log.warn("DataModels are not supported. " + field);
                 }
+                if (field.isAnnotationPresent(PersistenceContext.class) && EntityManager.class.equals(field.getType())) {
+                    persistenceContextFields.add(new DecoratingInjectionPoint<EntityManager>(field));
+                }
             }
         }
     }
@@ -220,6 +243,22 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor imp
         } else {
             return new String[0];
         }
+    }
+
+    private BeanType determineBeanType() {
+        if (javaClass.isAnnotationPresent(Stateless.class)) {
+            return BeanType.STATELESS;
+        }
+        if (javaClass.isAnnotationPresent(Stateful.class)) {
+            return BeanType.STATEFUL;
+        }
+        if (javaClass.isAnnotationPresent(Singleton.class)) {
+            return BeanType.SINGLETON;
+        }
+        if (javaClass.isAnnotationPresent(Entity.class)) {
+            return BeanType.ENTITY;
+        }
+        return BeanType.MANAGED_BEAN;
     }
 
     public Class<?> getJavaClass() {
@@ -289,12 +328,12 @@ public class ManagedBeanDescriptor extends AbstractManagedInstanceDescriptor imp
     public boolean isDefinedByClass() {
         return javaClass.isAnnotationPresent(Name.class);
     }
-    
-    /**
-     * Returns true if the underlying class is annotated with {@link Entity}.
-     */
-    public boolean isEntity()
-    {
-        return javaClass.isAnnotationPresent(Entity.class);
+
+    public Set<DecoratingInjectionPoint<EntityManager>> getPersistenceContextFields() {
+        return persistenceContextFields;
+    }
+
+    public BeanType getBeanType() {
+        return beanType;
     }
 }

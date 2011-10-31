@@ -15,18 +15,18 @@ import cz.muni.fi.xharting.classic.util.Seam2Utils;
 public class OutjectionPointDescriptor extends AbstractManagedFieldDescriptor {
 
     public OutjectionPointDescriptor(String specifiedName, boolean required, ScopeType specifiedScope, Field field,
-            ManagedBeanDescriptor bean) {
+            BeanDescriptor bean) {
         super(specifiedName, required, specifiedScope, field, bean);
         if (specifiedScope == ScopeType.STATELESS) {
             throw new IllegalArgumentException("cannot specify explicit scope=STATELESS on @Out: " + getPath());
         }
     }
 
-    public OutjectionPointDescriptor(Out out, Field field, ManagedBeanDescriptor bean) {
+    public OutjectionPointDescriptor(Out out, Field field, BeanDescriptor bean) {
         super(out.value(), out.required(), out.scope(), field, bean);
     }
 
-    public OutjectionPointDescriptor(OutjectionPointDescriptor descriptor, ManagedBeanDescriptor bean) {
+    public OutjectionPointDescriptor(OutjectionPointDescriptor descriptor, BeanDescriptor bean) {
         this(descriptor.getSpecifiedName(), descriptor.isRequired(), descriptor.getSpecifiedScope(), descriptor.getField(),
                 bean);
     }

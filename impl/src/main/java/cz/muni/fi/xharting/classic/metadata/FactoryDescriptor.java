@@ -14,11 +14,11 @@ import cz.muni.fi.xharting.classic.util.Seam2Utils;
 
 public class FactoryDescriptor extends AbstractFactoryDescriptor {
 
-    private ManagedBeanDescriptor bean;
+    private BeanDescriptor bean;
     private Method method;
     private Class<?> productType;
 
-    public FactoryDescriptor(String name, ScopeType specifiedScope, boolean autoCreate, ManagedBeanDescriptor bean,
+    public FactoryDescriptor(String name, ScopeType specifiedScope, boolean autoCreate, BeanDescriptor bean,
             Method method) {
         super(name, specifiedScope, autoCreate);
         this.bean = bean;
@@ -27,11 +27,11 @@ public class FactoryDescriptor extends AbstractFactoryDescriptor {
         Reflections.setAccessible(method);
     }
 
-    public FactoryDescriptor(FactoryDescriptor original, ManagedBeanDescriptor bean) {
+    public FactoryDescriptor(FactoryDescriptor original, BeanDescriptor bean) {
         this(original.getName(), original.getScope(), original.isAutoCreate(), bean, original.getMethod());
     }
 
-    public ManagedBeanDescriptor getBean() {
+    public BeanDescriptor getBean() {
         return bean;
     }
 

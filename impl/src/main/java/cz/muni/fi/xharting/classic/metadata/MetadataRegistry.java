@@ -20,12 +20,12 @@ import cz.muni.fi.xharting.classic.bootstrap.ConditionalInstallationService;
 public class MetadataRegistry {
 
     // basics
-    private final Set<ManagedBeanDescriptor> managedBeanDescriptors;
+    private final Set<BeanDescriptor> managedBeanDescriptors;
     private final Set<AbstractFactoryDescriptor> factoryDescriptors;
     private final Set<AbstractObserverMethodDescriptor> observerMethods;
 
     // lookup structures
-    private final Multimap<Class<?>, ManagedBeanDescriptor> managedInstancesByClass = HashMultimap.create();
+    private final Multimap<Class<?>, BeanDescriptor> managedInstancesByClass = HashMultimap.create();
     private final Map<String, AbstractManagedInstanceDescriptor> managedInstancesByName = new HashMap<String, AbstractManagedInstanceDescriptor>();
 
     private final Multimap<Class<? extends Annotation>, RoleDescriptor> startupBeans = HashMultimap.create();
@@ -42,13 +42,13 @@ public class MetadataRegistry {
         observerMethods = null;
     }
 
-    public MetadataRegistry(Set<ManagedBeanDescriptor> managedBeanDescriptors,
+    public MetadataRegistry(Set<BeanDescriptor> managedBeanDescriptors,
             Set<AbstractFactoryDescriptor> factoryDescriptors, Set<AbstractObserverMethodDescriptor> observerMethods) {
         this.managedBeanDescriptors = managedBeanDescriptors;
         this.factoryDescriptors = factoryDescriptors;
         this.observerMethods = observerMethods;
 
-        for (ManagedBeanDescriptor descriptor : managedBeanDescriptors) {
+        for (BeanDescriptor descriptor : managedBeanDescriptors) {
             managedInstancesByClass.put(descriptor.getJavaClass(), descriptor);
             for (RoleDescriptor role : descriptor.getRoles()) {
                 managedInstancesByName.put(role.getName(), descriptor);
@@ -83,7 +83,7 @@ public class MetadataRegistry {
             throw new IllegalArgumentException("Cyclic startup dependency found: " + pendingStartup);
         } else {
             pendingStartup.add(name);
-            ManagedBeanDescriptor descriptor = getManagedBeanDescriptorByName(name);
+            BeanDescriptor descriptor = getManagedBeanDescriptorByName(name);
             if (descriptor != null) {
                 for (String dependency : descriptor.getStartupDependencies()) {
                     checkStartupDependenciesForCycles(dependency, pendingStartup);
@@ -97,17 +97,17 @@ public class MetadataRegistry {
         return managedInstancesByName.get(name);
     }
 
-    public ManagedBeanDescriptor getManagedBeanDescriptorByName(String name) {
+    public BeanDescriptor getManagedBeanDescriptorByName(String name) {
         AbstractManagedInstanceDescriptor descriptor = getManagedInstanceDescriptorByName(name);
-        if (descriptor != null && descriptor instanceof ManagedBeanDescriptor) {
-            return (ManagedBeanDescriptor) descriptor;
+        if (descriptor != null && descriptor instanceof BeanDescriptor) {
+            return (BeanDescriptor) descriptor;
         } else {
             return null;
         }
     }
 
-    public Collection<ManagedBeanDescriptor> getManagedInstanceDescriptorByClass(Class<?> clazz, boolean superClassFallback) {
-        Collection<ManagedBeanDescriptor> descriptors = managedInstancesByClass.get(clazz);
+    public Collection<BeanDescriptor> getManagedInstanceDescriptorByClass(Class<?> clazz, boolean superClassFallback) {
+        Collection<BeanDescriptor> descriptors = managedInstancesByClass.get(clazz);
         if (descriptors.isEmpty() && superClassFallback) {
             // let's try again with superclass since the original class might have been a subclass which CDI implementation
             // uses to implement interceptors and decorators
@@ -119,7 +119,7 @@ public class MetadataRegistry {
         return Collections.unmodifiableCollection(descriptors);
     }
 
-    public Set<ManagedBeanDescriptor> getManagedBeanDescriptors() {
+    public Set<BeanDescriptor> getManagedBeanDescriptors() {
         return Collections.unmodifiableSet(managedBeanDescriptors);
     }
 

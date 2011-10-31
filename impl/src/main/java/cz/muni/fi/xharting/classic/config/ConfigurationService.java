@@ -20,7 +20,7 @@ import cz.muni.fi.xharting.classic.bootstrap.scan.Scanner;
 import cz.muni.fi.xharting.classic.config.Conversions.PropertyValue;
 import cz.muni.fi.xharting.classic.metadata.ElFactoryDescriptor;
 import cz.muni.fi.xharting.classic.metadata.ElObserverMethodDescriptor;
-import cz.muni.fi.xharting.classic.metadata.ManagedBeanDescriptor;
+import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.NamespaceDescriptor;
 
 public class ConfigurationService {
@@ -125,15 +125,15 @@ public class ConfigurationService {
      * @param discoveredManagedBeanDescriptors managed bean configuration to merge with
      * @return managed bean descriptors with applied configuration changes
      */
-    public Multimap<String, ManagedBeanDescriptor> mergeManagedBeanConfiguration(
-            Multimap<String, ManagedBeanDescriptor> discoveredManagedBeanDescriptors) {
+    public Multimap<String, BeanDescriptor> mergeManagedBeanConfiguration(
+            Multimap<String, BeanDescriptor> discoveredManagedBeanDescriptors) {
         for (ConfiguredManagedBean configuredBean : getConfiguredManagedBeans()) {
-            Collection<ManagedBeanDescriptor> descriptors = discoveredManagedBeanDescriptors.get(configuredBean.getName());
+            Collection<BeanDescriptor> descriptors = discoveredManagedBeanDescriptors.get(configuredBean.getName());
             if (configuredBean.getClazz() == null) // the XML element specifies not scope
             {
                 if (descriptors.size() == 1) {
-                    Iterator<ManagedBeanDescriptor> iterator = descriptors.iterator();
-                    ManagedBeanDescriptor reconfigured = new ManagedBeanDescriptor(configuredBean, iterator.next());
+                    Iterator<BeanDescriptor> iterator = descriptors.iterator();
+                    BeanDescriptor reconfigured = new BeanDescriptor(configuredBean, iterator.next());
                     iterator.remove();
                     descriptors.add(reconfigured);
                 } else {
@@ -141,18 +141,18 @@ public class ConfigurationService {
                             + ". Exactly one candidate required but there are: " + descriptors.toString());
                 }
             } else {
-                Set<ManagedBeanDescriptor> replacements = new HashSet<ManagedBeanDescriptor>();
-                for (Iterator<ManagedBeanDescriptor> iterator = descriptors.iterator(); iterator.hasNext();) {
-                    ManagedBeanDescriptor descriptor = iterator.next();
+                Set<BeanDescriptor> replacements = new HashSet<BeanDescriptor>();
+                for (Iterator<BeanDescriptor> iterator = descriptors.iterator(); iterator.hasNext();) {
+                    BeanDescriptor descriptor = iterator.next();
                     if (configuredBean.getClazz().equals(descriptor.getJavaClass())) {
                         // remove the original bean, install the replacement later
-                        replacements.add(new ManagedBeanDescriptor(configuredBean, descriptor));
+                        replacements.add(new BeanDescriptor(configuredBean, descriptor));
                         iterator.remove();
                     }
                 }
                 if (replacements.isEmpty()) {
                     // if the configured bean did not match any discovered bean, add it as a new bean
-                    descriptors.add(new ManagedBeanDescriptor(configuredBean));
+                    descriptors.add(new BeanDescriptor(configuredBean));
                 } else {
                     // install reconfigured beans
                     descriptors.addAll(replacements);

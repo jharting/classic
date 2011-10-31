@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import cz.muni.fi.xharting.classic.bootstrap.ConditionalInstallationService;
 import cz.muni.fi.xharting.classic.metadata.AbstractFactoryDescriptor;
-import cz.muni.fi.xharting.classic.metadata.ManagedBeanDescriptor;
+import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 
 public class ConditionalInstallationTest {
 
@@ -22,10 +22,10 @@ public class ConditionalInstallationTest {
     @BeforeClass
     public static void prepare()
     {
-        Set<ManagedBeanDescriptor> allDescriptors = new HashSet<ManagedBeanDescriptor>();
+        Set<BeanDescriptor> allDescriptors = new HashSet<BeanDescriptor>();
         for (Class<?> clazz : new Class<?>[] {Bean1.class, Bean2.class, Bean3.class, Bean4.class, Bean5.class, Bean6.class, Bean7.class, Bean8.class, Bean9.class})
         {
-            allDescriptors.add(new ManagedBeanDescriptor(clazz));
+            allDescriptors.add(new BeanDescriptor(clazz));
         }
         installationService = new ConditionalInstallationService(allDescriptors);
         installationService.filterInstallableComponents();

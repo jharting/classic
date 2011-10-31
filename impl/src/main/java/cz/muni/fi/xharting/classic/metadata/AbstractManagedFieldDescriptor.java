@@ -11,10 +11,10 @@ public abstract class AbstractManagedFieldDescriptor {
     private final boolean required;
     private final ScopeType specifiedScope;
     private final Field field;
-    private final ManagedBeanDescriptor bean;
+    private final BeanDescriptor bean;
 
     public AbstractManagedFieldDescriptor(String specifiedName, boolean required, ScopeType specifiedScope, Field field,
-            ManagedBeanDescriptor bean) {
+            BeanDescriptor bean) {
         this.specifiedName = specifiedName;
         this.required = required;
         this.specifiedScope = specifiedScope;
@@ -46,7 +46,7 @@ public abstract class AbstractManagedFieldDescriptor {
         return field;
     }
 
-    public ManagedBeanDescriptor getBean() {
+    public BeanDescriptor getBean() {
         return bean;
     }
 

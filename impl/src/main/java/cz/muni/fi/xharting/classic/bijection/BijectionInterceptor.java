@@ -23,15 +23,18 @@ import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InterceptorBinding;
 import javax.interceptor.InvocationContext;
+import javax.persistence.EntityManager;
 
 import org.jboss.seam.InstantiationException;
 import org.jboss.seam.RequiredException;
 
 import cz.muni.fi.xharting.classic.metadata.AbstractManagedInstanceDescriptor;
+import cz.muni.fi.xharting.classic.metadata.DecoratingInjectionPoint;
 import cz.muni.fi.xharting.classic.metadata.InjectionPointDescriptor;
-import cz.muni.fi.xharting.classic.metadata.ManagedBeanDescriptor;
+import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.MetadataRegistry;
 import cz.muni.fi.xharting.classic.metadata.OutjectionPointDescriptor;
+import cz.muni.fi.xharting.classic.persistence.InterpolatingEntityManagerDecorator;
 import cz.muni.fi.xharting.classic.scope.ScopeExtension;
 import cz.muni.fi.xharting.classic.util.CdiUtils;
 
@@ -50,7 +53,7 @@ public class BijectionInterceptor implements Serializable {
     @Inject
     private ScopeExtension extension;
 
-    private ManagedBeanDescriptor descriptor;
+    private BeanDescriptor descriptor;
 
     public BijectionInterceptor() {
 
@@ -58,7 +61,7 @@ public class BijectionInterceptor implements Serializable {
 
     protected void init(InvocationContext ctx) {
         Class<?> targetClass = ctx.getTarget().getClass();
-        Collection<ManagedBeanDescriptor> descriptors = registry.getManagedInstanceDescriptorByClass(targetClass, true);
+        Collection<BeanDescriptor> descriptors = registry.getManagedInstanceDescriptorByClass(targetClass, true);
         // since all the bean descriptors share the same class, any is OK for us
         descriptor = descriptors.iterator().next();
     }
@@ -68,6 +71,7 @@ public class BijectionInterceptor implements Serializable {
         init(ctx);
 
         Object target = ctx.getTarget();
+        decorateEEInjectedFields(target);
         inject(target, false);
 
         // proceed initializer chain
@@ -112,6 +116,17 @@ public class BijectionInterceptor implements Serializable {
             } else if (enforce && injectionPoint.isRequired()) {
                 throw new RequiredException("@In attribute requires non-null value: " + injectionPoint.getPath());
             }
+        }
+    }
+
+    protected void decorateEEInjectedFields(Object target) {
+        for (DecoratingInjectionPoint<EntityManager> field : descriptor.getPersistenceContextFields()) {
+            EntityManager delegate = field.get(target);
+            if (delegate == null) {
+                throw new IllegalStateException("EE-injected field " + field.getField() + " is null.");
+            }
+            EntityManager decorator = new InterpolatingEntityManagerDecorator(delegate);
+            field.setValue(target, decorator);
         }
     }
 

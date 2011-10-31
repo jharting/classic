@@ -6,11 +6,11 @@ import org.jboss.solder.reflection.Reflections;
 
 public class ObserverMethodDescriptor extends AbstractObserverMethodDescriptor {
 
-    private final ManagedBeanDescriptor bean;
+    private final BeanDescriptor bean;
     private final Method method;
     private final boolean autoCreate;
 
-    public ObserverMethodDescriptor(String type, ManagedBeanDescriptor bean, Method method, boolean autoCreate) {
+    public ObserverMethodDescriptor(String type, BeanDescriptor bean, Method method, boolean autoCreate) {
         super(type);
         this.bean = bean;
         this.method = method;
@@ -18,12 +18,12 @@ public class ObserverMethodDescriptor extends AbstractObserverMethodDescriptor {
         Reflections.setAccessible(method);
     }
     
-    public ObserverMethodDescriptor(ObserverMethodDescriptor original, ManagedBeanDescriptor bean)
+    public ObserverMethodDescriptor(ObserverMethodDescriptor original, BeanDescriptor bean)
     {
         this(original.getType(), bean, original.getMethod(), original.isAutoCreate());
     }
 
-    public ManagedBeanDescriptor getBean() {
+    public BeanDescriptor getBean() {
         return bean;
     }
 

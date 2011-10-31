@@ -2,38 +2,37 @@ package cz.muni.fi.xharting.classic.metadata;
 
 import java.lang.annotation.Annotation;
 
-import javax.ejb.Stateful;
 import javax.ejb.Stateless;
 import javax.enterprise.context.ConversationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.context.RequestScoped;
-import javax.persistence.Entity;
 
 import org.jboss.seam.ScopeType;
 
+import cz.muni.fi.xharting.classic.metadata.BeanDescriptor.BeanType;
 import cz.muni.fi.xharting.classic.util.Seam2Utils;
 
 public class RoleDescriptor {
 
     private String name;
     private ScopeType specifiedScope;
-    private ManagedBeanDescriptor bean;
+    private BeanDescriptor bean;
 
-    public RoleDescriptor(String name, ScopeType specifiedScope, ManagedBeanDescriptor bean) {
+    public RoleDescriptor(String name, ScopeType specifiedScope, BeanDescriptor bean) {
         this.name = name;
         this.specifiedScope = specifiedScope;
         this.bean = bean;
     }
 
-    public RoleDescriptor(RoleDescriptor role, ManagedBeanDescriptor managedBeanDescriptor) {
+    public RoleDescriptor(RoleDescriptor role, BeanDescriptor managedBeanDescriptor) {
         this(role.getName(), role.getSpecifiedScope(), managedBeanDescriptor);
     }
 
-    public ManagedBeanDescriptor getBean() {
+    public BeanDescriptor getBean() {
         return bean;
     }
 
-    public void setBean(ManagedBeanDescriptor bean) {
+    public void setBean(BeanDescriptor bean) {
         this.bean = bean;
     }
 
@@ -50,10 +49,9 @@ public class RoleDescriptor {
      */
     public Class<? extends Annotation> getCdiScope() {
         if (specifiedScope.equals(ScopeType.UNSPECIFIED)) {
-            Class<?> clazz = bean.getJavaClass();
-            if (clazz.isAnnotationPresent(Stateful.class) || clazz.isAnnotationPresent(Entity.class)) {
+            if (getBean().getBeanType().equals(BeanType.STATEFUL) || getBean().getBeanType().equals(BeanType.ENTITY)) {
                 return ConversationScoped.class;
-            } else if (clazz.isAnnotationPresent(Stateless.class)) {
+            } else if (getBean().getBeanType().equals(BeanType.STATELESS)) {
                 return Dependent.class;
             } else {
                 return RequestScoped.class;

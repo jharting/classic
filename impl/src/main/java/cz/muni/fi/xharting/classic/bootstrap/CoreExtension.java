@@ -30,7 +30,7 @@ import cz.muni.fi.xharting.classic.bootstrap.scan.Scanner;
 import cz.muni.fi.xharting.classic.config.ConfigurationService;
 import cz.muni.fi.xharting.classic.config.ConfiguringInjectionTarget;
 import cz.muni.fi.xharting.classic.factory.UnwrappedBean;
-import cz.muni.fi.xharting.classic.metadata.ManagedBeanDescriptor;
+import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.MetadataRegistry;
 import cz.muni.fi.xharting.classic.metadata.NamespaceDescriptor;
 import cz.muni.fi.xharting.classic.persistence.entity.DirectReferenceHolderBean;
@@ -58,9 +58,9 @@ public class CoreExtension implements Extension {
 
         // process found components
         Set<Class<?>> classes = event.getScanner().getTypesAnnotatedWith(Name.class);
-        Multimap<String, ManagedBeanDescriptor> discoveredManagedBeanDescriptors = HashMultimap.create();
+        Multimap<String, BeanDescriptor> discoveredManagedBeanDescriptors = HashMultimap.create();
         for (Class<?> clazz : classes) {
-            ManagedBeanDescriptor beanDescriptor = new ManagedBeanDescriptor(clazz);
+            BeanDescriptor beanDescriptor = new BeanDescriptor(clazz);
             discoveredManagedBeanDescriptors.put(beanDescriptor.getImplicitRole().getName(), beanDescriptor);
         }
 
@@ -70,7 +70,7 @@ public class CoreExtension implements Extension {
 
         // process XML configuration
         configuration.loadConfiguration(namespaces);
-        Multimap<String, ManagedBeanDescriptor> managedBeanDescriptors = configuration
+        Multimap<String, BeanDescriptor> managedBeanDescriptors = configuration
                 .mergeManagedBeanConfiguration(discoveredManagedBeanDescriptors);
 
         // process conditional installation

@@ -41,10 +41,11 @@ import cz.muni.fi.xharting.classic.factory.LegacyFactory;
 import cz.muni.fi.xharting.classic.factory.UnwrappedBean;
 import cz.muni.fi.xharting.classic.metadata.AbstractFactoryDescriptor;
 import cz.muni.fi.xharting.classic.metadata.AbstractObserverMethodDescriptor;
+import cz.muni.fi.xharting.classic.metadata.BeanDescriptor.BeanType;
 import cz.muni.fi.xharting.classic.metadata.ElFactoryDescriptor;
 import cz.muni.fi.xharting.classic.metadata.ElObserverMethodDescriptor;
 import cz.muni.fi.xharting.classic.metadata.FactoryDescriptor;
-import cz.muni.fi.xharting.classic.metadata.ManagedBeanDescriptor;
+import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.ObserverMethodDescriptor;
 import cz.muni.fi.xharting.classic.metadata.RoleDescriptor;
 import cz.muni.fi.xharting.classic.persistence.entity.DirectReferenceHolderBean;
@@ -77,7 +78,7 @@ public class ClassicBeanTransformer {
                 .getInstallableObserverMethodDescriptors(), manager);
     }
 
-    public ClassicBeanTransformer(Set<ManagedBeanDescriptor> managedBeanDescriptors,
+    public ClassicBeanTransformer(Set<BeanDescriptor> managedBeanDescriptors,
             Set<AbstractFactoryDescriptor> factoryDescriptors, Set<AbstractObserverMethodDescriptor> observerMethods,
             BeanManager manager) {
         this.manager = manager;
@@ -86,11 +87,11 @@ public class ClassicBeanTransformer {
         transformObserverMethods(observerMethods);
     }
 
-    protected void transformBeans(Set<ManagedBeanDescriptor> beans) {
-        for (ManagedBeanDescriptor bean : beans) {
+    protected void transformBeans(Set<BeanDescriptor> beans) {
+        for (BeanDescriptor bean : beans) {
             for (RoleDescriptor role : bean.getRoles()) {
                 // entities require special treatment
-                if (bean.isEntity()) {
+                if (bean.getBeanType().equals(BeanType.ENTITY)) {
                     transformEntity(bean, role, bean.getJavaClass());
                     continue;
                 }
@@ -199,8 +200,8 @@ public class ClassicBeanTransformer {
         }
     }
 
-    protected <T> void transformEntity(ManagedBeanDescriptor bean, RoleDescriptor role, Class<T> javaClass) {
-        if (!bean.isEntity()) {
+    protected <T> void transformEntity(BeanDescriptor bean, RoleDescriptor role, Class<T> javaClass) {
+        if (!bean.getBeanType().equals(BeanType.ENTITY)) {
             throw new IllegalArgumentException(bean.getJavaClass() + " is not an entity.");
         }
         if (!bean.getInjectionPoints().isEmpty()) {
@@ -215,7 +216,7 @@ public class ClassicBeanTransformer {
         if (bean.hasUnwrappingMethod()) {
             throw new IllegalArgumentException("Entities cannot define unwrap methods"); // TODO definitionException
         }
-        
+
         DirectReferenceHolderBean<T> holder;
         EntityProducer<T> producer;
         if (Serializable.class.isAssignableFrom(javaClass)) {
@@ -233,7 +234,7 @@ public class ClassicBeanTransformer {
         return new AnnotatedTypeBuilder<T>().readFromType(javaClass);
     }
 
-    private <T> void registerInterceptors(ManagedBeanDescriptor descriptor, RoleDescriptor role, AnnotatedTypeBuilder<T> builder) {
+    private <T> void registerInterceptors(BeanDescriptor descriptor, RoleDescriptor role, AnnotatedTypeBuilder<T> builder) {
         // support for injection/outjection
         builder.addToClass(BijectionInterceptor.Bijected.BijectedLiteral.INSTANCE);
         // session-scoped and page-scoped components are synchronized automatically

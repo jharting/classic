@@ -21,7 +21,7 @@ import cz.muni.fi.xharting.classic.metadata.AbstractObserverMethodDescriptor;
 import cz.muni.fi.xharting.classic.metadata.ElFactoryDescriptor;
 import cz.muni.fi.xharting.classic.metadata.ElObserverMethodDescriptor;
 import cz.muni.fi.xharting.classic.metadata.FactoryDescriptor;
-import cz.muni.fi.xharting.classic.metadata.ManagedBeanDescriptor;
+import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.ObserverMethodDescriptor;
 import cz.muni.fi.xharting.classic.metadata.RoleDescriptor;
 
@@ -38,16 +38,16 @@ public class ConditionalInstallationService {
     private Comparator<Sortable> comparator = new Sortable.Comparator();
 
     // lookup maps
-    private final Multimap<String, ManagedBeanDescriptor> descriptors;
-    private Map<String, ManagedBeanDescriptor> currentTest;
+    private final Multimap<String, BeanDescriptor> descriptors;
+    private Map<String, BeanDescriptor> currentTest;
     // configured factories - these are always installed, so these can satisfy @Install dependencies of other beans
     private Map<String, ElFactoryDescriptor> configuredFactories = new HashMap<String, ElFactoryDescriptor>();
     // installable stuff
-    private final Map<String, ManagedBeanDescriptor> installableComponents = new HashMap<String, ManagedBeanDescriptor>();
+    private final Map<String, BeanDescriptor> installableComponents = new HashMap<String, BeanDescriptor>();
     private final Set<AbstractFactoryDescriptor> factories = new HashSet<AbstractFactoryDescriptor>();
     private final Set<AbstractObserverMethodDescriptor> observerMethods = new HashSet<AbstractObserverMethodDescriptor>();
 
-    public ConditionalInstallationService(Collection<ManagedBeanDescriptor> incommingDescriptors,
+    public ConditionalInstallationService(Collection<BeanDescriptor> incommingDescriptors,
             Set<ElFactoryDescriptor> configuredFactories, Set<ElObserverMethodDescriptor> configuredObserverMethods) {
         this.descriptors = createLookupMap(incommingDescriptors);
         for (ElFactoryDescriptor descriptor : configuredFactories) {
@@ -58,19 +58,19 @@ public class ConditionalInstallationService {
         }
     }
 
-    public ConditionalInstallationService(Collection<ManagedBeanDescriptor> incommingDescriptors) {
+    public ConditionalInstallationService(Collection<BeanDescriptor> incommingDescriptors) {
         this(incommingDescriptors, new HashSet<ElFactoryDescriptor>(), new HashSet<ElObserverMethodDescriptor>());
     }
 
     public void filterInstallableComponents() {
         for (String component : descriptors.keySet()) {
-            currentTest = new HashMap<String, ManagedBeanDescriptor>();
+            currentTest = new HashMap<String, BeanDescriptor>();
             if (installComponent(component)) {
                 mergeDescriptorMaps(installableComponents, currentTest);
             }
             currentTest = null;
         }
-        for (Map.Entry<String, ManagedBeanDescriptor> entry : installableComponents.entrySet()) {
+        for (Map.Entry<String, BeanDescriptor> entry : installableComponents.entrySet()) {
             for (FactoryDescriptor factory : entry.getValue().getFactories()) {
                 factories.add(factory);
             }
@@ -83,12 +83,12 @@ public class ConditionalInstallationService {
         }
     }
 
-    public Set<ManagedBeanDescriptor> getInstallableManagedBeanBescriptors() {
-        return new HashSet<ManagedBeanDescriptor>(installableComponents.values());
+    public Set<BeanDescriptor> getInstallableManagedBeanBescriptors() {
+        return new HashSet<BeanDescriptor>(installableComponents.values());
     }
 
     // for tests
-    public Map<String, ManagedBeanDescriptor> getInstallableManagedBeanDescriptorMap() {
+    public Map<String, BeanDescriptor> getInstallableManagedBeanDescriptorMap() {
         return Collections.unmodifiableMap(installableComponents);
     }
 
@@ -105,11 +105,11 @@ public class ConditionalInstallationService {
             return true;
         }
         // sort possible candidates based on precedence
-        List<ManagedBeanDescriptor> implementations = new ArrayList<ManagedBeanDescriptor>(descriptors.get(name));
+        List<BeanDescriptor> implementations = new ArrayList<BeanDescriptor>(descriptors.get(name));
         Collections.sort(implementations, comparator);
-        for (ManagedBeanDescriptor implementation : implementations) {
+        for (BeanDescriptor implementation : implementations) {
 
-            Map<String, ManagedBeanDescriptor> backup = new HashMap<String, ManagedBeanDescriptor>(currentTest);
+            Map<String, BeanDescriptor> backup = new HashMap<String, BeanDescriptor>(currentTest);
             if (installImplementation(name, implementation)) {
                 return true;
             } else {
@@ -125,7 +125,7 @@ public class ConditionalInstallationService {
      * 
      * @return true if all bean's dependencies (including transitive) have been met.
      */
-    private boolean installImplementation(String name, ManagedBeanDescriptor descriptor) {
+    private boolean installImplementation(String name, BeanDescriptor descriptor) {
         if (!descriptor.getInstallDescriptor().isInstalled()) {
             return false;
         }
@@ -136,7 +136,7 @@ public class ConditionalInstallationService {
     /**
      * returns true if and only if all dependencies of a given managed bean are met
      */
-    private boolean checkDependencies(ManagedBeanDescriptor descriptor) {
+    private boolean checkDependencies(BeanDescriptor descriptor) {
         for (String dependency : descriptor.getInstallDescriptor().getDependencies()) {
             if (!installComponent(dependency)) {
                 return false;
@@ -148,7 +148,7 @@ public class ConditionalInstallationService {
     /**
      * returns true if and only if all class dependencies of a given managed bean are met
      */
-    private boolean checkClassDependencies(ManagedBeanDescriptor descriptor) {
+    private boolean checkClassDependencies(BeanDescriptor descriptor) {
         for (String dependency : descriptor.getInstallDescriptor().getClassDependencies()) {
             try {
                 Reflections.classForName(dependency);
@@ -162,12 +162,12 @@ public class ConditionalInstallationService {
     /**
      * returns true if and only if all generic dependencies of a given managed bean are met
      */
-    private boolean checkGenericDependencies(ManagedBeanDescriptor descriptor) {
+    private boolean checkGenericDependencies(BeanDescriptor descriptor) {
         for (Class<?> dependency : descriptor.getInstallDescriptor().getGenericDependencies()) {
             if (!isInstalled(dependency)) {
-                Set<ManagedBeanDescriptor> candidates = findPotentialComponents(dependency);
+                Set<BeanDescriptor> candidates = findPotentialComponents(dependency);
 
-                for (ManagedBeanDescriptor candidate : candidates) {
+                for (BeanDescriptor candidate : candidates) {
                     installComponent(candidate.getImplicitRole().getName());
                 }
                 if (!isInstalled(dependency)) {
@@ -182,9 +182,9 @@ public class ConditionalInstallationService {
     /**
      * Based on a collection passed as a parameter, create a bean name -> bean descriptor map
      */
-    private Multimap<String, ManagedBeanDescriptor> createLookupMap(Collection<ManagedBeanDescriptor> incommingDescriptors) {
-        Multimap<String, ManagedBeanDescriptor> descriptors = HashMultimap.create();
-        for (ManagedBeanDescriptor descriptor : incommingDescriptors) {
+    private Multimap<String, BeanDescriptor> createLookupMap(Collection<BeanDescriptor> incommingDescriptors) {
+        Multimap<String, BeanDescriptor> descriptors = HashMultimap.create();
+        for (BeanDescriptor descriptor : incommingDescriptors) {
             for (RoleDescriptor role : descriptor.getRoles()) {
                 descriptors.put(role.getName(), descriptor);
             }
@@ -200,9 +200,9 @@ public class ConditionalInstallationService {
      * 
      * @throws IllegalStateException if the first-parameter map already contains a key from the second-parameter map
      */
-    private Map<String, ManagedBeanDescriptor> mergeDescriptorMaps(Map<String, ManagedBeanDescriptor> map1,
-            Map<String, ManagedBeanDescriptor> map2) {
-        for (Map.Entry<String, ManagedBeanDescriptor> entry : map2.entrySet()) {
+    private Map<String, BeanDescriptor> mergeDescriptorMaps(Map<String, BeanDescriptor> map1,
+            Map<String, BeanDescriptor> map2) {
+        for (Map.Entry<String, BeanDescriptor> entry : map2.entrySet()) {
             if (map1.containsKey(entry.getKey())) {
                 throw new IllegalStateException("Map already contains key " + entry.getKey());
             }
@@ -222,12 +222,12 @@ public class ConditionalInstallationService {
      * @return true if and only if a bean defined by the class passed as a parameter is registered.
      */
     public boolean isInstalled(Class<?> clazz) {
-        for (ManagedBeanDescriptor descriptor : installableComponents.values()) {
+        for (BeanDescriptor descriptor : installableComponents.values()) {
             if (descriptor.getJavaClass().equals(clazz)) {
                 return true;
             }
         }
-        for (ManagedBeanDescriptor descriptor : currentTest.values()) {
+        for (BeanDescriptor descriptor : currentTest.values()) {
             if (descriptor.getJavaClass().equals(clazz)) {
                 return true;
             }
@@ -236,12 +236,12 @@ public class ConditionalInstallationService {
     }
 
     /**
-     * A set of {@link ManagedBeanDescriptor}s defined by the classes passed as a parameter.
+     * A set of {@link BeanDescriptor}s defined by the classes passed as a parameter.
      */
-    private Set<ManagedBeanDescriptor> findPotentialComponents(Class<?> dependency) {
-        Set<ManagedBeanDescriptor> candidates = new HashSet<ManagedBeanDescriptor>();
+    private Set<BeanDescriptor> findPotentialComponents(Class<?> dependency) {
+        Set<BeanDescriptor> candidates = new HashSet<BeanDescriptor>();
 
-        for (ManagedBeanDescriptor descriptor : descriptors.values()) {
+        for (BeanDescriptor descriptor : descriptors.values()) {
             if (descriptor.getJavaClass().equals(dependency)) {
                 candidates.add(descriptor);
             }

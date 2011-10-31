@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 
-import cz.muni.fi.xharting.classic.metadata.ManagedBeanDescriptor;
+import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.MetadataRegistry;
 import cz.muni.fi.xharting.classic.metadata.RoleDescriptor;
 import cz.muni.fi.xharting.classic.util.CdiUtils;
@@ -49,7 +49,7 @@ public class StartupListener implements ServletContextListener, HttpSessionListe
         if (started.contains(name)) {
             return; // started already
         }
-        ManagedBeanDescriptor descriptor = registry.getManagedBeanDescriptorByName(name);
+        BeanDescriptor descriptor = registry.getManagedBeanDescriptorByName(name);
         if (descriptor != null) {
             for (String dependency : descriptor.getStartupDependencies()) {
                 startup(dependency, started);

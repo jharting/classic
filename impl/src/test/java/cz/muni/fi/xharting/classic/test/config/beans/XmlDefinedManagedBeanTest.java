@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import cz.muni.fi.xharting.classic.metadata.AbstractManagedInstanceDescriptor;
-import cz.muni.fi.xharting.classic.metadata.ManagedBeanDescriptor;
+import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.MetadataRegistry;
 import cz.muni.fi.xharting.classic.test.config.beans.subpackage.Sparrow;
 
@@ -41,7 +41,7 @@ public class XmlDefinedManagedBeanTest {
     @Test
     public void testBeanRegistration(@Named("eagle") Eagle eagle) {
         assertNotNull(eagle);
-        ManagedBeanDescriptor descriptor = getManagedBeanDescriptorByName("eagle");
+        BeanDescriptor descriptor = getManagedBeanDescriptorByName("eagle");
         assertEquals("eagle", descriptor.getImplicitRole().getName());
         assertEquals(ScopeType.SESSION, descriptor.getImplicitRole().getSpecifiedScope());
         assertEquals(true, descriptor.isAutoCreate());
@@ -49,7 +49,7 @@ public class XmlDefinedManagedBeanTest {
     
     @Test
     public void testBeanRegistrationPackageLevelFile() {
-        ManagedBeanDescriptor descriptor = getManagedBeanDescriptorByName("eagle2");
+        BeanDescriptor descriptor = getManagedBeanDescriptorByName("eagle2");
         assertEquals("eagle2", descriptor.getImplicitRole().getName());
         assertEquals(ScopeType.APPLICATION, descriptor.getImplicitRole().getSpecifiedScope());
         assertEquals(true, descriptor.isAutoCreate());
@@ -57,7 +57,7 @@ public class XmlDefinedManagedBeanTest {
     
     @Test
     public void testBeanRegistrationSingleComponentFile() {
-        ManagedBeanDescriptor descriptor = getManagedBeanDescriptorByName("eagle3");
+        BeanDescriptor descriptor = getManagedBeanDescriptorByName("eagle3");
         assertEquals("eagle3", descriptor.getImplicitRole().getName());
         assertEquals(ScopeType.EVENT, descriptor.getImplicitRole().getSpecifiedScope());
         assertEquals(false, descriptor.isAutoCreate());
@@ -66,7 +66,7 @@ public class XmlDefinedManagedBeanTest {
     @Test
     public void testBeanAlteration(@Named("falcon") Falcon falcon) {
         assertNotNull(falcon);
-        ManagedBeanDescriptor descriptor = getManagedBeanDescriptorByName("falcon");
+        BeanDescriptor descriptor = getManagedBeanDescriptorByName("falcon");
         assertEquals(ScopeType.APPLICATION, descriptor.getImplicitRole().getSpecifiedScope());
         assertEquals(false, descriptor.isAutoCreate());
         assertEquals(true, descriptor.getInstallDescriptor().isInstalled());
@@ -76,7 +76,7 @@ public class XmlDefinedManagedBeanTest {
     public void testBeanOverriding(@Named("pigeon") Pigeon pigeon) {
         assertNotNull(pigeon);
         assertTrue(pigeon instanceof UltimatePigeon);
-        ManagedBeanDescriptor descriptor = getManagedBeanDescriptorByName("pigeon");
+        BeanDescriptor descriptor = getManagedBeanDescriptorByName("pigeon");
         assertEquals(ScopeType.EVENT, descriptor.getImplicitRole().getSpecifiedScope());
         assertEquals(UltimatePigeon.class, descriptor.getJavaClass());
         assertEquals(30, descriptor.getInstallDescriptor().getPrecedence());
@@ -91,17 +91,17 @@ public class XmlDefinedManagedBeanTest {
         assertEquals(13, sparrow.getAge());
         assertEquals("Ricki", sparrow.getName());
 
-        ManagedBeanDescriptor descriptor = getManagedBeanDescriptorByName("sparrow");
+        BeanDescriptor descriptor = getManagedBeanDescriptorByName("sparrow");
         assertEquals(true, descriptor.isAutoCreate());
         assertEquals(ScopeType.APPLICATION, descriptor.getImplicitRole().getSpecifiedScope());
     }
 
-    private ManagedBeanDescriptor getManagedBeanDescriptorByName(String name) {
+    private BeanDescriptor getManagedBeanDescriptorByName(String name) {
         AbstractManagedInstanceDescriptor descriptor = registry.getManagedInstanceDescriptorByName(name);
-        if (descriptor == null || !(descriptor instanceof ManagedBeanDescriptor)) {
+        if (descriptor == null || !(descriptor instanceof BeanDescriptor)) {
             fail();
         }
-        return (ManagedBeanDescriptor) descriptor;
+        return (BeanDescriptor) descriptor;
     }
 
 }
