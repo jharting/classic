@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>cz.muni.fi.xharting.classic.example</groupId>
+        <artifactId>registration-parent</artifactId>
+        <relativePath>../pom.xml</relativePath>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>registration-ear</artifactId>
+    <packaging>ear</packaging>
+    <name>Registration EAR Module</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>cz.muni.fi.xharting.classic.example</groupId>
+            <artifactId>registration-web</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>cz.muni.fi.xharting.classic.example</groupId>
+            <artifactId>registration-ejb</artifactId>
+            <version>${project.version}</version>
+            <type>ejb</type>
+        </dependency>
+        <!-- <dependency> -->
+        <!-- <groupId>org.jboss.seam</groupId> -->
+        <!-- <artifactId>jboss-seam</artifactId> -->
+        <!-- <type>ejb</type> -->
+        <!-- <scope>compile</scope> -->
+        <!-- <exclusions> -->
+        <!-- <exclusion> -->
+        <!-- <groupId>com.thoughtworks.xstream</groupId> -->
+        <!-- <artifactId>xstream</artifactId> -->
+        <!-- </exclusion> -->
+        <!-- <exclusion> -->
+        <!-- <groupId>xpp3</groupId> -->
+        <!-- <artifactId>xpp3_min</artifactId> -->
+        <!-- </exclusion> -->
+        <!-- </exclusions> -->
+        <!-- </dependency> -->
+    </dependencies>
+
+    <build>
+        <finalName>classic-registration</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <version>5</version>
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>
+                    <!-- Exclude eclipse generated application.xml and manually modified jboss-app.xml during mvn build -->
+                    <earSourceExcludes>**/application.xml, **/jboss-app.xml</earSourceExcludes>
+                    <!-- use maven generated application.xml instead -->
+                    <generateApplicationXml>true</generateApplicationXml>
+                    <modules>
+                        <webModule>
+                            <groupId>cz.muni.fi.xharting.classic.example</groupId>
+                            <artifactId>registration-web</artifactId>
+                            <contextRoot>/classic-registration</contextRoot>
+                            <bundleFileName>registration-web.war</bundleFileName>
+                        </webModule>
+                        <ejbModule>
+                            <groupId>cz.muni.fi.xharting.classic.example</groupId>
+                            <artifactId>registration-ejb</artifactId>
+                            <bundleFileName>registration-ejb.jar</bundleFileName>
+                        </ejbModule>
+                    </modules>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>jbossas-remote-7</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.as</groupId>
+                    <artifactId>jboss-as-arquillian-container-remote</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+</project>

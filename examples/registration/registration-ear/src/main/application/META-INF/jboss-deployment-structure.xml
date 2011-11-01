@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <ear-subdeployments-isolated>false</ear-subdeployments-isolated>
+    <deployment>
+        <dependencies>
+            <module name="org.jboss.as.web" />
+        </dependencies>
+    </deployment>
+    
+    <!-- TODO temporary workaround -->
+    <sub-deployment name="registration-ejb.jar">
+        <dependencies>
+            <module name="org.jboss.as.web" />
+        </dependencies>
+    </sub-deployment>
+</jboss-deployment-structure>
