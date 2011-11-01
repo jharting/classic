@@ -29,4 +29,5 @@ Changes related to migration to Java EE 6:
 
 
 Other changes not related directly to migration:
+
 1. Modify datasource definition (AS7)
