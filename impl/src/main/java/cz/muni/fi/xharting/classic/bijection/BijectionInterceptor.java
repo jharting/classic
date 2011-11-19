@@ -9,6 +9,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -55,14 +56,28 @@ public class BijectionInterceptor implements Serializable {
     private ScopeExtension extension;
 
     private BeanDescriptor descriptor;
+    private Object target;
 
-    public BijectionInterceptor() {
+    // This is a workaround for WELD-1016 - the state of the interceptor is not kept since multiple interceptors instances are
+    // used per target instance.
+    // Otherwise, a boolean field would be enough for us.
+    private static ThreadLocal<Set<Object>> injected = new ThreadLocal<Set<Object>>() {
+        @Override
+        protected Set<Object> initialValue() {
+            return new HashSet<Object>();
+        }
+    };
 
+    protected BijectionInterceptor() {
     }
 
     protected void init(InvocationContext ctx) {
-        Class<?> targetClass = ctx.getTarget().getClass();
+        this.target = ctx.getTarget();
+        Class<?> targetClass = target.getClass();
         Collection<BeanDescriptor> descriptors = registry.getManagedInstanceDescriptorByClass(targetClass, true);
+        if (descriptors.size() == 0) {
+            throw new IllegalArgumentException("Unknown component " + target);
+        }
         // since all the bean descriptors share the same class, any is OK for us
         descriptor = descriptors.iterator().next();
     }
@@ -71,9 +86,8 @@ public class BijectionInterceptor implements Serializable {
     public void postConstruct(InvocationContext ctx) {
         init(ctx);
 
-        Object target = ctx.getTarget();
-        decorateEEInjectedFields(target);
-        inject(target, false);
+        decorateEEInjectedFields();
+        inject(false);
 
         // proceed initializer chain
         try {
@@ -82,29 +96,37 @@ public class BijectionInterceptor implements Serializable {
             throw new InstantiationException("Could not instantiate Seam component: " + descriptor.getJavaClass(), e);
         }
 
-        outject(target, false);
-        disinject(target);
+        outject(false);
+        disinject();
     }
 
     @AroundInvoke
     public Object aroundInvoke(InvocationContext ctx) throws Exception {
+        if (injected.get().contains(ctx.getTarget())) {
+            return ctx.proceed(); // reentrant method calls
+        }
+
         if (descriptor == null) {
             init(ctx);
         }
 
-        Object target = ctx.getTarget();
+        inject(true);
+        injected.get().add(target);
 
-        inject(target, true);
+        try {
+            Object result = ctx.proceed();
 
-        Object result = ctx.proceed();
+            outject(true);
+            disinject();
 
-        outject(target, true);
-        disinject(target);
+            return result;
 
-        return result;
+        } finally {
+            injected.get().remove(target);
+        }
     }
 
-    protected void inject(Object target, boolean enforce) {
+    protected void inject(boolean enforce) {
         for (InjectionPointDescriptor injectionPoint : descriptor.getInjectionPoints()) {
             Object injectableReference = getInjectableReference(injectionPoint);
 
@@ -120,7 +142,7 @@ public class BijectionInterceptor implements Serializable {
         }
     }
 
-    protected void decorateEEInjectedFields(Object target) {
+    protected void decorateEEInjectedFields() {
         for (DecoratingInjectionPoint<EntityManager> field : descriptor.getPersistenceContextFields()) {
             EntityManager delegate = field.get(target);
             if (delegate == null) {
@@ -183,7 +205,7 @@ public class BijectionInterceptor implements Serializable {
         return null;
     }
 
-    protected void outject(Object target, boolean enforce) {
+    protected void outject(boolean enforce) {
         for (OutjectionPointDescriptor outjectionPoint : descriptor.getOutjectionPoints()) {
             outjectField(outjectionPoint, target, enforce);
         }
@@ -198,7 +220,7 @@ public class BijectionInterceptor implements Serializable {
         rewritableContextManager.set(outjectionPoint.getName(), value, outjectionPoint.getCdiScope());
     }
 
-    protected void disinject(Object target) {
+    protected void disinject() {
         for (InjectionPointDescriptor injectionPoint : descriptor.getInjectionPoints()) {
             injectionPoint.set(target, null);
         }
