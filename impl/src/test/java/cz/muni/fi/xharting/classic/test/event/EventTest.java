@@ -3,7 +3,11 @@ package cz.muni.fi.xharting.classic.test.event;
 import static cz.muni.fi.xharting.classic.test.util.Archives.createSeamWebApp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -96,7 +100,7 @@ public class EventTest {
         assertEquals(0, observingBean.getFooBarObserverCalled());
         assertEquals(0, observingBean.getBarObserverCalled());
     }
-
+    
     @Test
     public void testEventParameters() {
     	Events events = Events.instance();
@@ -164,5 +168,30 @@ public class EventTest {
         
         assertEquals(2, manager.resolveObserverMethods(payload, new EventQualifier.EventQualifierLiteral("foo", TransactionPhase.AFTER_SUCCESS)).size());
         assertEquals(1, manager.resolveObserverMethods(payload, new EventQualifier.EventQualifierLiteral("ignoredEvent", TransactionPhase.AFTER_SUCCESS)).size());
+    }
+    
+    @Test
+    public void testRuntimeExceptionInObserver() {
+        try {
+            Events.instance().raiseEvent("exception");
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("runtime exception", e.getMessage());
+            assertNull(e.getCause());
+        }
+    }
+    
+    @Test
+    public void testCheckedExceptionInObserver() {
+        try {
+            Events.instance().raiseEvent("checkedException");
+            fail();
+        } catch (RuntimeException e) {
+            assertEquals(RuntimeException.class, e.getClass());
+            assertEquals("exception invoking: checkedException", e.getMessage());
+            assertTrue(e.getCause() instanceof FileNotFoundException);
+            FileNotFoundException fnfe = (FileNotFoundException) e.getCause();
+            assertEquals("checked exception", fnfe.getMessage());
+        }
     }
 }

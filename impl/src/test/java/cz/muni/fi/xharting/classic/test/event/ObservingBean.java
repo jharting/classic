@@ -1,5 +1,6 @@
 package cz.muni.fi.xharting.classic.test.event;
 
+import java.io.FileNotFoundException;
 import java.util.Collection;
 
 import org.jboss.seam.ScopeType;
@@ -117,5 +118,15 @@ public class ObservingBean {
         p1 = null;
         p2 = null;
         p3 = null;
+    }
+
+    @Observer("exception")
+    public void exception() {
+        throw new IllegalStateException("runtime exception");
+    }
+
+    @Observer("checkedException")
+    public void checkedException() throws Exception {
+        throw new FileNotFoundException("checked exception");
     }
 }

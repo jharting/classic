@@ -1,5 +1,6 @@
 package cz.muni.fi.xharting.classic.event;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import javax.enterprise.event.TransactionPhase;
@@ -22,17 +23,30 @@ public class LegacyObserverMethod extends AbstractLegacyObserverMethod {
     private Class<?> hostType;
     private Method method;
 
-    public LegacyObserverMethod(String hostName, ObserverMethodDescriptor descriptor, TransactionPhase transactionPhase, BeanManager manager) {
+    public LegacyObserverMethod(String hostName, ObserverMethodDescriptor descriptor, TransactionPhase transactionPhase,
+            BeanManager manager) {
         super(descriptor.getType(), transactionPhase, descriptor.isAutoCreate(), manager);
         this.hostName = hostName;
         this.hostType = descriptor.getBean().getJavaClass();
         this.method = descriptor.getMethod();
+        if (method.isAccessible()) {
+            Reflections.setAccessible(method);
+        }
     }
 
     public void notify(EventPayload event) {
-        CdiUtils.ManagedBeanInstance<?> hostInstance =  CdiUtils.lookupBeanByName(hostName, hostType, getManager());
+        CdiUtils.ManagedBeanInstance<?> hostInstance = CdiUtils.lookupBeanByName(hostName, hostType, getManager());
         try {
-            Reflections.invokeMethod(false, method, Object.class, hostInstance.getInstance(), event.getParameters());
+            method.invoke(hostInstance.getInstance(), event.getParameters());
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            } else {
+                throw new RuntimeException("exception invoking: " + method.getName(), cause);
+            }
+        } catch (Throwable e) {
+            throw new RuntimeException("exception invoking: " + method.getName(), e);
         } finally {
             hostInstance.release();
         }
