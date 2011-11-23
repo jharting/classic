@@ -192,15 +192,7 @@ public class BijectionInterceptor implements Serializable {
         if (bean != null && !readOnly && (create || bean instanceof EntityProducer<?>)) {
             CreationalContext<?> ctx = manager.createCreationalContext(bean);
             Object product = manager.getReference(bean, Object.class, ctx);
-
-            // void factory was invoked, let's find the outjected value
-            if (product instanceof cz.muni.fi.xharting.classic.factory.Void) {
-                // invoke void factory method
-                ((cz.muni.fi.xharting.classic.factory.Void) product).forceBeanCreation();
-                return getInjectableReference(injectionPoint, true, scopes);
-            } else {
-                return product;
-            }
+            return product;
         }
         return null;
     }

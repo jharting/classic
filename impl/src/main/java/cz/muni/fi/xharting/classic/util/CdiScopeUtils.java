@@ -39,7 +39,7 @@ public class CdiScopeUtils {
             return DependentLiteral.INSTANCE;
         }
         if (StatelessScoped.class.equals(clazz)) {
-            return StatelessScoped.StatelessScopedLiteral.INSTALNCE;
+            return StatelessScoped.StatelessScopedLiteral.INSTANCE;
         }
         if (PageScoped.class.equals(clazz)) {
             return PageScoped.PageScopedLiteral.INSTANCE;

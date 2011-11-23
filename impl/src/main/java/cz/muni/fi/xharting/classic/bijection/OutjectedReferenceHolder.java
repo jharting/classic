@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.enterprise.context.NormalScope;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Qualifier;
 

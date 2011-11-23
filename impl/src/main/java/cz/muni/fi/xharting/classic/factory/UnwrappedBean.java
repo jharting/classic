@@ -38,4 +38,9 @@ public class UnwrappedBean extends AbstractLegacyFactory<Object> {
             host.getCreationalContext().release();
         }
     }
+
+    @Override
+    public Class<?> getBeanClass() {
+        return hostType;
+    }
 }

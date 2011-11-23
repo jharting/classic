@@ -38,6 +38,7 @@ import cz.muni.fi.xharting.classic.event.LegacyElObserverMethod;
 import cz.muni.fi.xharting.classic.event.LegacyObserverMethod;
 import cz.muni.fi.xharting.classic.factory.LegacyElFactory;
 import cz.muni.fi.xharting.classic.factory.LegacyFactory;
+import cz.muni.fi.xharting.classic.factory.LegacyVoidFactory;
 import cz.muni.fi.xharting.classic.factory.UnwrappedBean;
 import cz.muni.fi.xharting.classic.metadata.AbstractFactoryDescriptor;
 import cz.muni.fi.xharting.classic.metadata.AbstractObserverMethodDescriptor;
@@ -172,7 +173,11 @@ public class ClassicBeanTransformer {
         for (AbstractFactoryDescriptor descriptor : factoryDescriptors) {
             if (descriptor instanceof FactoryDescriptor) {
                 FactoryDescriptor beanFactoryDescriptor = (FactoryDescriptor) descriptor;
-                factoryMethodsToRegister.add(new LegacyFactory(beanFactoryDescriptor, manager));
+                if (beanFactoryDescriptor.isVoid()) {
+                    factoryMethodsToRegister.add(new LegacyVoidFactory(beanFactoryDescriptor, manager));
+                } else {
+                    factoryMethodsToRegister.add(new LegacyFactory(beanFactoryDescriptor, manager));
+                }
             } else if (descriptor instanceof ElFactoryDescriptor) {
                 ElFactoryDescriptor factoryDescriptor = (ElFactoryDescriptor) descriptor;
                 factoryMethodsToRegister.add(new LegacyElFactory(factoryDescriptor, manager));

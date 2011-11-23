@@ -16,6 +16,7 @@ import javax.inject.Named;
 import junit.framework.Assert;
 
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.seam.RequiredException;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -45,8 +46,7 @@ public class OutjectionTest {
 
     @Deployment
     public static WebArchive getDeployment() {
-        WebArchive war = createSeamWebApp("test.war").addPackage(OutjectionTest.class.getPackage()).addAsLibrary(
-                createSeamClassic());
+        WebArchive war = createSeamWebApp("test.war").addPackage(OutjectionTest.class.getPackage());
         war.addAsWebResource("cz/muni/fi/xharting/classic/test/outjection/home.xhtml", "home.xhtml");
         war.addAsWebInfResource("cz/muni/fi/xharting/classic/test/outjection/faces-config.xml", "faces-config.xml");
         war.setWebXML("cz/muni/fi/xharting/classic/test/outjection/web.xml");
@@ -113,10 +113,11 @@ public class OutjectionTest {
 
     @Test
     public void testVoidFactory() {
-        assertEquals("hotel", injectingBean.getHotel());
+        assertEquals("hotel", injectingBean.getHotel().getValue());
     }
 
     @Test
+    @RunAsClient
     public void testOutjectedValuesAccessibleFromJsf() throws Exception {
         String homepage = doGet("/test/home.jsf");
         assertTrue(verifyValue(homepage, "alpha", "alpha"));

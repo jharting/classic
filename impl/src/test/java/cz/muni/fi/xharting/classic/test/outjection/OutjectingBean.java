@@ -26,6 +26,7 @@ public class OutjectingBean {
     private Message golf = new Message("golf");
 
     public void ping() {
+        System.out.println();
     }
 
     public void setGolf(Message golf) {

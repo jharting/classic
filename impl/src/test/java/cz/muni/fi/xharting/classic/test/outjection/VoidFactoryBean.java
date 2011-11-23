@@ -12,10 +12,10 @@ public class VoidFactoryBean {
     
     @SuppressWarnings("unused")
     @Out(scope = ScopeType.EVENT)
-    private String hotel;
+    private Message hotel;
 
     @Factory(autoCreate = true, value = "hotel")
     public void setEcho() {
-        this.hotel = "hotel";
+        this.hotel = new Message("hotel");
     }
 }

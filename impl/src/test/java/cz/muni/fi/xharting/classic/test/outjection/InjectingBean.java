@@ -24,7 +24,7 @@ public class InjectingBean {
     @In(required = false)
     private Message golf;
     @In(required = false)
-    private String hotel;
+    private Message hotel;
 
     public Message getAlpha() {
         return alpha;
@@ -54,7 +54,7 @@ public class InjectingBean {
         return golf;
     }
 
-    public String getHotel() {
+    public Message getHotel() {
         return hotel;
     }
 }

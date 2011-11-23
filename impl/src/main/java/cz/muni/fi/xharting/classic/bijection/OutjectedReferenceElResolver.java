@@ -8,8 +8,6 @@ import javax.el.ELResolver;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
-import cz.muni.fi.xharting.classic.factory.Void;
-
 public class OutjectedReferenceElResolver extends ELResolver {
 
     private ELResolver delegate;
@@ -31,12 +29,6 @@ public class OutjectedReferenceElResolver extends ELResolver {
             if (result == null)
             {
                 result = delegate.getValue(context, base, p);
-            }
-            
-            if (result instanceof Void)
-            {
-                ((Void) result).forceBeanCreation(); // TODO this is duplicated
-                result = getValue(property);
             }
             
             if (result != null)

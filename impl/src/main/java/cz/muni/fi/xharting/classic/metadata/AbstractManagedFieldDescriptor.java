@@ -54,6 +54,10 @@ public abstract class AbstractManagedFieldDescriptor {
         return bean.getJavaClass().getName() + "." + field.getName();
     }
 
+    public Class<?> getType() {
+        return field.getType();
+    }
+
     @Override
     public String toString() {
         return "AbstractManagedFieldDescriptor [name=" + getName() + ", required=" + required + ", specifiedScope="

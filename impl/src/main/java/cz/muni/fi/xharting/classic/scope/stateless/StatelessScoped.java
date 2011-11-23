@@ -26,6 +26,6 @@ public @interface StatelessScoped {
 
     @SuppressWarnings("all")
     public static class StatelessScopedLiteral extends AnnotationLiteral<StatelessScoped> implements StatelessScoped {
-        public static final StatelessScoped INSTALNCE = new StatelessScopedLiteral();
+        public static final StatelessScoped INSTANCE = new StatelessScopedLiteral();
     }
 }

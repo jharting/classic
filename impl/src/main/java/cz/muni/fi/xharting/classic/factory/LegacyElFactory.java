@@ -25,13 +25,15 @@ public class LegacyElFactory extends AbstractLegacyFactory<Object> {
     @Override
     public Object create(CreationalContext<Object> creationalContext) {
         Expressions expressions = CdiUtils.lookupBean(Expressions.class, getManager()).getInstance();
-        if (valueExpression)
-        {
+        if (valueExpression) {
             return expressions.evaluateValueExpression(expression);
-        }
-        else
-        {
+        } else {
             return expressions.evaluateMethodExpression(expression);
         }
+    }
+
+    @Override
+    public Class<?> getBeanClass() {
+        return Object.class;
     }
 }

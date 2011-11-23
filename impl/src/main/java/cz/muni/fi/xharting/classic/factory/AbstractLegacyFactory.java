@@ -31,6 +31,10 @@ public abstract class AbstractLegacyFactory<T> implements Bean<T> {
             this.types.add(type);
         }
     }
+    
+    protected void addTypes(Set<Type> types) {
+        this.types.addAll(types);
+    }
 
     @Override
     public Set<Type> getTypes() {
@@ -55,11 +59,6 @@ public abstract class AbstractLegacyFactory<T> implements Bean<T> {
     @Override
     public Set<Class<? extends Annotation>> getStereotypes() {
         return Collections.emptySet();
-    }
-
-    @Override
-    public Class<?> getBeanClass() {
-        return Void.class; // TODO is this really the right thing to do?
     }
 
     @Override
