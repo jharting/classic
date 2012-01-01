@@ -1,52 +1,51 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>cz.muni.fi.xharting.classic</groupId>
         <artifactId>classic-parent</artifactId>
         <relativePath>../pom.xml</relativePath>
         <version>1.0-SNAPSHOT</version>
     </parent>
-
     <artifactId>classic-impl</artifactId>
     <packaging>jar</packaging>
-
     <name>Classic Implementation</name>
-
     <properties>
-        <reflections.version>0.9.6_jboss_errai_r2</reflections.version>
+        <arquillian.junit.version>1.0.0.CR7</arquillian.junit.version>
+        <dom4j.version>1.6.1</dom4j.version>
+        <jboss.as.version>7.1.0.CR1b</jboss.as.version>
+        <jboss.logging.version>3.1.0.CR2</jboss.logging.version>
         <jboss.osgi.version>1.0.27</jboss.osgi.version>
+        <junit.version>4.10</junit.version>
+        <reflections.version>0.9.6_jboss_errai_r2</reflections.version>
+        <shrinkwrap.resolver.version>1.0.0-beta-5</shrinkwrap.resolver.version>
+        <shrinkwrap.version>1.0.0-cr-1</shrinkwrap.version>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>cz.muni.fi.xharting.classic</groupId>
             <artifactId>classic-api</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.jboss.solder</groupId>
-            <artifactId>solder-api</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
+<!--         <dependency> -->
+<!--             <groupId>org.jboss.solder</groupId> -->
+<!--             <artifactId>solder-api</artifactId> -->
+<!--             <scope>compile</scope> -->
+<!--         </dependency> -->
         <dependency>
             <groupId>org.jboss.solder</groupId>
             <artifactId>solder-impl</artifactId>
             <scope>compile</scope>
         </dependency>
-
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
+            <version>${dom4j.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>${reflections.version}</version>
         </dependency>
-
         <!-- JEE API -->
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
@@ -73,38 +72,39 @@
             <artifactId>jboss-el-api_2.2_spec</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.jboss.spec.javax.servlet</groupId>
             <artifactId>jboss-servlet-api_3.0_spec</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.jboss.spec.javax.faces</groupId>
             <artifactId>jboss-jsf-api_2.0_spec</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>
+            <version>${arquillian.junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.shrinkwrap.resolver</groupId>
             <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+            <version>${shrinkwrap.resolver.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.arquillian.protocol</groupId>
-            <artifactId>arquillian-protocol-servlet</artifactId>
+            <groupId>org.jboss.shrinkwrap</groupId>
+            <artifactId>shrinkwrap-api</artifactId>
+            <version>${shrinkwrap.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -113,9 +113,13 @@
             <version>${jboss.osgi.version}</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <version>${jboss.logging.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
     <profiles>
         <profile>
             <id>jbossas-remote-7</id>
@@ -126,6 +130,19 @@
                 <dependency>
                     <groupId>org.jboss.as</groupId>
                     <artifactId>jboss-as-arquillian-container-remote</artifactId>
+                    <version>${jboss.as.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jbossas-managed</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.as</groupId>
+                    <artifactId>jboss-as-arquillian-container-managed</artifactId>
+                    <version>${jboss.as.version}</version>
+                    <scope>test</scope>
                 </dependency>
             </dependencies>
         </profile>
