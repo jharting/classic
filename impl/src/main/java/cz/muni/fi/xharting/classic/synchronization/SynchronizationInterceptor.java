@@ -5,11 +5,13 @@ import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.inject.Inject;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 
 import org.jboss.seam.annotations.Synchronized;
+import org.jboss.seam.core.Conversation;
 import org.jboss.seam.core.LockTimeoutException;
 
 /**
@@ -24,6 +26,9 @@ public class SynchronizationInterceptor implements Serializable {
 
     private static final long serialVersionUID = -5701898667462097519L;
     private ReentrantLock lock = new ReentrantLock(true);
+
+    @Inject
+    private Conversation conversation;
 
     @AroundInvoke
     public Object intercept(InvocationContext ctx) throws Exception {
@@ -40,6 +45,9 @@ public class SynchronizationInterceptor implements Serializable {
     }
 
     private long getTimeout(Class<?> clazz, Method method) {
+        if (conversation.getConcurrentRequestTimeout() != null && conversation.getConcurrentRequestTimeout() != Synchronized.DEFAULT_TIMEOUT) {
+            return conversation.getConcurrentRequestTimeout();
+        }
         if (clazz.isAnnotationPresent(Synchronized.class)) {
             return clazz.getAnnotation(Synchronized.class).timeout();
         }

@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.enterprise.context.ConversationScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.TransactionPhase;
 import javax.enterprise.inject.spi.AnnotatedType;
@@ -21,6 +22,7 @@ import javax.interceptor.InterceptorBinding;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Destroy;
 import org.jboss.seam.annotations.Logger;
+import org.jboss.seam.annotations.Synchronized;
 import org.jboss.seam.annotations.intercept.BypassInterceptors;
 import org.jboss.seam.annotations.intercept.Interceptors;
 import org.jboss.seam.annotations.web.RequestParameter;
@@ -75,13 +77,11 @@ public class ClassicBeanTransformer {
     private final BeanManager manager;
 
     public ClassicBeanTransformer(ConditionalInstallationService service, BeanManager manager) {
-        this(service.getInstallableManagedBeanBescriptors(), service.getInstallableFactoryDescriptors(), service
-                .getInstallableObserverMethodDescriptors(), manager);
+        this(service.getInstallableManagedBeanBescriptors(), service.getInstallableFactoryDescriptors(), service.getInstallableObserverMethodDescriptors(), manager);
     }
 
-    public ClassicBeanTransformer(Set<BeanDescriptor> managedBeanDescriptors,
-            Set<AbstractFactoryDescriptor> factoryDescriptors, Set<AbstractObserverMethodDescriptor> observerMethods,
-            BeanManager manager) {
+    public ClassicBeanTransformer(Set<BeanDescriptor> managedBeanDescriptors, Set<AbstractFactoryDescriptor> factoryDescriptors,
+            Set<AbstractObserverMethodDescriptor> observerMethods, BeanManager manager) {
         this.manager = manager;
         transformBeans(managedBeanDescriptors);
         transformFactories(factoryDescriptors);
@@ -103,8 +103,7 @@ public class ClassicBeanTransformer {
                 builder.addToClass(DefaultLiteral.INSTANCE);
                 if (bean.hasUnwrappingMethod()) // if it has one, the name is reserved for the unwrapping method
                 {
-                    registerUnwrappedBean(role.getName(), bean.getJavaClass(), bean.getUnwrappingMethod()
-                            .getGenericReturnType(), bean.getUnwrappingMethod(), manager);
+                    registerUnwrappedBean(role.getName(), bean.getJavaClass(), bean.getUnwrappingMethod().getGenericReturnType(), bean.getUnwrappingMethod(), manager);
                 } else {
                     builder.addToClass(new NamedLiteral(role.getName()));
                 }
@@ -165,8 +164,8 @@ public class ClassicBeanTransformer {
      */
     protected boolean isInterceptorBinding(Annotation annotation) {
         Class<? extends Annotation> annotationClass = annotation.annotationType();
-        return annotationClass.isAnnotationPresent(InterceptorBinding.class)
-                || annotationClass.isAnnotationPresent(Interceptors.class) || annotationClass.equals(Interceptors.class);
+        return annotationClass.isAnnotationPresent(InterceptorBinding.class) || annotationClass.isAnnotationPresent(Interceptors.class)
+                || annotationClass.equals(Interceptors.class);
     }
 
     protected void transformFactories(Set<AbstractFactoryDescriptor> factoryDescriptors) {
@@ -188,8 +187,7 @@ public class ClassicBeanTransformer {
     protected void transformObserverMethods(Set<AbstractObserverMethodDescriptor> observerMethods) {
 
         for (AbstractObserverMethodDescriptor om : observerMethods) {
-            for (TransactionPhase phase : new TransactionPhase[] { TransactionPhase.IN_PROGRESS,
-                    TransactionPhase.AFTER_COMPLETION, TransactionPhase.AFTER_SUCCESS }) {
+            for (TransactionPhase phase : new TransactionPhase[] { TransactionPhase.IN_PROGRESS, TransactionPhase.AFTER_COMPLETION, TransactionPhase.AFTER_SUCCESS }) {
 
                 if (om instanceof ElObserverMethodDescriptor) {
                     ElObserverMethodDescriptor observerMethod = (ElObserverMethodDescriptor) om;
@@ -242,11 +240,12 @@ public class ClassicBeanTransformer {
     private <T> void registerInterceptors(BeanDescriptor descriptor, RoleDescriptor role, AnnotatedTypeBuilder<T> builder) {
         // support for injection/outjection
         builder.addToClass(BijectionInterceptor.Bijected.BijectedLiteral.INSTANCE);
-        // session-scoped and page-scoped components are synchronized automatically
-        if (SessionScoped.class.equals(role.getCdiScope()) || PageScoped.class.equals(role.getCdiScope())) {
+        // session, conversation and page scoped components are synchronized automatically
+        Class<? extends Annotation> scope = role.getCdiScope();
+        if (!descriptor.getJavaClass().isAnnotationPresent(Synchronized.class) && SessionScoped.class.equals(scope) || PageScoped.class.equals(scope)
+                || ConversationScoped.class.equals(scope)) {
             builder.addToClass(SynchronizedLiteral.DEFAULT_INSTANCE);
         }
-
     }
 
     public Set<UnwrappedBean> getUnwrappedBeansToRegister() {
