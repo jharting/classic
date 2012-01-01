@@ -54,7 +54,7 @@ import cz.muni.fi.xharting.classic.persistence.entity.EntityProducer;
 import cz.muni.fi.xharting.classic.persistence.entity.PassivationCapableDirectReferenceHolderBean;
 import cz.muni.fi.xharting.classic.persistence.entity.PassivationCapableEntityProducer;
 import cz.muni.fi.xharting.classic.scope.page.PageScoped;
-import cz.muni.fi.xharting.classic.util.CdiScopeUtils;
+import cz.muni.fi.xharting.classic.util.ScopeUtils;
 import cz.muni.fi.xharting.classic.util.literal.SynchronizedLiteral;
 
 /**
@@ -110,7 +110,7 @@ public class ClassicBeanTransformer {
                 }
                 // Set scope
                 Class<? extends Annotation> scope = role.getCdiScope();
-                builder.addToClass(CdiScopeUtils.getScopeLiteral(scope));
+                builder.addToClass(ScopeUtils.getScopeLiteral(scope));
 
                 // Process annotation redefiners
                 // Lifecycle event interceptor methods

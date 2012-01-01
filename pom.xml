@@ -15,7 +15,7 @@
     <name>Classic Parent</name>
 
     <properties>
-        <solder.version>3.1.0.Beta4</solder.version>
+        <solder.version>3.1.0-SNAPSHOT</solder.version>
         <javaee.spec.version>2.0.0.Final</javaee.spec.version>
     </properties>
 

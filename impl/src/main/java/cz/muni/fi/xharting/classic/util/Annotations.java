@@ -1,6 +1,7 @@
 package cz.muni.fi.xharting.classic.util;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,10 +37,10 @@ public class Annotations {
     /**
      * Returns qualifiers applied to a given bean.
      */
-    public static Set<Annotation> getQualifiers(Class<?> clazz, BeanManager manager) {
+    public static Set<Annotation> getQualifiers(AnnotatedElement e, BeanManager manager) {
         Set<Annotation> result = new HashSet<Annotation>();
-        for (Annotation annotation : clazz.getAnnotations()) {
-            if (manager.isScope(annotation.annotationType())) {
+        for (Annotation annotation : e.getAnnotations()) {
+            if (manager.isQualifier(annotation.annotationType())) {
                 result.add(annotation);
             }
         }

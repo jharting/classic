@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.InjectionPoint;
 
+import org.jboss.solder.literal.DefaultLiteral;
 import org.jboss.solder.reflection.HierarchyDiscovery;
 
 public abstract class AbstractBean<T> implements Bean<T> {
@@ -22,15 +23,24 @@ public abstract class AbstractBean<T> implements Bean<T> {
     private final boolean alternative;
     private final boolean nullable;
 
-    public AbstractBean(Class<T> beanClass, Class<?> types, Class<? extends Annotation> scope, String name,
+    public AbstractBean(Class<T> beanClass, Set<Type> types, Class<? extends Annotation> scope, String name,
             boolean alternative, boolean nullable, Set<Annotation> qualifiers) {
         this.beanClass = beanClass;
-        this.types = new HierarchyDiscovery(types).getTypeClosure();
+        this.types = types;
         this.scope = scope;
         this.name = name;
         this.alternative = alternative;
         this.nullable = nullable;
-        this.qualifiers = qualifiers;
+        if (qualifiers.isEmpty()) {
+            this.qualifiers = Collections.<Annotation>singleton(DefaultLiteral.INSTANCE);
+        } else {
+            this.qualifiers = qualifiers;
+        }
+        
+    }
+    public AbstractBean(Class<T> beanClass, Class<?> types, Class<? extends Annotation> scope, String name,
+            boolean alternative, boolean nullable, Set<Annotation> qualifiers) {
+        this(beanClass, new HierarchyDiscovery(types).getTypeClosure(), scope, name, alternative, nullable, qualifiers);
     }
 
     public AbstractBean(Class<T> beanClass, Class<?> types, Class<? extends Annotation> scope, String name,
@@ -45,6 +55,10 @@ public abstract class AbstractBean<T> implements Bean<T> {
 
     public AbstractBean(Class<T> beanClass, Class<? extends Annotation> scope, Annotation... qualifiers) {
         this(beanClass, scope, null, false, false, qualifiers);
+    }
+
+    public AbstractBean(Class<T> beanClass, Class<? extends Annotation> scope, Set<Annotation> qualifiers) {
+        this(beanClass, beanClass, scope, null, false, false, qualifiers);
     }
 
     @Override

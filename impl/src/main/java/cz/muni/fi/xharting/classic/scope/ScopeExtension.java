@@ -26,7 +26,7 @@ import cz.muni.fi.xharting.classic.scope.page.PageContext;
 import cz.muni.fi.xharting.classic.scope.page.PageScoped;
 import cz.muni.fi.xharting.classic.scope.stateless.StatelessContext;
 import cz.muni.fi.xharting.classic.scope.stateless.StatelessScoped;
-import cz.muni.fi.xharting.classic.util.CdiScopeUtils;
+import cz.muni.fi.xharting.classic.util.ScopeUtils;
 
 /**
  * Registers scopes and extensions provided by Classic.
@@ -77,7 +77,7 @@ public class ScopeExtension implements Extension {
     private AnnotatedType<?> createOutjectedReferenceHolder(Class<? extends Annotation> scope) {
         AnnotatedTypeBuilder<OutjectedReferenceHolder> builder = new AnnotatedTypeBuilder<OutjectedReferenceHolder>();
         builder.readFromType(OutjectedReferenceHolder.class);
-        builder.addToClass(CdiScopeUtils.getScopeLiteral(scope));
+        builder.addToClass(ScopeUtils.getScopeLiteral(scope));
         builder.addToClass(OutjectedReferenceHolder.ScopeQualifier.ScopeQualifierLiteral.valueOf(scope));
         builder.removeFromClass(Veto.class);
         return builder.create();
