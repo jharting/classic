@@ -16,14 +16,14 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import cz.muni.fi.xharting.classic.persistence.entity.PassivationCapableEntityProducer;
+import cz.muni.fi.xharting.classic.util.reference.PassivationCapableDirectReferenceProducer;
 
 @RunWith(Arquillian.class)
 public class DirectReferenceHolderTest {
 
     @Inject
     private BeanManager manager;
-    
+
     @Deployment
     public static WebArchive getDeployment() {
         return createSeamWebApp("test.war", SerializableEntity.class, InjectedBean.class, NonSerializableEntity.class);
@@ -39,13 +39,12 @@ public class DirectReferenceHolderTest {
         assertEquals(SerializableEntity.class, injectedBean.getEntity2().getClass());
         assertEquals(NonSerializableEntity.class, injectedBean.getEntity3().getClass());
     }
-    
+
     @Test
-    public void testCorrectBeanProducerRegistered()
-    {
-        assertTrue(manager.resolve(manager.getBeans("entity")) instanceof PassivationCapableEntityProducer);
-        assertTrue(manager.resolve(manager.getBeans("entity2")) instanceof PassivationCapableEntityProducer);
-        assertFalse(manager.resolve(manager.getBeans("entity3")) instanceof PassivationCapableEntityProducer);
+    public void testCorrectBeanProducerRegistered() {
+        assertTrue(manager.resolve(manager.getBeans("entity")) instanceof PassivationCapableDirectReferenceProducer);
+        assertTrue(manager.resolve(manager.getBeans("entity2")) instanceof PassivationCapableDirectReferenceProducer);
+        assertFalse(manager.resolve(manager.getBeans("entity3")) instanceof PassivationCapableDirectReferenceProducer);
     }
 
 }

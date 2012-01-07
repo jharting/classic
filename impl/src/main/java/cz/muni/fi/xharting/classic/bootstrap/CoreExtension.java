@@ -33,8 +33,6 @@ import cz.muni.fi.xharting.classic.factory.UnwrappedBean;
 import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.MetadataRegistry;
 import cz.muni.fi.xharting.classic.metadata.NamespaceDescriptor;
-import cz.muni.fi.xharting.classic.persistence.entity.DirectReferenceHolderBean;
-import cz.muni.fi.xharting.classic.persistence.entity.EntityProducer;
 
 public class CoreExtension implements Extension {
 
@@ -82,7 +80,9 @@ public class CoreExtension implements Extension {
         // register annotated types for managed beans
         log.debugv("Registering {0} additional annotated types.", beanTransformer.getAdditionalAnnotatedTypes().size());
         for (AnnotatedType<?> annotatedType : beanTransformer.getAdditionalAnnotatedTypes()) {
-            log.debugv("Registering {0}", annotatedType.getAnnotation(Named.class).value());
+            Named named = annotatedType.getAnnotation(Named.class);
+            if (named != null) // entities overriden by a direct reference bean are the case
+            log.debugv("Registering {0}", named.value());
             event.addAnnotatedType(annotatedType);
         }
 
@@ -129,11 +129,8 @@ public class CoreExtension implements Extension {
     }
 
     void registerEntities(@Observes AfterBeanDiscovery event) {
-        for (DirectReferenceHolderBean<?> holder : beanTransformer.getEntityHolders()) {
-            event.addBean(holder);
-        }
-        for (EntityProducer<?> entity : beanTransformer.getEntities()) {
-            event.addBean(entity);
+        for (Bean<?> entityHolder : beanTransformer.getEntityHolders()) {
+            event.addBean(entityHolder);
         }
     }
 

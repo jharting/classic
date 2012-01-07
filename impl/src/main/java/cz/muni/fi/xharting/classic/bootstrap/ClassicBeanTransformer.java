@@ -1,6 +1,5 @@
 package cz.muni.fi.xharting.classic.bootstrap;
 
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -28,8 +27,12 @@ import org.jboss.seam.annotations.intercept.Interceptors;
 import org.jboss.seam.annotations.web.RequestParameter;
 import org.jboss.solder.literal.DefaultLiteral;
 import org.jboss.solder.literal.NamedLiteral;
+import org.jboss.solder.reflection.Synthetic;
 import org.jboss.solder.reflection.annotated.AnnotatedTypeBuilder;
 
+import com.google.common.collect.Sets;
+
+import cz.muni.fi.xharting.classic.DefinitionException;
 import cz.muni.fi.xharting.classic.Seam2ManagedBean;
 import cz.muni.fi.xharting.classic.bijection.BijectionInterceptor;
 import cz.muni.fi.xharting.classic.bootstrap.redefiners.CreateAnnotationRedefiner;
@@ -44,20 +47,17 @@ import cz.muni.fi.xharting.classic.factory.LegacyVoidFactory;
 import cz.muni.fi.xharting.classic.factory.UnwrappedBean;
 import cz.muni.fi.xharting.classic.metadata.AbstractFactoryDescriptor;
 import cz.muni.fi.xharting.classic.metadata.AbstractObserverMethodDescriptor;
+import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.BeanDescriptor.BeanType;
 import cz.muni.fi.xharting.classic.metadata.ElFactoryDescriptor;
 import cz.muni.fi.xharting.classic.metadata.ElObserverMethodDescriptor;
 import cz.muni.fi.xharting.classic.metadata.FactoryDescriptor;
-import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.ObserverMethodDescriptor;
 import cz.muni.fi.xharting.classic.metadata.RoleDescriptor;
-import cz.muni.fi.xharting.classic.persistence.entity.DirectReferenceHolderBean;
-import cz.muni.fi.xharting.classic.persistence.entity.EntityProducer;
-import cz.muni.fi.xharting.classic.persistence.entity.PassivationCapableDirectReferenceHolderBean;
-import cz.muni.fi.xharting.classic.persistence.entity.PassivationCapableEntityProducer;
 import cz.muni.fi.xharting.classic.scope.page.PageScoped;
 import cz.muni.fi.xharting.classic.util.ScopeUtils;
 import cz.muni.fi.xharting.classic.util.literal.SynchronizedLiteral;
+import cz.muni.fi.xharting.classic.util.reference.DirectReferenceFactory;
 
 /**
  * This class is responsible for transforming metadata gathered during the scanning phase to CDI SPI objects.
@@ -67,13 +67,16 @@ import cz.muni.fi.xharting.classic.util.literal.SynchronizedLiteral;
  */
 public class ClassicBeanTransformer {
 
+    // a special handling is required - this a specific qualifier
+    private static final String NAMESPACE = "cz.muni.fi.xharting.classic";
+    private static final Synthetic.Provider syntheticProvider = new Synthetic.Provider(NAMESPACE);
+
     private final Map<Class<?>, AnnotatedType<?>> modifiedAnnotatedTypes = new HashMap<Class<?>, AnnotatedType<?>>();
     private final Set<AnnotatedType<?>> additionalAnnotatedTypes = new HashSet<AnnotatedType<?>>();
     private final Set<ObserverMethod<?>> observerMethodsToRegister = new HashSet<ObserverMethod<?>>();
     private final Set<Bean<?>> factoryMethodsToRegister = new HashSet<Bean<?>>();
     private final Set<UnwrappedBean> unwrappedBeansToRegister = new HashSet<UnwrappedBean>();
-    private final Set<EntityProducer<?>> entities = new HashSet<EntityProducer<?>>();
-    private final Set<DirectReferenceHolderBean<?>> entityHolders = new HashSet<DirectReferenceHolderBean<?>>();
+    private final Set<Bean<?>> entityHolders = new HashSet<Bean<?>>();
     private final BeanManager manager;
 
     public ClassicBeanTransformer(ConditionalInstallationService service, BeanManager manager) {
@@ -127,14 +130,17 @@ public class ClassicBeanTransformer {
                 else {
                     registerInterceptors(bean, role, builder);
                 }
-
-                // We need the latter check since multiple xml-configured beans could share the same class
-                if (!modifiedAnnotatedTypes.containsKey(bean.getJavaClass()) && bean.isDefinedByClass()) {
-                    modifiedAnnotatedTypes.put(bean.getJavaClass(), builder.create());
-                } else {
-                    additionalAnnotatedTypes.add(builder.create());
-                }
+                addAnnotatedType(bean, builder.create());
             }
+        }
+    }
+
+    private void addAnnotatedType(BeanDescriptor descriptor, AnnotatedType<?> type) {
+        // We need the latter check since multiple xml-configured beans could share the same class
+        if (!modifiedAnnotatedTypes.containsKey(type.getJavaClass()) && descriptor.isDefinedByClass()) {
+            modifiedAnnotatedTypes.put(descriptor.getJavaClass(), type);
+        } else {
+            additionalAnnotatedTypes.add(type);
         }
     }
 
@@ -208,29 +214,26 @@ public class ClassicBeanTransformer {
             throw new IllegalArgumentException(bean.getJavaClass() + " is not an entity.");
         }
         if (!bean.getInjectionPoints().isEmpty()) {
-            throw new IllegalArgumentException("Entities cannot inject values"); // TODO DefinitionException
+            throw new DefinitionException("Entities cannot inject values");
         }
         if (!bean.getOutjectionPoints().isEmpty()) {
-            throw new IllegalArgumentException("Entities cannot outject values"); // TODO definitionException
+            throw new DefinitionException("Entities cannot outject values");
         }
         if (!bean.getFactories().isEmpty()) {
-            throw new IllegalArgumentException("Entities cannot define factory methods"); // TODO definitionException
+            throw new DefinitionException("Entities cannot define factory methods");
         }
         if (bean.hasUnwrappingMethod()) {
-            throw new IllegalArgumentException("Entities cannot define unwrap methods"); // TODO definitionException
+            throw new DefinitionException("Entities cannot define unwrap methods");
         }
 
-        DirectReferenceHolderBean<T> holder;
-        EntityProducer<T> producer;
-        if (Serializable.class.isAssignableFrom(javaClass)) {
-            holder = new PassivationCapableDirectReferenceHolderBean<T>(javaClass, role.getName(), role.getCdiScope());
-            producer = new PassivationCapableEntityProducer<T>(holder, manager, javaClass, role.getName());
-        } else {
-            holder = new DirectReferenceHolderBean<T>(javaClass, role.getName(), role.getCdiScope());
-            producer = new EntityProducer<T>(holder, manager, javaClass, role.getName());
-        }
-        entityHolders.add(holder);
-        entities.add(producer);
+        // add the synthetic qualifier to the type, so that it can be picked up by the reference holder
+        Synthetic synthetic = syntheticProvider.get();
+        AnnotatedTypeBuilder<T> builder = new AnnotatedTypeBuilder<T>().readFromType(javaClass).addToClass(synthetic);
+        addAnnotatedType(bean, builder.create());
+
+        // create entity holder beans - will be registered later
+        entityHolders.addAll(DirectReferenceFactory.createDirectReferenceHolder(javaClass, Sets.<Type> newHashSet(javaClass, Object.class),
+                Collections.<Annotation> singleton(DefaultLiteral.INSTANCE), role.getName(), synthetic, role.getCdiScope(), manager, false));
     }
 
     private <T> AnnotatedTypeBuilder<T> createAnnotatedTypeBuilder(Class<T> javaClass) {
@@ -277,11 +280,7 @@ public class ClassicBeanTransformer {
         return factoryMethodsToRegister;
     }
 
-    public Set<EntityProducer<?>> getEntities() {
-        return entities;
-    }
-
-    public Set<DirectReferenceHolderBean<?>> getEntityHolders() {
+    public Set<Bean<?>> getEntityHolders() {
         return entityHolders;
     }
 }

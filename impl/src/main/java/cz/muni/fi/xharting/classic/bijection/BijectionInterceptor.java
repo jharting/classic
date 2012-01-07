@@ -30,15 +30,15 @@ import org.jboss.seam.InstantiationException;
 import org.jboss.seam.RequiredException;
 
 import cz.muni.fi.xharting.classic.metadata.AbstractManagedInstanceDescriptor;
+import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.DecoratingInjectionPoint;
 import cz.muni.fi.xharting.classic.metadata.InjectionPointDescriptor;
-import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.MetadataRegistry;
 import cz.muni.fi.xharting.classic.metadata.OutjectionPointDescriptor;
 import cz.muni.fi.xharting.classic.persistence.InterpolatingEntityManagerDecorator;
-import cz.muni.fi.xharting.classic.persistence.entity.EntityProducer;
 import cz.muni.fi.xharting.classic.scope.ScopeExtension;
 import cz.muni.fi.xharting.classic.util.CdiUtils;
+import cz.muni.fi.xharting.classic.util.reference.DirectReferenceProducer;
 
 @Interceptor
 @BijectionInterceptor.Bijected
@@ -132,8 +132,7 @@ public class BijectionInterceptor implements Serializable {
 
             if (injectableReference != null) {
                 if (injectableReference instanceof Void) {
-                    throw new IllegalStateException("Factory method did not outject a value. Unable to injected reference: "
-                            + injectionPoint.getName());
+                    throw new IllegalStateException("Factory method did not outject a value. Unable to injected reference: " + injectionPoint.getName());
                 }
                 injectionPoint.set(target, injectableReference);
             } else if (enforce && injectionPoint.isRequired()) {
@@ -157,8 +156,7 @@ public class BijectionInterceptor implements Serializable {
         return getInjectableReference(injectionPoint, false, extension.getStatefulScopes());
     }
 
-    protected Object getInjectableReference(InjectionPointDescriptor injectionPoint, boolean readOnly,
-            List<Class<? extends Annotation>> scopes) {
+    protected Object getInjectableReference(InjectionPointDescriptor injectionPoint, boolean readOnly, List<Class<? extends Annotation>> scopes) {
         String injectionPointName = injectionPoint.getName();
         AbstractManagedInstanceDescriptor candidate = registry.getManagedInstanceDescriptorByName(injectionPointName);
 
@@ -189,7 +187,7 @@ public class BijectionInterceptor implements Serializable {
         }
 
         // create using CDI
-        if (bean != null && !readOnly && (create || bean instanceof EntityProducer<?>)) {
+        if (bean != null && !readOnly && (create || bean instanceof DirectReferenceProducer<?>)) {
             CreationalContext<?> ctx = manager.createCreationalContext(bean);
             Object product = manager.getReference(bean, Object.class, ctx);
             return product;
