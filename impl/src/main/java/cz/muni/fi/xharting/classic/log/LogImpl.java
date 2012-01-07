@@ -10,7 +10,7 @@ import static org.jboss.solder.logging.Logger.Level;
 /**
  * Log implementation that delegates calls to Solder logging
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  */
 public class LogImpl implements Log, Serializable {

@@ -35,7 +35,7 @@ import cz.muni.fi.xharting.classic.config.ConfiguredManagedBean;
 /**
  * Represents a class-based Seam 2 component (managed bean or session bean).
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  */
 public class BeanDescriptor extends AbstractManagedInstanceDescriptor implements Sortable {

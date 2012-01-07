@@ -10,7 +10,7 @@ import javax.enterprise.inject.spi.BeanManager;
 /**
  * Various annotation utilities
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  */
 public class Annotations {

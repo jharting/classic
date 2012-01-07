@@ -13,7 +13,7 @@ import cz.muni.fi.xharting.classic.util.spi.ForwardingEntityManager;
 /**
  * Decorates {@link EntityManager} in order to support EL expressions in JPA queries.
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  * 
  */

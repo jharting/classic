@@ -25,7 +25,7 @@ import cz.muni.fi.xharting.classic.intercept.ClassicInterceptorBinding.ClassicIn
 /**
  * Replaces Legacy Seam 2 intercepors with CDI interceptors
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  */
 public class InterceptorExtension implements Extension {

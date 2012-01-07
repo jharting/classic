@@ -21,7 +21,7 @@ import org.reflections.vfs.Vfs;
 /**
  * Scanner implementation that uses Reflections.
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  */
 public class ReflectionsScanner extends AbstractScanner {

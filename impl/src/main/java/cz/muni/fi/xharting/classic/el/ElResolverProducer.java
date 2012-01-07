@@ -21,7 +21,7 @@ import cz.muni.fi.xharting.classic.bijection.OutjectedReferenceElResolver;
 /**
  * Modifier version of {@link ElResolverProducer}. This version places plugin resolver into the beginning of the resolver chain.
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  */
 //@Alternative

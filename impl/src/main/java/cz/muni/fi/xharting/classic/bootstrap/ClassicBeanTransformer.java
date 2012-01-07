@@ -62,7 +62,7 @@ import cz.muni.fi.xharting.classic.util.reference.DirectReferenceFactory;
 /**
  * This class is responsible for transforming metadata gathered during the scanning phase to CDI SPI objects.
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  */
 public class ClassicBeanTransformer {

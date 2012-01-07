@@ -9,7 +9,7 @@ import org.jboss.seam.util.StaticLookup;
  * Support for Seam component-driven events
  * 
  * @author Gavin King
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  *
  */
 public abstract class Events 

@@ -8,7 +8,7 @@ import javax.interceptor.InvocationContext;
 /**
  * Utility class for supporting the legacy InvocationContext interface.
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  */
 public abstract class ForwardingInvocationContext implements InvocationContext {

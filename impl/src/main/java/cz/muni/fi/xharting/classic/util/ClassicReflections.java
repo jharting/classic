@@ -9,7 +9,7 @@ import java.lang.reflect.Type;
 /**
  * Reflection utilities. Selected methods are copied from Seam 2.2
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  */
 public class ClassicReflections {

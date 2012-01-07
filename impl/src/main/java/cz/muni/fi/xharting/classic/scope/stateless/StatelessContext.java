@@ -9,7 +9,7 @@ import javax.enterprise.context.spi.CreationalContext;
 /**
  * A new instance of bean is created on every invocation. This scope is useful for implementing unwrapping methods.
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  */
 public class StatelessContext implements Context {

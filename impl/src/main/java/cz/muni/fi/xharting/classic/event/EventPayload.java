@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Represents the payload of Seam 2 event. {@link #parameters} will passed as method parameters to the receiving method.
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  */
 public class EventPayload implements Serializable {

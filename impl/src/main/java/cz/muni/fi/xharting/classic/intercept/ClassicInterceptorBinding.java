@@ -14,7 +14,7 @@ import javax.enterprise.util.AnnotationLiteral;
 /**
  * Internal interceptor binding. Similarly Seam 2 interceptor bindings, this binding maps directly to an interceptor class.
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  */
 @Inherited

@@ -15,7 +15,7 @@ import javax.persistence.metamodel.Metamodel;
 /**
  * Utility implementation of {@link EntityManager} which delegates all method calls to the underlying delegate instance.
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  */
 public abstract class ForwardingEntityManager implements EntityManager {

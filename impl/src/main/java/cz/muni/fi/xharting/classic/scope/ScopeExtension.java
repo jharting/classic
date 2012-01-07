@@ -31,7 +31,7 @@ import cz.muni.fi.xharting.classic.util.ScopeUtils;
 /**
  * Registers scopes and extensions provided by Classic.
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  */
 public class ScopeExtension implements Extension {

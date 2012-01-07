@@ -30,7 +30,7 @@ import cz.muni.fi.xharting.classic.metadata.RoleDescriptor;
  * not met are filtered out from further processing. Moreover, bean precedence is taken into account if more than one bean
  * exists for a given name.
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  */
 public class ConditionalInstallationService {

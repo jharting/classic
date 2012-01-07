@@ -14,7 +14,7 @@ import cz.muni.fi.xharting.classic.util.CdiUtils;
 /**
  * Represents a Seam 2 observer method.
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  */
 public class LegacyObserverMethod extends AbstractLegacyObserverMethod {

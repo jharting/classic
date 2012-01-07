@@ -9,7 +9,7 @@ import org.jboss.solder.reflection.Reflections;
 /**
  * Represents an EE injected field that can be decorated, e.g. {@link PersistenceContext} field.
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  * 
  * @param <T> type of field
  */

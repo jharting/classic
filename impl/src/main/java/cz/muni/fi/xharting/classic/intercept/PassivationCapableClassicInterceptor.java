@@ -7,7 +7,7 @@ import javax.enterprise.inject.spi.PassivationCapable;
 /**
  * Passivation capable alternative to {@link ClassicInterceptor}
  * 
- * @author <a href="http://community.jboss.org/people/jharting">Jozef Hartinger</a>
+ * @author Jozef Hartinger
  */
 public class PassivationCapableClassicInterceptor<T> extends ClassicInterceptor<T> implements PassivationCapable {
 
