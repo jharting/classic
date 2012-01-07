@@ -15,8 +15,8 @@ import org.jboss.solder.reflection.Reflections;
 import cz.muni.fi.xharting.classic.util.spi.AbstractBean;
 
 /**
- * Bean implementation for {@link DirectReferenceHolderImpl}, which holds a direct reference to a bean instance. This bean has the scope of the original bean, while the scope of the original
- * bean has been altered to {@link Dependent}.
+ * Bean implementation for {@link DirectReferenceHolderImpl}, which holds a direct reference to a bean instance. This bean has
+ * the scope of the original bean, while the scope of the original bean has been altered to {@link Dependent}.
  * 
  * @author Jozef Hartinger
  * 
