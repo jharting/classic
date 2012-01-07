@@ -5,6 +5,12 @@ import javax.enterprise.inject.Produces;
 
 import cz.muni.fi.xharting.classic.metadata.MetadataRegistry;
 
+/**
+ * Just a simple shortcut.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 @ApplicationScoped
 public class RegistryProducer {
 

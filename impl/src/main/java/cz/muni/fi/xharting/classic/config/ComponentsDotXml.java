@@ -43,6 +43,9 @@ public class ComponentsDotXml {
 
     private static final Logger log = Logger.getLogger(ComponentsDotXml.class);
 
+    private Set<ElFactoryDescriptor> factoryCache;
+    private Set<ElObserverMethodDescriptor> observerMethodCache;
+
     @SuppressWarnings("serial")
     private static final Set<String> RESERVED_ATTRIBUTES = Collections.unmodifiableSet(new HashSet<String>() {
         {
@@ -80,37 +83,54 @@ public class ComponentsDotXml {
         return rootElement.elements(name);
     }
 
+    /**
+     * Set of factory methods defined in the component descriptor
+     */
     public Set<ElFactoryDescriptor> getFactories() {
-        Set<ElFactoryDescriptor> factories = new HashSet<ElFactoryDescriptor>();
-        for (Element factory : elements(root, "factory")) {
-            factories.add(parseFactory(factory));
+        if (factoryCache == null) {
+            factoryCache = new HashSet<ElFactoryDescriptor>();
+            for (Element factory : elements(root, "factory")) {
+                factoryCache.add(parseFactory(factory));
+            }
         }
-        return factories;
+        return factoryCache;
     }
 
+    /**
+     * Set of observer methods defined in the component descriptor
+     */
     public Set<ElObserverMethodDescriptor> getObserverMethods() {
-        Set<ElObserverMethodDescriptor> observerMethods = new HashSet<ElObserverMethodDescriptor>();
-        for (Element event : elements(root, "event")) {
-            String type = event.attributeValue("type");
-            if (type == null) {
-                throw new IllegalArgumentException("must specify type for <event/> declaration");
-            }
-            for (Element action : elements(event, "action")) {
-                String execute = action.attributeValue("execute");
-                if (execute == null) {
-                    throw new IllegalArgumentException("must specify execute for <action/> declaration");
+        if (observerMethodCache == null) {
+            observerMethodCache = new HashSet<ElObserverMethodDescriptor>();
+            for (Element event : elements(root, "event")) {
+                String type = event.attributeValue("type");
+                if (type == null) {
+                    throw new IllegalArgumentException("must specify type for <event/> declaration");
                 }
-                observerMethods.add(new ElObserverMethodDescriptor(type, execute));
+                for (Element action : elements(event, "action")) {
+                    String execute = action.attributeValue("execute");
+                    if (execute == null) {
+                        throw new IllegalArgumentException("must specify execute for <action/> declaration");
+                    }
+                    observerMethodCache.add(new ElObserverMethodDescriptor(type, execute));
+                }
             }
         }
-        return observerMethods;
+        return observerMethodCache;
     }
 
+    /**
+     * Initial values. Each entry represents an initial values for a given component, identified by name (map key). The value of
+     * each entry is a map representing mapping between the field name and its initial value.
+     */
     public Map<String, Map<String, Conversions.PropertyValue>> getInitialValueMap() {
         lazyInitCheck();
         return Collections.unmodifiableMap(initialValueMap);
     }
 
+    /**
+     * Returns configurations of a Seam components defined in the component descriptor file.
+     */
     public Set<ConfiguredManagedBean> getConfiguredManagedBeans() {
         lazyInitCheck();
         return Collections.unmodifiableSet(configuredManagedBeans);
@@ -128,8 +148,7 @@ public class ComponentsDotXml {
         String value = factory.attributeValue("value");
 
         if (method != null && value != null) {
-            throw new IllegalArgumentException("must specify either method or value in <factory/> declaration for variable: "
-                    + name);
+            throw new IllegalArgumentException("must specify either method or value in <factory/> declaration for variable: " + name);
         }
 
         if (value != null) {
@@ -229,14 +248,12 @@ public class ComponentsDotXml {
                 throw new IllegalArgumentException("must specify either class or name in <component/> declaration");
             }
             if (!clazz.isAnnotationPresent(Name.class)) {
-                throw new IllegalArgumentException(
-                        "Component class must have @Name annotation or name must be specified in components.xml: " + className);
+                throw new IllegalArgumentException("Component class must have @Name annotation or name must be specified in components.xml: " + className);
             }
             name = clazz.getAnnotation(Name.class).value();
         }
 
-        ConfiguredManagedBean bean = new ConfiguredManagedBean(name, installed, scope, startup, startupDepends, clazz,
-                jndiName, precedence, autoCreate);
+        ConfiguredManagedBean bean = new ConfiguredManagedBean(name, installed, scope, startup, startupDepends, clazz, jndiName, precedence, autoCreate);
         configuredManagedBeans.add(bean);
 
         // process initial values
@@ -258,9 +275,8 @@ public class ComponentsDotXml {
                     propValue = getPropertyValue(prop);
                     initialValuesForComponent.put(qualifiedPropName, propValue);
                 } catch (Exception ex) {
-                    throw new IllegalArgumentException(String.format(
-                            "Exception setting property %s on component %s.  Expression %s evaluated to %s.",
-                            qualifiedPropName, componentName, prop.getValue(), propValue), ex);
+                    throw new IllegalArgumentException(String.format("Exception setting property %s on component %s.  Expression %s evaluated to %s.", qualifiedPropName,
+                            componentName, prop.getValue(), propValue), ex);
 
                 }
             }

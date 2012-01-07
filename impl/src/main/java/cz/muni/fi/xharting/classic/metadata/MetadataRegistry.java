@@ -11,12 +11,18 @@ import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.SessionScoped;
 
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import cz.muni.fi.xharting.classic.bootstrap.ConditionalInstallationService;
 
+/**
+ * The central point that stores metadata about beans, factories and observer methods. The registry is available for CDI
+ * injection.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 public class MetadataRegistry {
 
     // basics
@@ -31,8 +37,7 @@ public class MetadataRegistry {
     private final Multimap<Class<? extends Annotation>, RoleDescriptor> startupBeans = HashMultimap.create();
 
     public MetadataRegistry(ConditionalInstallationService service) {
-        this(service.getInstallableManagedBeanBescriptors(), service.getInstallableFactoryDescriptors(), service
-                .getInstallableObserverMethodDescriptors());
+        this(service.getInstallableManagedBeanBescriptors(), service.getInstallableFactoryDescriptors(), service.getInstallableObserverMethodDescriptors());
     }
 
     // make this bean proxyable
@@ -42,8 +47,7 @@ public class MetadataRegistry {
         observerMethods = null;
     }
 
-    public MetadataRegistry(Set<BeanDescriptor> managedBeanDescriptors,
-            Set<AbstractFactoryDescriptor> factoryDescriptors, Set<AbstractObserverMethodDescriptor> observerMethods) {
+    public MetadataRegistry(Set<BeanDescriptor> managedBeanDescriptors, Set<AbstractFactoryDescriptor> factoryDescriptors, Set<AbstractObserverMethodDescriptor> observerMethods) {
         this.managedBeanDescriptors = managedBeanDescriptors;
         this.factoryDescriptors = factoryDescriptors;
         this.observerMethods = observerMethods;
@@ -55,8 +59,7 @@ public class MetadataRegistry {
                 if (descriptor.isStartup()) {
                     Class<? extends Annotation> scope = role.getCdiScope();
                     if (!SessionScoped.class.equals(scope) && !ApplicationScoped.class.equals(scope)) {
-                        throw new IllegalArgumentException(
-                                "@Startup only supported for SESSION or APPLICATION scoped components: " + role.getName());
+                        throw new IllegalArgumentException("@Startup only supported for SESSION or APPLICATION scoped components: " + role.getName());
                     }
                     startupBeans.put(role.getCdiScope(), role);
                 }

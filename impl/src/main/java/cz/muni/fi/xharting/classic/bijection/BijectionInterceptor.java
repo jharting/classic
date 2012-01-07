@@ -40,6 +40,12 @@ import cz.muni.fi.xharting.classic.scope.ScopeExtension;
 import cz.muni.fi.xharting.classic.util.CdiUtils;
 import cz.muni.fi.xharting.classic.util.reference.DirectReferenceProducer;
 
+/**
+ * This interceptor handles injection and outjection for legacy components.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 @Interceptor
 @BijectionInterceptor.Bijected
 public class BijectionInterceptor implements Serializable {

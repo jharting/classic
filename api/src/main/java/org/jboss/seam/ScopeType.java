@@ -79,30 +79,8 @@ public enum ScopeType
    public boolean isContextActive()
    {
        throw new UnsupportedOperationException();
-//      switch (this)
-//      {
-//         case STATELESS:
-//            return true;
-//         case METHOD:
-//            return Contexts.isMethodContextActive();
-//         case EVENT:
-//            return Contexts.isEventContextActive();
-//         case PAGE:
-//            return Contexts.isPageContextActive();
-//         case CONVERSATION:
-//            return Contexts.isConversationContextActive();
-//         case SESSION:
-//            return Contexts.isSessionContextActive();
-//         case APPLICATION:
-//            return Contexts.isApplicationContextActive();
-//         case BUSINESS_PROCESS:
-//            return Contexts.isBusinessProcessContextActive();
-//         default: 
-//            throw new IllegalArgumentException();
-//      }
    }
 
-   // TODO
    /**
     * @return the Context object for this scope
     */
@@ -162,7 +140,4 @@ public enum ScopeType
    {
       return prefix;
    }
-
 }
-
-

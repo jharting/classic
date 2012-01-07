@@ -12,14 +12,19 @@ import org.jboss.solder.reflection.Reflections;
 import cz.muni.fi.xharting.classic.scope.stateless.StatelessScoped;
 import cz.muni.fi.xharting.classic.util.Seam2Utils;
 
+/**
+ * Represents a Seam factory method.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 public class FactoryDescriptor extends AbstractFactoryDescriptor {
 
     private BeanDescriptor bean;
     private Method method;
     private Class<?> productType;
 
-    public FactoryDescriptor(String name, ScopeType specifiedScope, boolean autoCreate, BeanDescriptor bean,
-            Method method) {
+    public FactoryDescriptor(String name, ScopeType specifiedScope, boolean autoCreate, BeanDescriptor bean, Method method) {
         super(name, specifiedScope, autoCreate);
         this.bean = bean;
         this.method = method;

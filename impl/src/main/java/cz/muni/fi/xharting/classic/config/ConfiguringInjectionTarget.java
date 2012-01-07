@@ -30,6 +30,13 @@ import org.jboss.solder.reflection.Reflections;
 import cz.muni.fi.xharting.classic.config.Conversions.PropertyValue;
 import cz.muni.fi.xharting.classic.util.ClassicReflections;
 
+/**
+ * {@link InjectionTarget} implementation which performs Seam static injection of initial values.
+ * 
+ * @author Jozef Hartinger
+ * 
+ * @param <T>
+ */
 public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> {
 
     private Map<Field, InitialValue> fieldInitializers = new HashMap<Field, ConfiguringInjectionTarget.InitialValue>();
@@ -37,8 +44,7 @@ public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> 
     private InjectionTarget<T> delegate;
     private String name;
 
-    public ConfiguringInjectionTarget(Map<String, PropertyValue> values, InjectionTarget<T> delegate,
-            AnnotatedType<T> annotatedType, String name) {
+    public ConfiguringInjectionTarget(Map<String, PropertyValue> values, InjectionTarget<T> delegate, AnnotatedType<T> annotatedType, String name) {
         this.delegate = delegate;
         this.name = name;
         for (Map.Entry<String, Conversions.PropertyValue> value : values.entrySet()) {
@@ -70,7 +76,6 @@ public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> 
     @Override
     public void inject(T instance, CreationalContext<T> ctx) {
         delegate.inject(instance, ctx);
-        // if ( log.isTraceEnabled() ) log.trace("initializing new instance of: " + name);
         for (Map.Entry<Method, InitialValue> me : methodInitializers.entrySet()) {
             Method method = me.getKey();
             Object initialValue = me.getValue().getValue(method.getParameterTypes()[0]);
@@ -81,7 +86,6 @@ public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> 
             Object initialValue = me.getValue().getValue(field.getType());
             setFieldValue(instance, field, field.getName(), initialValue);
         }
-        // if ( log.isTraceEnabled() ) log.trace("done initializing: " + name);
     }
 
     @Override
@@ -89,10 +93,8 @@ public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> 
         return delegate;
     }
 
-    private static InitialValue getInitialValue(Conversions.PropertyValue propertyValue, Class<?> parameterClass,
-            Type parameterType) {
-        if (parameterClass.equals(ValueExpression.class) || parameterClass.equals(MethodExpression.class)
-                || propertyValue.isExpression()) {
+    private static InitialValue getInitialValue(Conversions.PropertyValue propertyValue, Class<?> parameterClass, Type parameterType) {
+        if (parameterClass.equals(ValueExpression.class) || parameterClass.equals(MethodExpression.class) || propertyValue.isExpression()) {
             return new ELInitialValue(propertyValue, parameterClass, parameterType);
         } else if (propertyValue.isMultiValued()) {
             if (Set.class.isAssignableFrom(parameterClass)) {
@@ -214,13 +216,11 @@ public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> 
                 try {
                     set = (Set<Object>) collectionClass.newInstance();
                 } catch (IllegalAccessException e) {
-                    throw new IllegalArgumentException("Cannot instantiate a set of type " + collectionClass
-                            + "; try specifying type type in components.xml");
+                    throw new IllegalArgumentException("Cannot instantiate a set of type " + collectionClass + "; try specifying type type in components.xml");
                 } catch (ClassCastException e) {
                     throw new IllegalArgumentException("Cannot cast " + collectionClass + " to java.util.Set");
                 } catch (java.lang.InstantiationException e) {
-                    throw new IllegalArgumentException("Cannot instantiate a set of type " + collectionClass
-                            + "; try specifying type type in components.xml");
+                    throw new IllegalArgumentException("Cannot instantiate a set of type " + collectionClass + "; try specifying type type in components.xml");
                 }
             }
             for (InitialValue iv : initialValues) {
@@ -275,13 +275,11 @@ public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> 
                     try {
                         list = (List<Object>) collectionClass.newInstance();
                     } catch (IllegalAccessException e) {
-                        throw new IllegalArgumentException("Cannot instantiate a list of type " + collectionClass
-                                + "; try specifying type type in components.xml");
+                        throw new IllegalArgumentException("Cannot instantiate a list of type " + collectionClass + "; try specifying type type in components.xml");
                     } catch (ClassCastException e) {
                         throw new IllegalArgumentException("Cannot cast " + collectionClass + " to java.util.List");
                     } catch (java.lang.InstantiationException e) {
-                        throw new IllegalArgumentException("Cannot instantiate a list of type " + collectionClass
-                                + "; try specifying type type in components.xml");
+                        throw new IllegalArgumentException("Cannot instantiate a list of type " + collectionClass + "; try specifying type type in components.xml");
                     }
                 }
                 for (InitialValue iv : initialValues) {
@@ -317,8 +315,7 @@ public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> 
             for (Map.Entry<String, String> me : expressions.entrySet()) {
                 PropertyValue keyValue = new Conversions.FlatPropertyValue(me.getKey());
                 PropertyValue elementValue = new Conversions.FlatPropertyValue(me.getValue());
-                initialValues.put(getInitialValue(keyValue, keyType, keyType),
-                        getInitialValue(elementValue, elementType, elementType));
+                initialValues.put(getInitialValue(keyValue, keyType, keyType), getInitialValue(elementValue, elementType, elementType));
             }
         }
 
@@ -335,13 +332,11 @@ public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> 
                 try {
                     result = (Map<Object, Object>) collectionClass.newInstance();
                 } catch (IllegalAccessException e) {
-                    throw new IllegalArgumentException("Cannot instantiate a map of type " + collectionClass
-                            + "; try specifying type type in components.xml");
+                    throw new IllegalArgumentException("Cannot instantiate a map of type " + collectionClass + "; try specifying type type in components.xml");
                 } catch (ClassCastException e) {
                     throw new IllegalArgumentException("Cannot cast " + collectionClass + " to java.util.Map");
                 } catch (java.lang.InstantiationException e) {
-                    throw new IllegalArgumentException("Cannot instantiate a map of type " + collectionClass
-                            + "; try specifying type type in components.xml");
+                    throw new IllegalArgumentException("Cannot instantiate a map of type " + collectionClass + "; try specifying type type in components.xml");
                 }
             }
 

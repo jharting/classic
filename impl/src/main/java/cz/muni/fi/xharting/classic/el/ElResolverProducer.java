@@ -19,7 +19,7 @@ import org.jboss.solder.el.Resolver;
 import cz.muni.fi.xharting.classic.bijection.OutjectedReferenceElResolver;
 
 /**
- * Modifier version of {@link ElResolverProducer}. This version places plugin resolver into the beginning of the resolver chain.
+ * Modified version of {@link ElResolverProducer}. This version places plugin resolver into the beginning of the resolver chain.
  * 
  * @author Jozef Hartinger
  * 

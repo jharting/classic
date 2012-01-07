@@ -13,7 +13,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-
 import com.google.common.collect.Multimap;
 
 import cz.muni.fi.xharting.classic.bootstrap.scan.Scanner;
@@ -23,6 +22,12 @@ import cz.muni.fi.xharting.classic.metadata.ElObserverMethodDescriptor;
 import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.NamespaceDescriptor;
 
+/**
+ * Provides common operations over a set of component descriptor files.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 public class ConfigurationService {
 
     private static final Pattern CONFIGURATION_FILE_PATTERN = Pattern.compile(".*components.xml");
@@ -125,8 +130,7 @@ public class ConfigurationService {
      * @param discoveredManagedBeanDescriptors managed bean configuration to merge with
      * @return managed bean descriptors with applied configuration changes
      */
-    public Multimap<String, BeanDescriptor> mergeManagedBeanConfiguration(
-            Multimap<String, BeanDescriptor> discoveredManagedBeanDescriptors) {
+    public Multimap<String, BeanDescriptor> mergeManagedBeanConfiguration(Multimap<String, BeanDescriptor> discoveredManagedBeanDescriptors) {
         for (ConfiguredManagedBean configuredBean : getConfiguredManagedBeans()) {
             Collection<BeanDescriptor> descriptors = discoveredManagedBeanDescriptors.get(configuredBean.getName());
             if (configuredBean.getClazz() == null) // the XML element specifies not scope
@@ -137,8 +141,8 @@ public class ConfigurationService {
                     iterator.remove();
                     descriptors.add(reconfigured);
                 } else {
-                    throw new IllegalStateException("Cannot reconfigure bean: " + configuredBean.getName()
-                            + ". Exactly one candidate required but there are: " + descriptors.toString());
+                    throw new IllegalStateException("Cannot reconfigure bean: " + configuredBean.getName() + ". Exactly one candidate required but there are: "
+                            + descriptors.toString());
                 }
             } else {
                 Set<BeanDescriptor> replacements = new HashSet<BeanDescriptor>();

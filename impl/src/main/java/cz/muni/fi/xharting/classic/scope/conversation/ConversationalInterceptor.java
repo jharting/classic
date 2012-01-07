@@ -16,12 +16,19 @@ import org.jboss.seam.annotations.Conversational;
 import cz.muni.fi.xharting.classic.event.EventsImpl;
 import cz.muni.fi.xharting.classic.util.CdiUtils;
 
+/**
+ * Enforces the {@link Conversational} annotation. Components annotated with this annotation may only be called within a
+ * long-running conversation.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 @Interceptor
 @Conversational
 public class ConversationalInterceptor implements Serializable {
 
     private static final long serialVersionUID = 5363536727813095400L;
-    
+
     @Inject
     private Conversation conversation;
     @Inject
@@ -35,7 +42,6 @@ public class ConversationalInterceptor implements Serializable {
             return ctx.proceed();
         }
         event.raiseEvent("org.jboss.seam.noConversation");
-        throw new NoConversationException("no long-running conversation for @Conversational bean: "
-                + ctx.getTarget().toString());
+        throw new NoConversationException("no long-running conversation for @Conversational bean: " + ctx.getTarget().toString());
     }
 }

@@ -34,6 +34,18 @@ import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.MetadataRegistry;
 import cz.muni.fi.xharting.classic.metadata.NamespaceDescriptor;
 
+/**
+ * This extension coordinates the bootstrap of the Classic module.
+ * 
+ * Firstly, the extension initiates scanning during which legacy components are discovered. The result of the scan is made
+ * available to other extension. The {@link ScanningCompleteEvent} is used for this purpose.
+ * 
+ * Based on the scanning result, the extension reads XML descriptors and component definitions, processes conditional
+ * installation and transforms component definitions using {@link ClassicBeanTransformer}.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 public class CoreExtension implements Extension {
 
     private static final Logger log = Logger.getLogger(CoreExtension.class);
@@ -68,12 +80,11 @@ public class CoreExtension implements Extension {
 
         // process XML configuration
         configuration.loadConfiguration(namespaces);
-        Multimap<String, BeanDescriptor> managedBeanDescriptors = configuration
-                .mergeManagedBeanConfiguration(discoveredManagedBeanDescriptors);
+        Multimap<String, BeanDescriptor> managedBeanDescriptors = configuration.mergeManagedBeanConfiguration(discoveredManagedBeanDescriptors);
 
         // process conditional installation
-        ConditionalInstallationService installationService = new ConditionalInstallationService(
-                managedBeanDescriptors.values(), configuration.getFactories(), configuration.getObserverMethods());
+        ConditionalInstallationService installationService = new ConditionalInstallationService(managedBeanDescriptors.values(), configuration.getFactories(),
+                configuration.getObserverMethods());
         installationService.filterInstallableComponents();
         beanTransformer = new ClassicBeanTransformer(installationService, manager);
 
@@ -82,7 +93,7 @@ public class CoreExtension implements Extension {
         for (AnnotatedType<?> annotatedType : beanTransformer.getAdditionalAnnotatedTypes()) {
             Named named = annotatedType.getAnnotation(Named.class);
             if (named != null) // entities overriden by a direct reference bean are the case
-            log.debugv("Registering {0}", named.value());
+                log.debugv("Registering {0}", named.value());
             event.addAnnotatedType(annotatedType);
         }
 
@@ -134,13 +145,15 @@ public class CoreExtension implements Extension {
         }
     }
 
+    /**
+     * {@link InjectionTarget} implementations, which take care of Seam static injection (initial values), are registered.
+     */
     <T> void registerConfiguringInjectionTargets(@Observes ProcessInjectionTarget<T> event) {
         Named named = event.getAnnotatedType().getAnnotation(Named.class);
         if (named != null && configuration.getInitialValueMap().containsKey(named.value())) {
             InjectionTarget<T> delegate = event.getInjectionTarget();
             AnnotatedType<T> annotatedType = event.getAnnotatedType();
-            InjectionTarget<T> replacement = new ConfiguringInjectionTarget<T>(configuration.getInitialValueMap().get(
-                    named.value()), delegate, annotatedType, named.value());
+            InjectionTarget<T> replacement = new ConfiguringInjectionTarget<T>(configuration.getInitialValueMap().get(named.value()), delegate, annotatedType, named.value());
             event.setInjectionTarget(replacement);
         }
     }

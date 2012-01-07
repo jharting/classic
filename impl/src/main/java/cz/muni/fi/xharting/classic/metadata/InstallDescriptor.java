@@ -2,6 +2,12 @@ package cz.muni.fi.xharting.classic.metadata;
 
 import org.jboss.seam.annotations.Install;
 
+/**
+ * Holds information read from the {@link Install} annotation.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 public class InstallDescriptor {
 
     private final boolean installed;

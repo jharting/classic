@@ -11,22 +11,28 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import java.lang.annotation.Target;
 
-@Target({FIELD, PARAMETER})
+/**
+ * A qualifier used to identify a legacy event.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
+@Target({ FIELD, PARAMETER })
 @Qualifier
 @Retention(RUNTIME)
 public @interface EventQualifier {
 
     String name();
-    
+
     TransactionPhase transactionPhase();
-    
+
     @SuppressWarnings("all")
     public static class EventQualifierLiteral extends AnnotationLiteral<EventQualifier> implements EventQualifier {
 
         private static final long serialVersionUID = -3511232440719418509L;
         private String name;
         private TransactionPhase transactionPhase;
-        
+
         public EventQualifierLiteral(String name, TransactionPhase transactionPhase) {
             this.name = name;
             this.transactionPhase = transactionPhase;
@@ -39,6 +45,5 @@ public @interface EventQualifier {
         public TransactionPhase transactionPhase() {
             return transactionPhase;
         }
-
     }
 }

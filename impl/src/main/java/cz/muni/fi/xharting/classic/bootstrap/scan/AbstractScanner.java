@@ -18,8 +18,7 @@ public abstract class AbstractScanner implements Scanner {
 
     private static final Logger log = Logger.getLogger(AbstractScanner.class);
 
-    private static final String[] SEAM_ARCHIVE_MARKERS = { "seam.properties", "META-INF/seam.properties",
-            "META-INF/components.xml" };
+    private static final String[] SEAM_ARCHIVE_MARKERS = { "seam.properties", "META-INF/seam.properties", "META-INF/components.xml" };
     private static final String[] SEAM_ARCHIVE_BLACKLIST = { "org/jboss/integration/ext-content/main/bundled/jboss-seam-int.jar" };
 
     protected String[] getSeamArchiveMarkers() {

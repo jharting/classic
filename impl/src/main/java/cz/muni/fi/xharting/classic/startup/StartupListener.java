@@ -14,11 +14,20 @@ import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
+import org.jboss.seam.annotations.Startup;
+
 import cz.muni.fi.xharting.classic.metadata.BeanDescriptor;
 import cz.muni.fi.xharting.classic.metadata.MetadataRegistry;
 import cz.muni.fi.xharting.classic.metadata.RoleDescriptor;
 import cz.muni.fi.xharting.classic.util.CdiUtils;
 
+/**
+ * Listens to the activation of the application and session scopes and eagerly instantiates components marked with
+ * {@link Startup}.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 @WebListener
 public class StartupListener implements ServletContextListener, HttpSessionListener {
 

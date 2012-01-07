@@ -8,7 +8,7 @@ import java.util.Set;
 import javax.enterprise.inject.spi.BeanManager;
 
 /**
- * Various annotation utilities
+ * Various annotation-related utilities
  * 
  * @author Jozef Hartinger
  * 

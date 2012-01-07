@@ -13,6 +13,12 @@ import cz.muni.fi.xharting.classic.scope.stateless.StatelessScoped;
 import cz.muni.fi.xharting.classic.util.CdiUtils;
 import cz.muni.fi.xharting.classic.util.CdiUtils.ManagedBeanInstance;
 
+/**
+ * Represents a Seam 2 factory method with void return type. Special handling is necessary.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 public class LegacyVoidFactory extends LegacyFactory {
 
     private final OutjectionPointDescriptor field;
@@ -32,8 +38,7 @@ public class LegacyVoidFactory extends LegacyFactory {
                 return field;
             }
         }
-        throw new IllegalArgumentException("Void factory method " + factory.getMethod()
-                + " must have a matching outjected field named " + factory.getName());
+        throw new IllegalArgumentException("Void factory method " + factory.getMethod() + " must have a matching outjected field named " + factory.getName());
     }
 
     @Override

@@ -11,6 +11,12 @@ import javax.inject.Inject;
 import cz.muni.fi.xharting.classic.scope.ScopeExtension;
 import cz.muni.fi.xharting.classic.util.CdiUtils;
 
+/**
+ * Exposes high-level operations for manipulating rewritable contexts.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 @ApplicationScoped
 public class RewritableContextManager {
 
@@ -60,8 +66,7 @@ public class RewritableContextManager {
         Instance<OutjectedReferenceHolder> instance = this.instance.select(OutjectedReferenceHolder.class,
                 OutjectedReferenceHolder.ScopeQualifier.ScopeQualifierLiteral.valueOf(scope));
         if (instance.isAmbiguous() || instance.isUnsatisfied()) {
-            throw new IllegalArgumentException("Unable to lookup " + OutjectedReferenceHolder.class.getName() + " for scope "
-                    + scope);
+            throw new IllegalArgumentException("Unable to lookup " + OutjectedReferenceHolder.class.getName() + " for scope " + scope);
         }
         return instance.get();
     }

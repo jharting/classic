@@ -6,6 +6,12 @@ import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.In;
 import org.jboss.solder.reflection.Reflections;
 
+/**
+ * Represents a field annotated with the {@link In} annotation.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 public class InjectionPointDescriptor extends AbstractManagedFieldDescriptor {
 
     private final boolean create;
@@ -16,12 +22,10 @@ public class InjectionPointDescriptor extends AbstractManagedFieldDescriptor {
     }
 
     public InjectionPointDescriptor(InjectionPointDescriptor original, BeanDescriptor bean) {
-        this(original.getSpecifiedName(), original.isRequired(), original.getSpecifiedScope(), original.getField(), bean,
-                original.isCreate());
+        this(original.getSpecifiedName(), original.isRequired(), original.getSpecifiedScope(), original.getField(), bean, original.isCreate());
     }
 
-    public InjectionPointDescriptor(String name, boolean required, ScopeType specifiedScope, Field field,
-            BeanDescriptor bean, boolean create) {
+    public InjectionPointDescriptor(String name, boolean required, ScopeType specifiedScope, Field field, BeanDescriptor bean, boolean create) {
         super(name, required, specifiedScope, field, bean);
         this.create = create;
     }

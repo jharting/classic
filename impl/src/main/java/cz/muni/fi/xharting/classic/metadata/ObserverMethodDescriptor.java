@@ -4,6 +4,12 @@ import java.lang.reflect.Method;
 
 import org.jboss.solder.reflection.Reflections;
 
+/**
+ * Represents a legacy observer method defined on a Seam component.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 public class ObserverMethodDescriptor extends AbstractObserverMethodDescriptor {
 
     private final BeanDescriptor bean;
@@ -17,9 +23,8 @@ public class ObserverMethodDescriptor extends AbstractObserverMethodDescriptor {
         this.autoCreate = autoCreate;
         Reflections.setAccessible(method);
     }
-    
-    public ObserverMethodDescriptor(ObserverMethodDescriptor original, BeanDescriptor bean)
-    {
+
+    public ObserverMethodDescriptor(ObserverMethodDescriptor original, BeanDescriptor bean) {
         this(original.getType(), bean, original.getMethod(), original.isAutoCreate());
     }
 

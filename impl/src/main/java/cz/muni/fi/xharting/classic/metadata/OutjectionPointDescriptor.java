@@ -12,10 +12,15 @@ import org.jboss.solder.reflection.Reflections;
 
 import cz.muni.fi.xharting.classic.util.Seam2Utils;
 
+/**
+ * Represents a field annotated with the {@link Out} annotation.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 public class OutjectionPointDescriptor extends AbstractManagedFieldDescriptor {
 
-    public OutjectionPointDescriptor(String specifiedName, boolean required, ScopeType specifiedScope, Field field,
-            BeanDescriptor bean) {
+    public OutjectionPointDescriptor(String specifiedName, boolean required, ScopeType specifiedScope, Field field, BeanDescriptor bean) {
         super(specifiedName, required, specifiedScope, field, bean);
         if (specifiedScope == ScopeType.STATELESS) {
             throw new IllegalArgumentException("cannot specify explicit scope=STATELESS on @Out: " + getPath());
@@ -27,8 +32,7 @@ public class OutjectionPointDescriptor extends AbstractManagedFieldDescriptor {
     }
 
     public OutjectionPointDescriptor(OutjectionPointDescriptor descriptor, BeanDescriptor bean) {
-        this(descriptor.getSpecifiedName(), descriptor.isRequired(), descriptor.getSpecifiedScope(), descriptor.getField(),
-                bean);
+        this(descriptor.getSpecifiedName(), descriptor.isRequired(), descriptor.getSpecifiedScope(), descriptor.getField(), bean);
     }
 
     public Object get(Object target) {

@@ -9,6 +9,12 @@ import javax.inject.Named;
 import org.jboss.seam.async.Schedule;
 import org.jboss.seam.core.Events;
 
+/**
+ * Implementation of the legacy {@link Events} API.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 @Named("org.jboss.seam.core.events")
 @ApplicationScoped
 public class EventsImpl extends Events {
@@ -25,8 +31,7 @@ public class EventsImpl extends Events {
      * @param parameters parameters to be passes to the listener method
      */
     public void raiseEvent(String type, Object... parameters) {
-        event.select(new EventQualifier.EventQualifierLiteral(type, TransactionPhase.IN_PROGRESS)).fire(
-                new EventPayload(type, parameters));
+        event.select(new EventQualifier.EventQualifierLiteral(type, TransactionPhase.IN_PROGRESS)).fire(new EventPayload(type, parameters));
     }
 
     @Override
@@ -46,14 +51,12 @@ public class EventsImpl extends Events {
 
     @Override
     public void raiseTransactionSuccessEvent(String type, Object... parameters) {
-        event.select(new EventQualifier.EventQualifierLiteral(type, TransactionPhase.AFTER_SUCCESS)).fire(
-                new EventPayload(type, parameters));
+        event.select(new EventQualifier.EventQualifierLiteral(type, TransactionPhase.AFTER_SUCCESS)).fire(new EventPayload(type, parameters));
     }
 
     @Override
     public void raiseTransactionCompletionEvent(String type, Object... parameters) {
-        event.select(new EventQualifier.EventQualifierLiteral(type, TransactionPhase.AFTER_COMPLETION)).fire(
-                new EventPayload(type, parameters));
+        event.select(new EventQualifier.EventQualifierLiteral(type, TransactionPhase.AFTER_COMPLETION)).fire(new EventPayload(type, parameters));
     }
 
 }

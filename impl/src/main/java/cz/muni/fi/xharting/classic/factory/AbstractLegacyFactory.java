@@ -13,6 +13,13 @@ import javax.enterprise.inject.spi.InjectionPoint;
 
 import org.jboss.solder.literal.NamedLiteral;
 
+/**
+ * Common operations for a legacy factory.
+ * 
+ * @author Jozef Hartinger
+ * 
+ * @param <T>
+ */
 public abstract class AbstractLegacyFactory<T> implements Bean<T> {
 
     private final String name;
@@ -31,7 +38,7 @@ public abstract class AbstractLegacyFactory<T> implements Bean<T> {
             this.types.add(type);
         }
     }
-    
+
     protected void addTypes(Set<Type> types) {
         this.types.addAll(types);
     }
@@ -75,7 +82,7 @@ public abstract class AbstractLegacyFactory<T> implements Bean<T> {
     public Set<InjectionPoint> getInjectionPoints() {
         return Collections.emptySet();
     }
-    
+
     @Override
     public void destroy(T instance, CreationalContext<T> creationalContext) {
         creationalContext.release();

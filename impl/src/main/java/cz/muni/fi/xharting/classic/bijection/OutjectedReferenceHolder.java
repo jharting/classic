@@ -17,11 +17,21 @@ import javax.inject.Qualifier;
 
 import org.jboss.solder.core.Veto;
 
+/**
+ * An implementation of a rewritable context used for emulation of push/pull context model used in Seam. This component
+ * represents an inner rewritable object store. Every time a component attempts to modify the content of a context, this change
+ * is reflected within the rewritable context. Likewise, when a component instance is requested, the rewritable context is
+ * checked first. If the requested component instance is found in the rewritable context, it is served from there. Otherwise,
+ * the request is delegated to the CDI context. The rewritable context internally uses a threadsafe map structure.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 @Veto
 public class OutjectedReferenceHolder implements Serializable {
 
     private static final long serialVersionUID = -3467806759929526350L;
-    
+
     private Map<String, Object> values = new ConcurrentHashMap<String, Object>();
 
     public Object get(String name) {
@@ -39,7 +49,14 @@ public class OutjectedReferenceHolder implements Serializable {
     public boolean contains(String name) {
         return values.containsKey(name);
     }
-    
+
+    /**
+     * A qualifier used to distinguish between different instances of {@link OutjectedReferenceHolder} placed in different
+     * context.
+     * 
+     * @author Jozef Hartinger
+     * 
+     */
     @Qualifier
     @Target({ TYPE })
     @Retention(RUNTIME)

@@ -8,6 +8,12 @@ import javax.el.ELResolver;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
+/**
+ * An implementation of {@link ELResolver} which considers {@link OutjectedReferenceHolder} instances in the resolution process.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 public class OutjectedReferenceElResolver extends ELResolver {
 
     private ELResolver delegate;
@@ -24,24 +30,21 @@ public class OutjectedReferenceElResolver extends ELResolver {
         if (base == null && p instanceof String) {
             String property = (String) p;
             Object result = getValue(property);
-            
+
             // let's delegate to BM's ELResolver
-            if (result == null)
-            {
+            if (result == null) {
                 result = delegate.getValue(context, base, p);
             }
-            
-            if (result != null)
-            {
+
+            if (result != null) {
                 context.setPropertyResolved(true);
             }
             return result;
         }
         return null;
     }
-    
-    private Object getValue(String property)
-    {
+
+    private Object getValue(String property) {
         return rewritableContextManager.get(property);
     }
 

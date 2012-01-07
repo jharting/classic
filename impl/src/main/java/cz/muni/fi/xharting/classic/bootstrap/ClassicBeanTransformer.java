@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.enterprise.context.ConversationScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.TransactionPhase;
 import javax.enterprise.inject.spi.AnnotatedType;
@@ -62,12 +61,18 @@ import cz.muni.fi.xharting.classic.util.reference.DirectReferenceFactory;
 /**
  * This class is responsible for transforming metadata gathered during the scanning phase to CDI SPI objects.
  * 
+ * The annotated types representing class components are modified directly.
+ * 
+ * {@link Bean} instances are created for factory methods, unwrapping methods and JPA entities.
+ * 
+ * {@link ObserverMethod} instances are created for observer methods.
+ * 
  * @author Jozef Hartinger
  * 
  */
 public class ClassicBeanTransformer {
 
-    // a special handling is required - this a specific qualifier
+    // a special handling is required for entities using direct reference holder - this a specific qualifier
     private static final String NAMESPACE = "cz.muni.fi.xharting.classic";
     private static final Synthetic.Provider syntheticProvider = new Synthetic.Provider(NAMESPACE);
 
@@ -245,8 +250,7 @@ public class ClassicBeanTransformer {
         builder.addToClass(BijectionInterceptor.Bijected.BijectedLiteral.INSTANCE);
         // session, conversation and page scoped components are synchronized automatically
         Class<? extends Annotation> scope = role.getCdiScope();
-        if (!descriptor.getJavaClass().isAnnotationPresent(Synchronized.class) && SessionScoped.class.equals(scope) || PageScoped.class.equals(scope)
-                || ConversationScoped.class.equals(scope)) {
+        if (!descriptor.getJavaClass().isAnnotationPresent(Synchronized.class) && SessionScoped.class.equals(scope) || PageScoped.class.equals(scope)) {
             builder.addToClass(SynchronizedLiteral.DEFAULT_INSTANCE);
         }
     }

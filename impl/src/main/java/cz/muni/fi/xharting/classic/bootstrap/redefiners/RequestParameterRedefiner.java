@@ -8,6 +8,12 @@ import org.jboss.solder.reflection.annotated.RedefinitionContext;
 
 import cz.muni.fi.xharting.classic.util.literal.RequestParamLiteral;
 
+/**
+ * Provides trivial syntactic transformation of {@link RequestParameter} to its counterpart in Solder.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 public class RequestParameterRedefiner implements AnnotationRedefiner<RequestParameter> {
 
     @Override
@@ -15,10 +21,9 @@ public class RequestParameterRedefiner implements AnnotationRedefiner<RequestPar
         AnnotationBuilder builder = ctx.getAnnotationBuilder();
         RequestParameter requestParameter = builder.getAnnotation(RequestParameter.class);
         RequestParamLiteral replacement = new RequestParamLiteral(requestParameter.value());
-        
+
         builder.remove(RequestParameter.class);
         builder.add(replacement);
         builder.add(InjectLiteral.INSTANCE);
     }
-
 }

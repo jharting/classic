@@ -9,6 +9,12 @@ import org.jboss.solder.el.Expressions;
 import cz.muni.fi.xharting.classic.metadata.ElFactoryDescriptor;
 import cz.muni.fi.xharting.classic.util.CdiUtils;
 
+/**
+ * Represents a factory method configured in the component descriptor file.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 public class LegacyElFactory extends AbstractLegacyFactory<Object> {
 
     private String expression;

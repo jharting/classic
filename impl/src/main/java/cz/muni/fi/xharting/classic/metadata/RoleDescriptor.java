@@ -12,6 +12,12 @@ import org.jboss.seam.ScopeType;
 import cz.muni.fi.xharting.classic.metadata.BeanDescriptor.BeanType;
 import cz.muni.fi.xharting.classic.util.Seam2Utils;
 
+/**
+ * Seam role - a combination of a name and scope.
+ * 
+ * @author Jozef Hartinger
+ * 
+ */
 public class RoleDescriptor {
 
     private String name;
