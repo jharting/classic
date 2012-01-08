@@ -28,11 +28,6 @@
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
-<!--             <dependency> -->
-<!--                 <groupId>org.jboss.solder</groupId> -->
-<!--                 <artifactId>solder-api</artifactId> -->
-<!--                 <version>${solder.version}</version> -->
-<!--             </dependency> -->
             <dependency>
                 <groupId>org.jboss.solder</groupId>
                 <artifactId>solder-impl</artifactId>
