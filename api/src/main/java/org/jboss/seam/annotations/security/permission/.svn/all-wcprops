@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/permission
+END
+PermissionTarget.java
+K 25
+svn:wc:ra_dav:version-url
+V 132
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/permission/PermissionTarget.java
+END
+Permission.java
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/permission/Permission.java
+END
+PermissionDiscriminator.java
+K 25
+svn:wc:ra_dav:version-url
+V 139
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/permission/PermissionDiscriminator.java
+END
+PermissionUser.java
+K 25
+svn:wc:ra_dav:version-url
+V 130
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/permission/PermissionUser.java
+END
+Identifier.java
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/permission/Identifier.java
+END
+PermissionAction.java
+K 25
+svn:wc:ra_dav:version-url
+V 132
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/permission/PermissionAction.java
+END
+PermissionRole.java
+K 25
+svn:wc:ra_dav:version-url
+V 130
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/permission/PermissionRole.java
+END
+Permissions.java
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/permission/Permissions.java
+END

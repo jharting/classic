@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security
+END
+TokenUsername.java
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/TokenUsername.java
+END
+Admin.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/Admin.java
+END
+Restrict.java
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/Restrict.java
+END
+Delete.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/Delete.java
+END
+Update.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/Update.java
+END
+Insert.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/Insert.java
+END
+PermissionCheck.java
+K 25
+svn:wc:ra_dav:version-url
+V 120
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/PermissionCheck.java
+END
+TokenValue.java
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/TokenValue.java
+END
+Read.java
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/Read.java
+END
+package-info.java
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/package-info.java
+END
+RoleCheck.java
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/RoleCheck.java
+END

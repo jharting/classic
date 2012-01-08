@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/bpm
+END
+EndTask.java
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/bpm/EndTask.java
+END
+BeginTask.java
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/bpm/BeginTask.java
+END
+StartTask.java
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/bpm/StartTask.java
+END
+package-info.java
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/bpm/package-info.java
+END
+Transition.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/bpm/Transition.java
+END
+CreateProcess.java
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/bpm/CreateProcess.java
+END
+ResumeProcess.java
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/bpm/ResumeProcess.java
+END

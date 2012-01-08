@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/management
+END
+RoleConditional.java
+K 25
+svn:wc:ra_dav:version-url
+V 131
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/management/RoleConditional.java
+END
+UserFirstName.java
+K 25
+svn:wc:ra_dav:version-url
+V 129
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/management/UserFirstName.java
+END
+UserLastName.java
+K 25
+svn:wc:ra_dav:version-url
+V 128
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/management/UserLastName.java
+END
+RoleGroups.java
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/management/RoleGroups.java
+END
+UserPassword.java
+K 25
+svn:wc:ra_dav:version-url
+V 128
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/management/UserPassword.java
+END
+UserEnabled.java
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/management/UserEnabled.java
+END
+UserPrincipal.java
+K 25
+svn:wc:ra_dav:version-url
+V 129
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/management/UserPrincipal.java
+END
+UserRoles.java
+K 25
+svn:wc:ra_dav:version-url
+V 125
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/management/UserRoles.java
+END
+RoleName.java
+K 25
+svn:wc:ra_dav:version-url
+V 124
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/management/RoleName.java
+END
+PasswordSalt.java
+K 25
+svn:wc:ra_dav:version-url
+V 128
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/security/management/PasswordSalt.java
+END

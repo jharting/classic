@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/async
+END
+Expiration.java
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/async/Expiration.java
+END
+IntervalDuration.java
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/async/IntervalDuration.java
+END
+Asynchronous.java
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/async/Asynchronous.java
+END
+package-info.java
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/async/package-info.java
+END
+FinalExpiration.java
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/async/FinalExpiration.java
+END
+Duration.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/async/Duration.java
+END
+IntervalCron.java
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/repos/seam/!svn/ver/11084/branches/community/Seam_2_2/src/main/org/jboss/seam/annotations/async/IntervalCron.java
+END
