@@ -56,6 +56,6 @@
     </dependencies>
 
     <build>
-        <finalName>classic-registration</finalName>
+        <finalName>classic-registration-war</finalName>
     </build>
 </project>
