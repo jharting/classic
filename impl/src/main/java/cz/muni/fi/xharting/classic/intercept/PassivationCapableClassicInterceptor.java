@@ -20,4 +20,8 @@ public class PassivationCapableClassicInterceptor<T> extends ClassicInterceptor<
         return getBeanClass().getName();
     }
 
+    @Override
+    public String toString() {
+        return "Passivation" + super.toString();
+    }
 }

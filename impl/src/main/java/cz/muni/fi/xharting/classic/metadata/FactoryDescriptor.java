@@ -69,4 +69,9 @@ public class FactoryDescriptor extends AbstractFactoryDescriptor {
     public boolean isVoid() {
         return void.class.equals(productType);
     }
+
+    @Override
+    public String toString() {
+        return "FactoryDescriptor [method=" + method + "]";
+    }
 }

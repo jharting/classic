@@ -1,5 +1,7 @@
 package cz.muni.fi.xharting.classic.config;
 
+import java.util.Arrays;
+
 import org.jboss.seam.ScopeType;
 
 /**
@@ -67,5 +69,11 @@ public class ConfiguredManagedBean {
 
     public Boolean getAutoCreate() {
         return autoCreate;
+    }
+
+    @Override
+    public String toString() {
+        return "ConfiguredManagedBean [name=" + name + ", installed=" + installed + ", scope=" + scope + ", startup=" + startup + ", startupDependends="
+                + Arrays.toString(startupDependends) + ", clazz=" + clazz + ", jndiName=" + jndiName + ", precedence=" + precedence + ", autoCreate=" + autoCreate + "]";
     }
 }

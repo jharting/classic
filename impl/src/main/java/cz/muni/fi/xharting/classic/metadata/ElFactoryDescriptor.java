@@ -29,4 +29,9 @@ public class ElFactoryDescriptor extends AbstractFactoryDescriptor {
     public boolean isValueExpression() {
         return valueExpression;
     }
+
+    @Override
+    public String toString() {
+        return "ElFactoryDescriptor mapping " + getName() + " to expression " + expression;
+    }
 }

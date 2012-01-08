@@ -23,8 +23,7 @@ public class LegacyObserverMethod extends AbstractLegacyObserverMethod {
     private Class<?> hostType;
     private Method method;
 
-    public LegacyObserverMethod(String hostName, ObserverMethodDescriptor descriptor, TransactionPhase transactionPhase,
-            BeanManager manager) {
+    public LegacyObserverMethod(String hostName, ObserverMethodDescriptor descriptor, TransactionPhase transactionPhase, BeanManager manager) {
         super(descriptor.getType(), transactionPhase, descriptor.isAutoCreate(), manager);
         this.hostName = hostName;
         this.hostType = descriptor.getBean().getJavaClass();
@@ -55,5 +54,10 @@ public class LegacyObserverMethod extends AbstractLegacyObserverMethod {
     @Override
     public Class<?> getBeanClass() {
         return hostType;
+    }
+
+    @Override
+    public String toString() {
+        return "LegacyObserverMethod [method=" + method + "]";
     }
 }

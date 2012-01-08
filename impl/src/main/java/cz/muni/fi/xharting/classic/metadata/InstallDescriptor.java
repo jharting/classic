@@ -1,5 +1,7 @@
 package cz.muni.fi.xharting.classic.metadata;
 
+import java.util.Arrays;
+
 import org.jboss.seam.annotations.Install;
 
 /**
@@ -64,4 +66,11 @@ public class InstallDescriptor {
     public int getPrecedence() {
         return precedence;
     }
+
+    @Override
+    public String toString() {
+        return "InstallDescriptor [installed=" + installed + ", dependencies=" + Arrays.toString(dependencies) + ", genericDependencies=" + Arrays.toString(genericDependencies)
+                + ", classDependencies=" + Arrays.toString(classDependencies) + ", precedence=" + precedence + "]";
+    }
+
 }

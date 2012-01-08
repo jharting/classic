@@ -67,4 +67,8 @@ public class LegacyVoidFactory extends LegacyFactory {
         return context;
     }
 
+    @Override
+    public String toString() {
+        return "LegacyVoidFactory [getMethod()=" + getMethod() + ", getName()=" + getName() + "]";
+    }
 }

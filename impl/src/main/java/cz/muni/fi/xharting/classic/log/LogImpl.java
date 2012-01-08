@@ -127,4 +127,9 @@ public class LogImpl implements Log, Serializable {
         }
         return object.toString();
     }
+
+    @Override
+    public String toString() {
+        return "LogImpl [delegate=" + delegate + "]";
+    }
 }

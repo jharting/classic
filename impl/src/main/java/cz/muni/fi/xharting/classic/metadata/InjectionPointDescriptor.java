@@ -37,4 +37,9 @@ public class InjectionPointDescriptor extends AbstractManagedFieldDescriptor {
     public void set(Object target, Object value) {
         Reflections.setFieldValue(false, getField(), target, value);
     }
+
+    @Override
+    public String toString() {
+        return "InjectionPointDescriptor [getField()=" + getField() + "]";
+    }
 }

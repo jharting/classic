@@ -39,4 +39,9 @@ public class ObserverMethodDescriptor extends AbstractObserverMethodDescriptor {
     public boolean isAutoCreate() {
         return autoCreate;
     }
+
+    @Override
+    public String toString() {
+        return "ObserverMethodDescriptor [method=" + method + "]";
+    }
 }

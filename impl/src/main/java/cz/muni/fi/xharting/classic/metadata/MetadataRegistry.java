@@ -137,4 +137,29 @@ public class MetadataRegistry {
     public Collection<RoleDescriptor> getStartupBeans(Class<? extends Annotation> scope) {
         return startupBeans.get(scope);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("MetadataRegistry");
+        builder.append("\n");
+        builder.append("managedBeanDescriptors=");
+        builder.append(managedBeanDescriptors);
+        builder.append("\n");
+        builder.append("factoryDescriptors=");
+        builder.append(factoryDescriptors);
+        builder.append("\n");
+        builder.append("observerMethods=");
+        builder.append(observerMethods);
+        builder.append("\n");
+        builder.append("managedInstancesByClass=");
+        builder.append(managedInstancesByClass);
+        builder.append("\n");
+        builder.append("managedInstancesByName=");
+        builder.append(managedInstancesByName);
+        builder.append("\n");
+        builder.append("startupBeans=");
+        builder.append(startupBeans);
+        return builder.toString();
+    }
 }

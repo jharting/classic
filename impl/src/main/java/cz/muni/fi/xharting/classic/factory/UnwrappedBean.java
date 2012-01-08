@@ -49,4 +49,10 @@ public class UnwrappedBean extends AbstractLegacyFactory<Object> {
     public Class<?> getBeanClass() {
         return hostType;
     }
+
+    @Override
+    public String toString() {
+        return "UnwrappedBean [method=" + method + ", getName()=" + getName() + "]";
+    }
+
 }

@@ -90,4 +90,9 @@ public class OutjectedReferenceHolder implements Serializable {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return "Rewritable context [values=" + values + "]";
+    }
 }

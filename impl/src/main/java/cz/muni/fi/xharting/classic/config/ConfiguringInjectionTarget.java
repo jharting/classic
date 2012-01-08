@@ -371,4 +371,10 @@ public class ConfiguringInjectionTarget<T> extends ForwardingInjectionTarget<T> 
     private String getAttributeMessage(String attributeName) {
         return name + '.' + attributeName;
     }
+
+    @Override
+    public String toString() {
+        return "ConfiguringInjectionTarget for name=" + name + " [fieldInitializers=" + fieldInitializers + ", methodInitializers=" + methodInitializers + "]";
+    }
+
 }

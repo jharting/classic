@@ -53,4 +53,9 @@ public class OutjectionPointDescriptor extends AbstractManagedFieldDescriptor {
         }
         return Seam2Utils.transformExplicitLegacyScopeToCdiScope(getSpecifiedScope());
     }
+
+    @Override
+    public String toString() {
+        return "OutjectionPointDescriptor [getField()=" + getField() + "]";
+    }
 }

@@ -1,6 +1,7 @@
 package cz.muni.fi.xharting.classic.event;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Represents the payload of Seam 2 event. {@link #parameters} are passed as method parameters to the receiving method.
@@ -29,5 +30,10 @@ public class EventPayload implements Serializable {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String toString() {
+        return "EventPayload [name=" + name + ", parameters=" + Arrays.toString(parameters) + "]";
     }
 }

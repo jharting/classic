@@ -42,4 +42,9 @@ public class LegacyElFactory extends AbstractLegacyFactory<Object> {
     public Class<?> getBeanClass() {
         return Object.class;
     }
+
+    @Override
+    public String toString() {
+        return "LegacyElFactory mapping " + getName() + " to " + expression;
+    }
 }

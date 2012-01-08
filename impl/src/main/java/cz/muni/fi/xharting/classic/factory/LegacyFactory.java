@@ -59,4 +59,9 @@ public class LegacyFactory extends AbstractLegacyFactory<Object> {
     public Method getMethod() {
         return method;
     }
+
+    @Override
+    public String toString() {
+        return "LegacyFactory [getMethod()=" + getMethod() + ", getScope()=" + getScope() + ", getName()=" + getName() + "]";
+    }
 }

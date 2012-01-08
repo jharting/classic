@@ -287,4 +287,29 @@ public class ClassicBeanTransformer {
     public Set<Bean<?>> getEntityHolders() {
         return entityHolders;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("ClassicBeanTransformer");
+        builder.append("\n");
+        builder.append("modifiedAnnotatedTypes=");
+        builder.append(modifiedAnnotatedTypes);
+        builder.append("\n");
+        builder.append("additionalAnnotatedTypes=");
+        builder.append(additionalAnnotatedTypes);
+        builder.append("\n");
+        builder.append("observerMethodsToRegister=");
+        builder.append(observerMethodsToRegister);
+        builder.append("\n");
+        builder.append("factoryMethodsToRegister=");
+        builder.append(factoryMethodsToRegister);
+        builder.append("\n");
+        builder.append("unwrappedBeansToRegister=");
+        builder.append(unwrappedBeansToRegister);
+        builder.append("\n");
+        builder.append("entityHolders=");
+        builder.append(entityHolders);
+        return builder.toString();
+    }
 }

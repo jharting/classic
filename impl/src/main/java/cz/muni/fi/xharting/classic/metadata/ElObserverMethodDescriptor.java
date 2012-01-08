@@ -18,4 +18,10 @@ public class ElObserverMethodDescriptor extends AbstractObserverMethodDescriptor
     public String getMethodExpression() {
         return methodExpression;
     }
+
+    @Override
+    public String toString() {
+        return "ElObserverMethodDescriptor mapping " + getType() + " to " + methodExpression;
+    }
+
 }

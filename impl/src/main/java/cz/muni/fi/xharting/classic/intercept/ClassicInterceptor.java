@@ -119,4 +119,9 @@ public class ClassicInterceptor<T> extends AbstractInterceptor<T> {
     public void destroy(T instance, CreationalContext<T> creationalContext) {
         creationalContext.release();
     }
+
+    @Override
+    public String toString() {
+        return "ClassicInterceptor [getBeanClass()=" + getBeanClass() + "]";
+    }
 }

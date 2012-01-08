@@ -167,4 +167,8 @@ public class ConfigurationService {
         return discoveredManagedBeanDescriptors;
     }
 
+    @Override
+    public String toString() {
+        return "ConfigurationService [configurationFiles=" + configurationFiles.size() + ", replacements=" + replacements + "]";
+    }
 }
