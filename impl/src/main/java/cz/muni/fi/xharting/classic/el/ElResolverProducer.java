@@ -16,7 +16,7 @@ import org.jboss.solder.el.Composite;
 import org.jboss.solder.el.ELResolverProducer;
 import org.jboss.solder.el.Resolver;
 
-import cz.muni.fi.xharting.classic.bijection.OutjectedReferenceElResolver;
+import cz.muni.fi.xharting.classic.bijection.RewritableContextAwareElResolver;
 
 /**
  * Modified version of {@link ElResolverProducer}. This version places plugin resolver into the beginning of the resolver chain.
@@ -31,7 +31,7 @@ public class ElResolverProducer extends ELResolverProducer {
     @Composite
     @ApplicationScoped
 //    @Alternative
-    public ELResolver getELResolver(@Resolver Instance<ELResolver> resolvers, BeanManager beanManager, OutjectedReferenceElResolver classicResolver) {
+    public ELResolver getELResolver(@Resolver Instance<ELResolver> resolvers, BeanManager beanManager, RewritableContextAwareElResolver classicResolver) {
         // Create the default el resolvers
         CompositeELResolver compositeResolver = new CompositeELResolver();
 

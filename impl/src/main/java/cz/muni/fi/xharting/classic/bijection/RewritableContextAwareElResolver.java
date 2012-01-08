@@ -14,14 +14,14 @@ import javax.inject.Inject;
  * @author Jozef Hartinger
  * 
  */
-public class OutjectedReferenceElResolver extends ELResolver {
+public class RewritableContextAwareElResolver extends ELResolver {
 
     private ELResolver delegate;
     @Inject
     private RewritableContextManager rewritableContextManager;
 
     @Inject
-    public OutjectedReferenceElResolver(BeanManager manager) {
+    public RewritableContextAwareElResolver(BeanManager manager) {
         this.delegate = manager.getELResolver();
     }
 

@@ -5,11 +5,8 @@
     <interceptors>
         <class>cz.muni.fi.xharting.classic.synchronization.SynchronizationInterceptor</class>
         <class>cz.muni.fi.xharting.classic.scope.conversation.ConversationalInterceptor</class>
+        <class>cz.muni.fi.xharting.classic.scope.conversation.ConversationBoundaryInterceptor</class>
         <class>cz.muni.fi.xharting.classic.bijection.BijectionInterceptor</class>
         <class>cz.muni.fi.xharting.classic.event.RaiseEventInterceptor</class>
     </interceptors>
-    
-<!--     <alternatives> -->
-<!--         <class>cz.muni.fi.xharting.classic.el.ElResolverProducer</class> -->
-<!--     </alternatives> -->
 </beans>
